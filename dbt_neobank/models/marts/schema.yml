@@ -31,7 +31,7 @@ models:
       - name: experiment_name
         tests: [not_null, unique]
   - name: fct_experiment_user_metrics
-    description: User-level experiment metrics, secondary metrics, and guardrails.
+    description: User-level experiment metrics, CUPED covariates, secondary metrics, and guardrails.
     columns:
       - name: user_id
         tests: [not_null, unique]
@@ -40,6 +40,9 @@ models:
           - accepted_values:
               arguments:
                 values: [control, treatment]
+      - name: d7_activation_probability_control
+        description: Pre-treatment signup-metadata activation propensity used for CUPED.
+        tests: [not_null]
   - name: fct_user_clv_proxy
     description: User-level 12-month CLV proxy for business thresholding.
     columns:
