@@ -120,7 +120,7 @@ def render_model_card(run: ActivationModelRun) -> str:
     )
     return f"""# Model Card: Activation Decisioning
 
-## TL;DR
+## Executive Summary
 
 {run.recommendation}
 

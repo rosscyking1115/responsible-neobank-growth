@@ -158,7 +158,7 @@ def render_markdown(run: ReferralIncrementalityRun) -> str:
     )
     return f"""# Decision Memo: Referral Incrementality Geo Experiment
 
-## TL;DR
+## Executive Summary
 
 {run.recommendation}
 
