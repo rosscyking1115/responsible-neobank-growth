@@ -1,8 +1,10 @@
 from pathlib import Path
 
 import duckdb
+import pytest
 
 from app.dashboard_data import (
+    ensure_demo_database,
     load_dashboard_data,
     onboarding_lift_pp,
     read_decision_memos,
@@ -156,6 +158,49 @@ def test_load_dashboard_data_summarises_marts(tmp_path: Path) -> None:
     assert data.activation_by_region.loc[0, "region"] == "London"
     assert data.retention_curve["weeks_since_signup"].tolist() == [1]
     assert onboarding_lift_pp(data.experiment_variants) == 50.0
+
+
+def test_ensure_demo_database_returns_existing_database(tmp_path: Path) -> None:
+    db_path = tmp_path / "existing.duckdb"
+    db_path.touch()
+
+    prepared_path = ensure_demo_database(db_path)
+
+    assert prepared_path == db_path
+
+
+def test_ensure_demo_database_bootstraps_missing_database(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    calls = []
+    db_path = tmp_path / "demo.duckdb"
+    raw_path = tmp_path / "raw"
+
+    def fake_run_bootstrap_command(
+        command: list[str], *, env: dict[str, str] | None = None
+    ) -> None:
+        calls.append((command, env))
+
+    monkeypatch.setattr(
+        "app.dashboard_data._run_bootstrap_command",
+        fake_run_bootstrap_command,
+    )
+
+    prepared_path = ensure_demo_database(db_path, raw_path=raw_path, users=10, months=1)
+
+    assert prepared_path == db_path
+    assert calls[0][0][-6:] == [
+        "--users",
+        "10",
+        "--months",
+        "1",
+        "--output-dir",
+        str(raw_path),
+    ]
+    assert calls[1][0][-2] == "--vars"
+    assert calls[1][0][-1] == f"{{raw_path: '{raw_path.as_posix()}'}}"
+    assert calls[1][1] is not None
+    assert calls[1][1]["NEOBANK_DUCKDB_PATH"] == str(db_path)
 
 
 def test_trim_partial_week_removes_final_incomplete_week(tmp_path: Path) -> None:

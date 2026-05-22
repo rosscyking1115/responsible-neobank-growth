@@ -9,6 +9,7 @@ try:
     from app.dashboard_data import (
         DEFAULT_DB_PATH,
         DashboardData,
+        ensure_demo_database,
         load_dashboard_data,
         onboarding_lift_pp,
         read_decision_memos,
@@ -19,6 +20,7 @@ except ModuleNotFoundError:
     from dashboard_data import (  # type: ignore[no-redef]
         DEFAULT_DB_PATH,
         DashboardData,
+        ensure_demo_database,
         load_dashboard_data,
         onboarding_lift_pp,
         read_decision_memos,
@@ -40,7 +42,8 @@ PRIMARY_BLUE = "#0B66C3"
 
 @st.cache_data(show_spinner=False)
 def cached_dashboard_data(db_path: str) -> DashboardData:
-    return load_dashboard_data(Path(db_path))
+    prepared_db_path = ensure_demo_database(Path(db_path))
+    return load_dashboard_data(prepared_db_path)
 
 
 @st.cache_data(show_spinner=False)
