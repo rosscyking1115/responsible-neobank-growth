@@ -64,6 +64,7 @@ uv sync --group dev
 uv run python -m data_generator.generate --users 5000 --months 6 --output-dir raw/ci
 uv run pytest
 uv run ruff check .
+uv run marimo check notebooks --ignore-scripts
 uv run dbt build --project-dir dbt_neobank --profiles-dir dbt_neobank
 ```
 
@@ -83,7 +84,7 @@ is gitignored so the data is reproducible without committing generated artifacts
 - Phase 0: setup and scaffolding complete.
 - Phase 1: synthetic data generator complete.
 - Phase 2: dbt metrics layer complete.
-- Phase 3: EDA pending.
+- Phase 3: EDA product insights complete.
 - Phase 4: A/B experimentation pending.
 - Phase 5: activation decisioning model pending.
 - Phase 6: regional referral experiment pending.
