@@ -1,0 +1,180 @@
+from pathlib import Path
+
+import duckdb
+
+from app.dashboard_data import (
+    load_dashboard_data,
+    onboarding_lift_pp,
+    read_decision_memos,
+    referral_economics,
+    referral_grouped_daily,
+)
+
+
+def _build_dashboard_fixture(db_path: Path) -> None:
+    with duckdb.connect(str(db_path)) as con:
+        con.execute("create schema main_marts")
+        con.execute(
+            """
+            create table main_marts.fct_activation as
+            select *
+            from (
+                values
+                    (1, date '2026-01-01', 'London', 'organic', true, true, 4, 120.0),
+                    (2, date '2026-01-02', 'London', 'paid', false, true, 2, 40.0),
+                    (3, date '2026-01-03', 'Wales', 'organic', true, true, 5, 160.0)
+            ) as t(
+                user_id,
+                signup_date,
+                region,
+                signup_channel,
+                activated_d7,
+                activated_ever,
+                lifetime_transaction_count,
+                lifetime_card_spend_gbp
+            )
+            """
+        )
+        con.execute(
+            """
+            create table main_marts.fct_user_clv_proxy as
+            select *
+            from (
+                values
+                    (1, 'London', 'organic', 'mass', true, 32.0),
+                    (2, 'London', 'paid', 'student', false, 12.0),
+                    (3, 'Wales', 'organic', 'mass', true, 48.0)
+            ) as t(
+                user_id,
+                region,
+                signup_channel,
+                income_segment,
+                activated_d7,
+                clv_proxy_12m_gbp
+            )
+            """
+        )
+        con.execute(
+            """
+            create table main_marts.fct_weekly_engagement as
+            select *
+            from (
+                values
+                    (date '2026-01-05', 2, 6, 180.0, 3.0),
+                    (date '2026-01-12', 3, 8, 240.0, 2.7)
+            ) as t(
+                activity_week,
+                weekly_active_users,
+                transactions,
+                card_spend_gbp,
+                transactions_per_active_user
+            )
+            """
+        )
+        con.execute(
+            """
+            create table main_marts.fct_retention_cohorts as
+            select *
+            from (
+                values
+                    (date '2026-01-05', 0, 2, 2, 1.0),
+                    (date '2026-01-05', 1, 2, 1, 0.5)
+            ) as t(
+                signup_week,
+                weeks_since_signup,
+                activated_users,
+                retained_users,
+                retention_rate
+            )
+            """
+        )
+        con.execute(
+            """
+            create table main_marts.fct_feature_adoption as
+            select *
+            from (
+                values
+                    ('savings_pot', date '2026-01-01', 2, 3),
+                    ('salary_sorter', date '2026-01-01', 1, 1)
+            ) as t(feature_name, adoption_month, adopting_users, adoption_events)
+            """
+        )
+        con.execute(
+            """
+            create table main_marts.fct_experiment_user_metrics as
+            select *
+            from (
+                values
+                    ('personalised_onboarding_pot_prompt', 1, 'control', true, 0, 0, 0),
+                    ('personalised_onboarding_pot_prompt', 2, 'control', false, 1, 0, 0),
+                    ('personalised_onboarding_pot_prompt', 3, 'treatment', true, 0, 0, 1),
+                    ('personalised_onboarding_pot_prompt', 4, 'treatment', true, 0, 0, 0)
+            ) as t(
+                experiment_name,
+                user_id,
+                variant,
+                activated_d7,
+                support_contacts,
+                complaints,
+                app_crashes
+            )
+            """
+        )
+        con.execute(
+            """
+            create table main_marts.fct_region_daily_referrals as
+            select *
+            from (
+                values
+                    ('London', date '2026-01-01', false, false, false, 10, 1, 0, 0.0),
+                    ('Wales', date '2026-01-01', true, true, true, 12, 5, 2, 60.0),
+                    ('Wales', date '2026-01-02', true, true, true, 9, 3, 1, 30.0)
+            ) as t(
+                region,
+                date_day,
+                treated_region,
+                post_period,
+                incentive_active,
+                signups,
+                referral_signups,
+                incremental_signups_ground_truth,
+                reward_cost_gbp
+            )
+            """
+        )
+
+
+def test_load_dashboard_data_summarises_marts(tmp_path: Path) -> None:
+    db_path = tmp_path / "dashboard.duckdb"
+    _build_dashboard_fixture(db_path)
+
+    data = load_dashboard_data(db_path)
+
+    assert int(data.overview["users"]) == 3
+    assert data.weekly_engagement["weekly_active_users"].tolist() == [2, 3]
+    assert data.activation_by_region.loc[0, "region"] == "London"
+    assert onboarding_lift_pp(data.experiment_variants) == 50.0
+
+
+def test_referral_helpers_compute_economics_and_groups(tmp_path: Path) -> None:
+    db_path = tmp_path / "dashboard.duckdb"
+    _build_dashboard_fixture(db_path)
+    data = load_dashboard_data(db_path)
+
+    economics = referral_economics(data.referral_daily)
+    grouped = referral_grouped_daily(data.referral_daily)
+
+    assert economics["treated_post_referral_signups"] == 8.0
+    assert economics["reward_cost_gbp"] == 90.0
+    assert economics["embedded_incremental_signups"] == 3.0
+    assert economics["cost_per_embedded_incremental_signup"] == 30.0
+    assert set(grouped["geo_group"]) == {"Control regions", "Treated regions"}
+
+
+def test_read_decision_memos_handles_missing_files(tmp_path: Path) -> None:
+    (tmp_path / "MEMO_AB_ONBOARDING.md").write_text("# Ship it", encoding="utf-8")
+
+    memos = read_decision_memos(tmp_path)
+
+    assert memos["Onboarding A/B"] == "# Ship it"
+    assert memos["Referral Geo"] == "Memo has not been generated."
