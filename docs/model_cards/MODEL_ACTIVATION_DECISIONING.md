@@ -1,6 +1,6 @@
 # Model Card: Activation Decisioning
 
-## TL;DR
+## Executive Summary
 
 PILOT: use the model for a monitored onboarding-help treatment.
 

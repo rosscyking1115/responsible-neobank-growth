@@ -1,6 +1,6 @@
 # Decision Memo: Referral Incrementality Geo Experiment
 
-## TL;DR
+## Executive Summary
 
 ITERATE: referral lift is positive, but unit economics need a cheaper incentive.
 

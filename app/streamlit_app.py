@@ -40,6 +40,39 @@ VARIANT_COLORS = {"control": "#6B7280", "treatment": "#00A88F"}
 PRIMARY_BLUE = "#0B66C3"
 
 
+def _apply_app_style() -> None:
+    st.markdown(
+        """
+        <style>
+        .block-container {
+            max-width: 1180px;
+            padding-top: 3rem;
+            padding-bottom: 3rem;
+        }
+        a[href^="#"] {
+            display: none;
+        }
+        div[data-testid="stMetric"] label {
+            color: #111827;
+            font-size: 0.95rem;
+        }
+        div[data-testid="stMetricValue"] {
+            color: #202436;
+            font-size: 2.35rem;
+        }
+        div[data-testid="stMarkdownContainer"] h3 {
+            margin-top: 1.6rem;
+            margin-bottom: 0.7rem;
+        }
+        div[data-testid="stMarkdownContainer"] li {
+            margin-bottom: 0.35rem;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
 @st.cache_data(show_spinner=False)
 def cached_dashboard_data(db_path: str) -> DashboardData:
     prepared_db_path = ensure_demo_database(Path(db_path))
@@ -67,6 +100,20 @@ def _apply_chart_layout(fig, *, height: int) -> None:
         font={"family": "Inter, Segoe UI, sans-serif"},
         legend_title_text="",
     )
+
+
+def _dashboard_memo(markdown: str) -> str:
+    rendered_lines = []
+    for line in markdown.splitlines():
+        if line.startswith("# "):
+            continue
+        if line.startswith("## "):
+            rendered_lines.append(f"### {line[3:]}")
+        elif line.startswith("### "):
+            rendered_lines.append(f"#### {line[4:]}")
+        else:
+            rendered_lines.append(line)
+    return "\n".join(rendered_lines).strip()
 
 
 def _metric_grid(data: DashboardData) -> None:
@@ -213,13 +260,14 @@ def _render_memos(memo_dir: str) -> None:
     left, right = st.columns(2)
     with left:
         st.subheader("Onboarding Decision")
-        st.markdown(memos["Onboarding A/B"])
+        st.markdown(_dashboard_memo(memos["Onboarding A/B"]))
     with right:
         st.subheader("Referral Decision")
-        st.markdown(memos["Referral Geo"])
+        st.markdown(_dashboard_memo(memos["Referral Geo"]))
 
 
 def main() -> None:
+    _apply_app_style()
     st.title("Neobank Product Analytics")
 
     with st.sidebar:
