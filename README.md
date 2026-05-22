@@ -103,6 +103,17 @@ uv run dbt build --project-dir dbt_neobank --profiles-dir dbt_neobank --vars "{r
 uv run python -m src.experiments.run_referral_incrementality
 ```
 
+## Run the Product Dashboard
+
+```powershell
+uv run python -m data_generator.generate --users 50000 --months 12 --output-dir raw/phase1_full
+uv run dbt build --project-dir dbt_neobank --profiles-dir dbt_neobank --vars "{raw_path: raw/phase1_full}"
+uv run streamlit run app/streamlit_app.py
+```
+
+The dashboard reads the dbt marts in `neobank.duckdb` and displays product health,
+onboarding A/B results, referral geo incrementality, and the two decision memos.
+
 ## Phase Status
 
 - Phase 0: setup and scaffolding complete.
@@ -112,7 +123,7 @@ uv run python -m src.experiments.run_referral_incrementality
 - Phase 4: A/B experimentation with CUPED complete.
 - Phase 5: activation decisioning model complete.
 - Phase 6: regional referral experiment complete.
-- Phase 7: dashboard and memos pending.
+- Phase 7: dashboard and memos complete.
 - Phase 8: polish and public release pending.
 
 The repository should remain private through Phase 0 and flip public once the
