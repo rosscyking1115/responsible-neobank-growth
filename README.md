@@ -141,9 +141,17 @@ uv run streamlit run app/streamlit_app.py
 
 The dashboard reads the dbt marts in `neobank.duckdb` and displays product health,
 onboarding A/B results, referral geo incrementality, and the two decision memos.
+If `neobank.duckdb` does not exist, the dashboard automatically generates a
+5,000-user synthetic demo dataset and builds the dbt marts on first load.
 
 For a lightweight CI-sized run, use the default `raw/ci` data generated in Local
 Setup. For portfolio screenshots, use the 50,000-user commands above.
+
+## Deploy on Streamlit Community Cloud
+
+Use `app/streamlit_app.py` as the app entrypoint and `requirements.txt` for
+dependencies. No secrets are required. See `docs/STREAMLIT_DEPLOYMENT.md` for the
+full deployment checklist and cold-start behavior.
 
 ## Phase Status
 
