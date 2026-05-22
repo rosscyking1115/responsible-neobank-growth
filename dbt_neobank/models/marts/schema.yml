@@ -1,0 +1,54 @@
+version: 2
+
+models:
+  - name: fct_activation
+    description: One row per user with signup attributes and activation outcomes.
+    columns:
+      - name: user_id
+        tests: [not_null, unique]
+      - name: activated_d7
+        tests: [not_null]
+  - name: fct_retention_cohorts
+    description: Signup-week retention table for activated users.
+    columns:
+      - name: signup_week
+        tests: [not_null]
+      - name: weeks_since_signup
+        tests: [not_null]
+  - name: fct_feature_adoption
+    description: Monthly feature-adoption counts.
+    columns:
+      - name: feature_name
+        tests: [not_null]
+  - name: fct_weekly_engagement
+    description: Weekly active users and transaction-frequency metrics.
+    columns:
+      - name: activity_week
+        tests: [not_null, unique]
+  - name: dim_experiment
+    description: Experiment assignment summary.
+    columns:
+      - name: experiment_name
+        tests: [not_null, unique]
+  - name: fct_experiment_user_metrics
+    description: User-level experiment metrics, secondary metrics, and guardrails.
+    columns:
+      - name: user_id
+        tests: [not_null, unique]
+      - name: variant
+        tests:
+          - accepted_values:
+              arguments:
+                values: [control, treatment]
+  - name: fct_user_clv_proxy
+    description: User-level 12-month CLV proxy for business thresholding.
+    columns:
+      - name: user_id
+        tests: [not_null, unique]
+  - name: fct_region_daily_signups
+    description: Region-day signup panel for geo incrementality analysis.
+    columns:
+      - name: region
+        tests: [not_null]
+      - name: date_day
+        tests: [not_null]

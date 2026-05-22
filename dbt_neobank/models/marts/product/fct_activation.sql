@@ -1,0 +1,21 @@
+select
+    user_id,
+    signup_ts,
+    signup_date,
+    signup_week,
+    region,
+    signup_channel,
+    device_os,
+    age,
+    income_segment,
+    push_opt_in,
+    vulnerable_customer_flag,
+    business_account_flag,
+    first_transaction_ts,
+    first_transaction_date,
+    coalesce(lifetime_transaction_count, 0) as lifetime_transaction_count,
+    coalesce(lifetime_card_spend_gbp, 0) as lifetime_card_spend_gbp,
+    coalesce(lifetime_interchange_revenue_gbp, 0) as lifetime_interchange_revenue_gbp,
+    activated_ever,
+    coalesce(activated_d7, false) as activated_d7
+from {{ ref('int_user_activation') }}
