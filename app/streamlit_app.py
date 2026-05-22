@@ -28,6 +28,15 @@ except ModuleNotFoundError:
 
 st.set_page_config(page_title="Neobank Product Analytics", layout="wide")
 
+FEATURE_COLORS = {
+    "easy_access_savings": "#0B6B75",
+    "referrals": "#00A88F",
+    "salary_sorter": "#F2B544",
+    "savings_pot": "#7C6FE8",
+}
+VARIANT_COLORS = {"control": "#6B7280", "treatment": "#00A88F"}
+PRIMARY_BLUE = "#0B66C3"
+
 
 @st.cache_data(show_spinner=False)
 def cached_dashboard_data(db_path: str) -> DashboardData:
@@ -45,6 +54,16 @@ def _pct(value: float) -> str:
 
 def _gbp(value: float) -> str:
     return f"GBP {value:,.0f}"
+
+
+def _apply_chart_layout(fig, *, height: int) -> None:
+    fig.update_layout(
+        height=height,
+        margin={"l": 10, "r": 10, "t": 10, "b": 10},
+        template="plotly_white",
+        font={"family": "Inter, Segoe UI, sans-serif"},
+        legend_title_text="",
+    )
 
 
 def _metric_grid(data: DashboardData) -> None:
@@ -73,7 +92,8 @@ def _render_product_health(data: DashboardData) -> None:
             markers=True,
             labels={"activity_week": "Week", "weekly_active_users": "WAU"},
         )
-        fig.update_layout(margin={"l": 10, "r": 10, "t": 10, "b": 10}, height=330)
+        fig.update_traces(line_color=PRIMARY_BLUE, marker_color=PRIMARY_BLUE)
+        _apply_chart_layout(fig, height=330)
         st.plotly_chart(fig, width="stretch")
     with right:
         st.subheader("D7 Activation By Region")
@@ -86,13 +106,14 @@ def _render_product_health(data: DashboardData) -> None:
             labels={"d7_activation_rate": "D7 activation", "region": "Region"},
             hover_data=["users", "avg_lifetime_transactions"],
         )
-        fig.update_layout(margin={"l": 10, "r": 10, "t": 10, "b": 10}, height=330)
+        fig.update_traces(marker_color=PRIMARY_BLUE)
+        _apply_chart_layout(fig, height=330)
         fig.update_xaxes(tickformat=".0%")
         st.plotly_chart(fig, width="stretch")
 
     left, right = st.columns(2)
     with left:
-        st.subheader("Activated Cohort Retention")
+        st.subheader("Post-Activation Retention")
         fig = px.line(
             data.retention_curve,
             x="weeks_since_signup",
@@ -100,7 +121,8 @@ def _render_product_health(data: DashboardData) -> None:
             markers=True,
             labels={"weeks_since_signup": "Weeks since signup", "retention_rate": "Retention"},
         )
-        fig.update_layout(margin={"l": 10, "r": 10, "t": 10, "b": 10}, height=320)
+        fig.update_traces(line_color=PRIMARY_BLUE, marker_color=PRIMARY_BLUE)
+        _apply_chart_layout(fig, height=320)
         fig.update_yaxes(tickformat=".0%")
         st.plotly_chart(fig, width="stretch")
     with right:
@@ -110,13 +132,14 @@ def _render_product_health(data: DashboardData) -> None:
             x="adoption_month",
             y="adopting_users",
             color="feature_name",
+            color_discrete_map=FEATURE_COLORS,
             labels={
                 "adoption_month": "Month",
                 "adopting_users": "Adopting users",
                 "feature_name": "Feature",
             },
         )
-        fig.update_layout(margin={"l": 10, "r": 10, "t": 10, "b": 10}, height=320)
+        _apply_chart_layout(fig, height=320)
         st.plotly_chart(fig, width="stretch")
 
     st.subheader("Value By Income Segment")
@@ -125,6 +148,7 @@ def _render_product_health(data: DashboardData) -> None:
         x="income_segment",
         y="avg_clv_proxy_12m_gbp",
         color="d7_activation_rate",
+        color_continuous_scale=["#DCEFF7", "#8DD7D0", "#006C67"],
         labels={
             "income_segment": "Income segment",
             "avg_clv_proxy_12m_gbp": "Avg CLV proxy",
@@ -132,7 +156,7 @@ def _render_product_health(data: DashboardData) -> None:
         },
         hover_data=["users"],
     )
-    fig.update_layout(margin={"l": 10, "r": 10, "t": 10, "b": 10}, height=330)
+    _apply_chart_layout(fig, height=330)
     st.plotly_chart(fig, width="stretch")
 
 
@@ -147,10 +171,12 @@ def _render_experiments(data: DashboardData) -> None:
             x="variant",
             y="d7_activation_rate",
             color="variant",
+            color_discrete_map=VARIANT_COLORS,
             labels={"variant": "Variant", "d7_activation_rate": "D7 activation"},
             hover_data=["users", "support_contact_rate", "complaint_rate", "app_crash_rate"],
         )
-        fig.update_layout(showlegend=False, margin={"l": 10, "r": 10, "t": 10, "b": 10})
+        _apply_chart_layout(fig, height=330)
+        fig.update_layout(showlegend=False)
         fig.update_yaxes(tickformat=".0%")
         st.plotly_chart(fig, width="stretch")
 
@@ -168,13 +194,14 @@ def _render_experiments(data: DashboardData) -> None:
             x="date_day",
             y="referral_signups",
             color="geo_group",
+            color_discrete_map={"Control regions": "#6B7280", "Treated regions": "#00A88F"},
             labels={
                 "date_day": "Date",
                 "referral_signups": "Referral signups",
                 "geo_group": "Geo group",
             },
         )
-        fig.update_layout(margin={"l": 10, "r": 10, "t": 10, "b": 10}, height=340)
+        _apply_chart_layout(fig, height=340)
         st.plotly_chart(fig, width="stretch")
 
 

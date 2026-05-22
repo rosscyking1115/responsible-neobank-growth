@@ -12,6 +12,7 @@ DEFAULT_DB_PATH = Path("neobank.duckdb")
 DEFAULT_MEMO_DIR = Path("docs/memos")
 ONBOARDING_MEMO = "MEMO_AB_ONBOARDING.md"
 REFERRAL_MEMO = "MEMO_REFERRAL_INCREMENTALITY.md"
+PARTIAL_WEEK_DROP_RATIO = 0.70
 
 
 @dataclass(frozen=True)
@@ -28,6 +29,20 @@ class DashboardData:
 
 def _fetch_frame(con: duckdb.DuckDBPyConnection, query: str) -> pd.DataFrame:
     return con.execute(query).fetchdf()
+
+
+def trim_partial_week(weekly_engagement: pd.DataFrame) -> pd.DataFrame:
+    """Drop a final partial week when it is visibly incomplete versus the prior week."""
+    if len(weekly_engagement) < 3:
+        return weekly_engagement.copy()
+    ordered = weekly_engagement.copy()
+    ordered["activity_week"] = pd.to_datetime(ordered["activity_week"])
+    ordered = ordered.sort_values("activity_week").reset_index(drop=True)
+    last_wau = float(ordered.loc[len(ordered) - 1, "weekly_active_users"])
+    prior_wau = float(ordered.loc[len(ordered) - 2, "weekly_active_users"])
+    if prior_wau > 0 and last_wau < prior_wau * PARTIAL_WEEK_DROP_RATIO:
+        return ordered.iloc[:-1].copy()
+    return ordered
 
 
 def load_dashboard_data(db_path: Path = DEFAULT_DB_PATH) -> DashboardData:
@@ -90,6 +105,7 @@ def load_dashboard_data(db_path: Path = DEFAULT_DB_PATH) -> DashboardData:
                 sum(activated_users) as activated_users,
                 sum(retained_users) as retained_users
             from main_marts.fct_retention_cohorts
+            where weeks_since_signup between 1 and 12
             group by 1
             order by 1
             """,
@@ -155,7 +171,7 @@ def load_dashboard_data(db_path: Path = DEFAULT_DB_PATH) -> DashboardData:
 
     return DashboardData(
         overview=overview,
-        weekly_engagement=weekly_engagement,
+        weekly_engagement=trim_partial_week(weekly_engagement),
         activation_by_region=activation_by_region,
         retention_curve=retention_curve,
         feature_adoption=feature_adoption,

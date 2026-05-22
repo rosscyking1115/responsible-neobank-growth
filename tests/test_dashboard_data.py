@@ -8,6 +8,7 @@ from app.dashboard_data import (
     read_decision_memos,
     referral_economics,
     referral_grouped_daily,
+    trim_partial_week,
 )
 
 
@@ -153,7 +154,20 @@ def test_load_dashboard_data_summarises_marts(tmp_path: Path) -> None:
     assert int(data.overview["users"]) == 3
     assert data.weekly_engagement["weekly_active_users"].tolist() == [2, 3]
     assert data.activation_by_region.loc[0, "region"] == "London"
+    assert data.retention_curve["weeks_since_signup"].tolist() == [1]
     assert onboarding_lift_pp(data.experiment_variants) == 50.0
+
+
+def test_trim_partial_week_removes_final_incomplete_week(tmp_path: Path) -> None:
+    db_path = tmp_path / "dashboard.duckdb"
+    _build_dashboard_fixture(db_path)
+    data = load_dashboard_data(db_path)
+    weekly = data.weekly_engagement.copy()
+    weekly.loc[len(weekly)] = ["2026-01-19", 1, 1, 10.0, 1.0]
+
+    trimmed = trim_partial_week(weekly)
+
+    assert trimmed["weekly_active_users"].tolist() == [2, 3]
 
 
 def test_referral_helpers_compute_economics_and_groups(tmp_path: Path) -> None:
