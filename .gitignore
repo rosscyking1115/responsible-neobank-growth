@@ -20,6 +20,9 @@ dbt_neobank/dbt_packages/
 dbt_neobank/logs/
 dbt_neobank/.user.yml
 
+# Notebook runtime caches
+notebooks/__marimo__/
+
 # Local app/editor files
 .env
 .env.*
