@@ -2,17 +2,24 @@
 
 from __future__ import annotations
 
+import os
+import subprocess
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 
 import duckdb
 import pandas as pd
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_DB_PATH = Path("neobank.duckdb")
 DEFAULT_MEMO_DIR = Path("docs/memos")
+DEFAULT_DEMO_RAW_PATH = Path("raw/streamlit_demo")
 ONBOARDING_MEMO = "MEMO_AB_ONBOARDING.md"
 REFERRAL_MEMO = "MEMO_REFERRAL_INCREMENTALITY.md"
 PARTIAL_WEEK_DROP_RATIO = 0.70
+DEMO_USERS = 5_000
+DEMO_MONTHS = 6
 
 
 @dataclass(frozen=True)
@@ -31,6 +38,73 @@ def _fetch_frame(con: duckdb.DuckDBPyConnection, query: str) -> pd.DataFrame:
     return con.execute(query).fetchdf()
 
 
+def resolve_project_path(path: Path) -> Path:
+    """Resolve relative app paths from the repository root."""
+    return path if path.is_absolute() else PROJECT_ROOT / path
+
+
+def _run_bootstrap_command(command: list[str], *, env: dict[str, str] | None = None) -> None:
+    completed = subprocess.run(
+        command,
+        cwd=PROJECT_ROOT,
+        env=env,
+        capture_output=True,
+        check=False,
+        text=True,
+    )
+    if completed.returncode != 0:
+        output = "\n".join(part for part in [completed.stdout, completed.stderr] if part)
+        raise RuntimeError(f"Demo database bootstrap failed while running {command!r}:\n{output}")
+
+
+def ensure_demo_database(
+    db_path: Path = DEFAULT_DB_PATH,
+    *,
+    raw_path: Path = DEFAULT_DEMO_RAW_PATH,
+    users: int = DEMO_USERS,
+    months: int = DEMO_MONTHS,
+) -> Path:
+    """Create a small synthetic DuckDB database when the dashboard runs in a fresh cloud app."""
+    resolved_db_path = resolve_project_path(db_path)
+    if resolved_db_path.exists():
+        return resolved_db_path
+
+    resolved_raw_path = resolve_project_path(raw_path)
+    resolved_raw_path.parent.mkdir(parents=True, exist_ok=True)
+
+    _run_bootstrap_command(
+        [
+            sys.executable,
+            "-m",
+            "data_generator.generate",
+            "--users",
+            str(users),
+            "--months",
+            str(months),
+            "--output-dir",
+            str(resolved_raw_path),
+        ]
+    )
+    env = os.environ.copy()
+    env["NEOBANK_DUCKDB_PATH"] = str(resolved_db_path)
+    _run_bootstrap_command(
+        [
+            sys.executable,
+            "-m",
+            "dbt.cli.main",
+            "build",
+            "--project-dir",
+            "dbt_neobank",
+            "--profiles-dir",
+            "dbt_neobank",
+            "--vars",
+            f"{{raw_path: '{resolved_raw_path.as_posix()}'}}",
+        ],
+        env=env,
+    )
+    return resolved_db_path
+
+
 def trim_partial_week(weekly_engagement: pd.DataFrame) -> pd.DataFrame:
     """Drop a final partial week when it is visibly incomplete versus the prior week."""
     if len(weekly_engagement) < 3:
@@ -47,12 +121,14 @@ def trim_partial_week(weekly_engagement: pd.DataFrame) -> pd.DataFrame:
 
 def load_dashboard_data(db_path: Path = DEFAULT_DB_PATH) -> DashboardData:
     """Load dashboard-ready frames from the dbt mart schemas."""
-    if not db_path.exists():
+    resolved_db_path = resolve_project_path(db_path)
+    if not resolved_db_path.exists():
         raise FileNotFoundError(
-            f"{db_path} was not found. Build the dbt project before launching the dashboard."
+            f"{resolved_db_path} was not found. "
+            "Build the dbt project before launching the dashboard."
         )
 
-    with duckdb.connect(str(db_path), read_only=True) as con:
+    with duckdb.connect(str(resolved_db_path), read_only=True) as con:
         overview = _fetch_frame(
             con,
             """
