@@ -8,6 +8,7 @@ import streamlit as st
 try:
     from app.dashboard_data import (
         DEFAULT_DB_PATH,
+        DEFAULT_MEMO_DIR,
         DashboardData,
         ensure_demo_database,
         load_dashboard_data,
@@ -19,6 +20,7 @@ try:
 except ModuleNotFoundError:
     from dashboard_data import (  # type: ignore[no-redef]
         DEFAULT_DB_PATH,
+        DEFAULT_MEMO_DIR,
         DashboardData,
         ensure_demo_database,
         load_dashboard_data,
@@ -28,7 +30,11 @@ except ModuleNotFoundError:
         referral_grouped_daily,
     )
 
-st.set_page_config(page_title="Neobank Product Analytics", layout="wide")
+st.set_page_config(
+    page_title="Neobank Product Analytics",
+    layout="wide",
+    initial_sidebar_state="collapsed",
+)
 
 FEATURE_COLORS = {
     "easy_access_savings": "#0B6B75",
@@ -270,9 +276,8 @@ def main() -> None:
     _apply_app_style()
     st.title("Neobank Product Analytics")
 
-    with st.sidebar:
-        db_path = st.text_input("DuckDB path", value=str(DEFAULT_DB_PATH))
-        memo_dir = st.text_input("Memo directory", value="docs/memos")
+    db_path = str(DEFAULT_DB_PATH)
+    memo_dir = str(DEFAULT_MEMO_DIR)
 
     try:
         data = cached_dashboard_data(db_path)
