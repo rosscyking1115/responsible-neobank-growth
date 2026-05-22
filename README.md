@@ -66,10 +66,21 @@ uv run ruff check .
 uv run dbt build --project-dir dbt_neobank --profiles-dir dbt_neobank
 ```
 
+## Generate Synthetic Data
+
+```powershell
+uv run python -m data_generator.generate --users 50000 --months 12 --output-dir raw/phase1_full
+```
+
+The generator writes parquet files for users, experiment assignments, activation
+ground truth, transactions, sessions, feature events, support contacts, referrals,
+regional daily signups, and embedded experiment ground truth. The `raw/` directory
+is gitignored so the data is reproducible without committing generated artifacts.
+
 ## Phase Status
 
-- Phase 0: setup and scaffolding in progress.
-- Phase 1: synthetic data generator pending.
+- Phase 0: setup and scaffolding complete.
+- Phase 1: synthetic data generator complete.
 - Phase 2: dbt metrics layer pending.
 - Phase 3: EDA pending.
 - Phase 4: A/B experimentation pending.
