@@ -34,6 +34,11 @@ select
     activation.signup_channel,
     activation.income_segment,
     activation.vulnerable_customer_flag,
+    users.device_os,
+    users.push_opt_in,
+    users.business_account_flag,
+    users.d7_activation_probability_control,
+    users.primary_bank_propensity,
     activation.activated_d7,
     activation.activated_ever,
     coalesce(feature_adoption.adopted_savings_pot, 0)::boolean as adopted_savings_pot,
@@ -44,6 +49,8 @@ select
 from {{ ref('stg_experiment_assignments') }} as assignments
 inner join {{ ref('fct_activation') }} as activation
     on assignments.user_id = activation.user_id
+inner join {{ ref('stg_users') }} as users
+    on assignments.user_id = users.user_id
 left join support
     on assignments.user_id = support.user_id
 left join feature_adoption
