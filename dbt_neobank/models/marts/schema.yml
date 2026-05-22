@@ -55,3 +55,12 @@ models:
         tests: [not_null]
       - name: date_day
         tests: [not_null]
+  - name: fct_region_daily_referrals
+    description: Region-day referral signup panel for geo incrementality analysis.
+    columns:
+      - name: region
+        tests: [not_null]
+      - name: date_day
+        tests: [not_null]
+      - name: referral_signups
+        tests: [not_null]
