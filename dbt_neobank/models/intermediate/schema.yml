@@ -1,0 +1,22 @@
+version: 2
+
+models:
+  - name: int_user_first_transaction
+    description: First card transaction and lifetime transaction aggregates by user.
+    columns:
+      - name: user_id
+        tests: [not_null, unique]
+      - name: first_transaction_ts
+        tests: [not_null]
+  - name: int_user_weekly_activity
+    description: User-week card activity used for WAU and retention cohorts.
+    columns:
+      - name: user_id
+        tests: [not_null]
+      - name: activity_week
+        tests: [not_null]
+  - name: int_user_activation
+    description: User-level activation flags joined to signup attributes.
+    columns:
+      - name: user_id
+        tests: [not_null, unique]

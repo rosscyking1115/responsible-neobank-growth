@@ -1,17 +1,87 @@
 version: 2
 
 models:
-  - name: stg_phase0_smoke
-    description: Phase 0 dbt smoke-test model.
+  - name: stg_users
+    description: Cleaned synthetic user signup and customer attributes.
     columns:
-      - name: smoke_test_id
-        description: Constant identifier used to verify dbt can build locally and in CI.
-        tests:
-          - not_null
-          - unique
-      - name: scaffold_status
-        description: Human-readable setup status.
+      - name: user_id
+        tests: [not_null, unique]
+      - name: signup_date
+        tests: [not_null]
+      - name: region
+        tests: [not_null]
+      - name: signup_channel
         tests:
           - accepted_values:
               arguments:
-                values: ["phase_0_ready"]
+                values:
+                  - word_of_mouth
+                  - app_store
+                  - organic_search
+                  - paid_social
+                  - partnership
+                  - campus
+                  - business_referral
+  - name: stg_transactions
+    description: Cleaned card transaction events.
+    columns:
+      - name: transaction_id
+        tests: [not_null, unique]
+      - name: user_id
+        tests: [not_null]
+      - name: amount_gbp
+        tests: [not_null]
+  - name: stg_sessions
+    description: Cleaned app session events.
+    columns:
+      - name: session_id
+        tests: [not_null, unique]
+      - name: user_id
+        tests: [not_null]
+  - name: stg_feature_events
+    description: Cleaned product feature adoption events.
+    columns:
+      - name: feature_event_id
+        tests: [not_null, unique]
+      - name: feature_name
+        tests:
+          - accepted_values:
+              arguments:
+                values: [savings_pot, easy_access_savings, salary_sorter, referrals]
+  - name: stg_experiment_assignments
+    description: Deterministic user-level experiment assignment events.
+    columns:
+      - name: user_id
+        tests: [not_null, unique]
+      - name: variant
+        tests:
+          - accepted_values:
+              arguments:
+                values: [control, treatment]
+  - name: stg_activation_ground_truth
+    description: Activation outcomes generated for experiment validation.
+    columns:
+      - name: user_id
+        tests: [not_null, unique]
+  - name: stg_support_contacts
+    description: Customer support contact and complaint guardrail events.
+    columns:
+      - name: support_contact_id
+        tests: [not_null, unique]
+  - name: stg_referrals
+    description: Referral graph events with geo-incentive treatment flags.
+    columns:
+      - name: referral_id
+        tests: [not_null, unique]
+  - name: stg_region_daily_signups
+    description: Region-day signup panel for DiD and synthetic control.
+    columns:
+      - name: region
+        tests: [not_null]
+      - name: date_day
+        tests: [not_null]
+  - name: stg_experiment_ground_truth
+    description: Embedded causal parameters for validation notebooks.
+    columns:
+      - name: metric
+        tests: [not_null, unique]

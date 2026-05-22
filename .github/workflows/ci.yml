@@ -32,5 +32,8 @@ jobs:
       - name: Test
         run: uv run pytest
 
+      - name: Generate synthetic data for dbt
+        run: uv run python -m data_generator.generate --users 5000 --months 6 --seed 42 --output-dir raw/ci
+
       - name: dbt build
         run: uv run dbt build --project-dir dbt_neobank --profiles-dir dbt_neobank
