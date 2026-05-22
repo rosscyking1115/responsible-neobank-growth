@@ -79,13 +79,21 @@ ground truth, transactions, sessions, feature events, support contacts, referral
 regional daily signups, and embedded experiment ground truth. The `raw/` directory
 is gitignored so the data is reproducible without committing generated artifacts.
 
+## Reproduce the Onboarding A/B Memo
+
+```powershell
+uv run python -m data_generator.generate --users 50000 --months 12 --output-dir raw/phase1_full
+uv run dbt build --project-dir dbt_neobank --profiles-dir dbt_neobank --vars "{raw_path: raw/phase1_full}"
+uv run python -m src.experiments.run_onboarding_ab
+```
+
 ## Phase Status
 
 - Phase 0: setup and scaffolding complete.
 - Phase 1: synthetic data generator complete.
 - Phase 2: dbt metrics layer complete.
 - Phase 3: EDA product insights complete.
-- Phase 4: A/B experimentation pending.
+- Phase 4: A/B experimentation with CUPED complete.
 - Phase 5: activation decisioning model pending.
 - Phase 6: regional referral experiment pending.
 - Phase 7: dashboard and memos pending.
