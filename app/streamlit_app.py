@@ -5,15 +5,26 @@ from pathlib import Path
 import plotly.express as px
 import streamlit as st
 
-from app.dashboard_data import (
-    DEFAULT_DB_PATH,
-    DashboardData,
-    load_dashboard_data,
-    onboarding_lift_pp,
-    read_decision_memos,
-    referral_economics,
-    referral_grouped_daily,
-)
+try:
+    from app.dashboard_data import (
+        DEFAULT_DB_PATH,
+        DashboardData,
+        load_dashboard_data,
+        onboarding_lift_pp,
+        read_decision_memos,
+        referral_economics,
+        referral_grouped_daily,
+    )
+except ModuleNotFoundError:
+    from dashboard_data import (  # type: ignore[no-redef]
+        DEFAULT_DB_PATH,
+        DashboardData,
+        load_dashboard_data,
+        onboarding_lift_pp,
+        read_decision_memos,
+        referral_economics,
+        referral_grouped_daily,
+    )
 
 st.set_page_config(page_title="Neobank Product Analytics", layout="wide")
 
