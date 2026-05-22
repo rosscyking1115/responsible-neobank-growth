@@ -32,6 +32,9 @@ jobs:
       - name: Lint
         run: uv run ruff check .
 
+      - name: Check notebooks
+        run: uv run marimo check notebooks --ignore-scripts
+
       - name: Test
         run: uv run pytest
 
