@@ -95,6 +95,14 @@ uv run dbt build --project-dir dbt_neobank --profiles-dir dbt_neobank --vars "{r
 uv run python -m src.modelling.run_activation_model
 ```
 
+## Reproduce the Referral Geo Memo
+
+```powershell
+uv run python -m data_generator.generate --users 50000 --months 12 --output-dir raw/phase1_full
+uv run dbt build --project-dir dbt_neobank --profiles-dir dbt_neobank --vars "{raw_path: raw/phase1_full}"
+uv run python -m src.experiments.run_referral_incrementality
+```
+
 ## Phase Status
 
 - Phase 0: setup and scaffolding complete.
@@ -103,7 +111,7 @@ uv run python -m src.modelling.run_activation_model
 - Phase 3: EDA product insights complete.
 - Phase 4: A/B experimentation with CUPED complete.
 - Phase 5: activation decisioning model complete.
-- Phase 6: regional referral experiment pending.
+- Phase 6: regional referral experiment complete.
 - Phase 7: dashboard and memos pending.
 - Phase 8: polish and public release pending.
 
