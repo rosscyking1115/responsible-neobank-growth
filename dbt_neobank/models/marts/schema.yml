@@ -5,25 +5,31 @@ models:
     description: One row per user with signup attributes and activation outcomes.
     columns:
       - name: user_id
+        description: Synthetic user identifier.
         tests: [not_null, unique]
       - name: activated_d7
+        description: True when the user made their first card transaction within 7 days of signup.
         tests: [not_null]
   - name: fct_retention_cohorts
-    description: Signup-week retention table for activated users.
+    description: Weekly transaction-active retention table for activated users by signup cohort.
     columns:
       - name: signup_week
+        description: Week of signup for the activated-user cohort.
         tests: [not_null]
       - name: weeks_since_signup
+        description: Number of calendar weeks since the user's signup week.
         tests: [not_null]
   - name: fct_feature_adoption
     description: Monthly feature-adoption counts.
     columns:
       - name: feature_name
+        description: Adopted feature, such as Savings Pot, Salary Sorter, or referrals.
         tests: [not_null]
   - name: fct_weekly_engagement
     description: Weekly active users and transaction-frequency metrics.
     columns:
       - name: activity_week
+        description: Week containing at least one transaction activity event.
         tests: [not_null, unique]
   - name: dim_experiment
     description: Experiment assignment summary.
@@ -47,20 +53,26 @@ models:
     description: User-level 12-month CLV proxy for business thresholding.
     columns:
       - name: user_id
+        description: Synthetic user identifier.
         tests: [not_null, unique]
   - name: fct_region_daily_signups
     description: Region-day signup panel for geo incrementality analysis.
     columns:
       - name: region
+        description: UK region assigned to the synthetic user or region-day panel row.
         tests: [not_null]
       - name: date_day
+        description: Calendar day in the regional signup panel.
         tests: [not_null]
   - name: fct_region_daily_referrals
     description: Region-day referral signup panel for geo incrementality analysis.
     columns:
       - name: region
+        description: UK region in the referral geo experiment panel.
         tests: [not_null]
       - name: date_day
+        description: Calendar day in the referral geo experiment panel.
         tests: [not_null]
       - name: referral_signups
+        description: Referral-attributed signups observed in the region-day row.
         tests: [not_null]

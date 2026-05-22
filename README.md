@@ -3,12 +3,32 @@
 A Monzo-inspired product analytics portfolio project using dbt, DuckDB, Python,
 experimentation, and synthetic-control geo lift analysis.
 
+This is a complete synthetic analytics case study for a Product Data Scientist /
+Growth Data Scientist role. It starts with generated fintech event data, builds a
+tested metrics layer, runs causal analyses and an activation model, then packages
+the findings into a dashboard, decision memos, and a public-release narrative.
+
 ## How to Read This Repo in 5 Minutes
 
-1. Start with the two decision memos in `docs/memos/` once the experiments land.
-2. Check the dbt models in `dbt_neobank/models/` for the trusted metrics layer.
-3. Open the Marimo notebooks in `notebooks/` for analysis narratives.
-4. Run the Streamlit dashboard in `app/streamlit_app.py` for the PM-facing view.
+1. Start with the one-page decision memos in `docs/memos/`.
+2. Open the Streamlit dashboard in `app/streamlit_app.py` for the PM-facing view.
+3. Check the dbt models in `dbt_neobank/models/` for the trusted metrics layer.
+4. Read the activation model card in `docs/model_cards/`.
+5. Open the Marimo notebook in `notebooks/` for the EDA narrative.
+
+## Portfolio Highlights
+
+- Built a reproducible synthetic neobank warehouse covering users, transactions,
+  sessions, feature events, referrals, support contacts, and experiments.
+- Modelled activation, retention, engagement, feature adoption, CLV proxy,
+  experiment metrics, and region-day referral incrementality in dbt.
+- Analysed a personalised onboarding A/B test with SRM, CUPED, guardrails, power,
+  heterogeneous effects, and a launch recommendation.
+- Trained and documented an activation decisioning model with calibration,
+  explainability, fairness-oriented segment checks, and customer-outcome guardrails.
+- Estimated regional referral incrementality using DiD, synthetic control,
+  spillover checks, placebos, and embedded ground-truth recovery.
+- Delivered a Streamlit dashboard and decision memos designed for product review.
 
 ## Why This Exists
 
@@ -35,7 +55,7 @@ The plan is refreshed against Monzo's public 2026 direction:
 - Fintech standards: Consumer Duty guardrails, vulnerable-customer checks, model
   explainability, exposure logging, sample-ratio checks, and rollout monitoring.
 
-## Planned Deliverables
+## Deliverables
 
 - Synthetic neobank event data for users, transactions, sessions, features,
   referrals, support contacts, and experiments.
@@ -46,6 +66,7 @@ The plan is refreshed against Monzo's public 2026 direction:
 - Calibrated activation model with explainability and customer-outcome guardrails.
 - Streamlit dashboard for product metrics and experiment readouts.
 - One-page decision memos for the A/B onboarding test and referral geo experiment.
+- Portfolio release notes with CV and LinkedIn wording in `docs/PORTFOLIO_RELEASE.md`.
 
 ## Core Metrics
 
@@ -66,6 +87,13 @@ uv run pytest
 uv run ruff check .
 uv run marimo check notebooks --ignore-scripts
 uv run dbt build --project-dir dbt_neobank --profiles-dir dbt_neobank
+```
+
+## dbt Documentation
+
+```powershell
+uv run dbt docs generate --project-dir dbt_neobank --profiles-dir dbt_neobank
+uv run dbt docs serve --project-dir dbt_neobank --profiles-dir dbt_neobank
 ```
 
 ## Generate Synthetic Data
@@ -114,6 +142,9 @@ uv run streamlit run app/streamlit_app.py
 The dashboard reads the dbt marts in `neobank.duckdb` and displays product health,
 onboarding A/B results, referral geo incrementality, and the two decision memos.
 
+For a lightweight CI-sized run, use the default `raw/ci` data generated in Local
+Setup. For portfolio screenshots, use the 50,000-user commands above.
+
 ## Phase Status
 
 - Phase 0: setup and scaffolding complete.
@@ -124,7 +155,10 @@ onboarding A/B results, referral geo incrementality, and the two decision memos.
 - Phase 5: activation decisioning model complete.
 - Phase 6: regional referral experiment complete.
 - Phase 7: dashboard and memos complete.
-- Phase 8: polish and public release pending.
+- Phase 8: polish and public release complete.
 
-The repository should remain private through Phase 0 and flip public once the
-synthetic data generator is merged and reproducible.
+## Public Release Notes
+
+This repo uses synthetic data only. No Monzo internal data, customer data, or
+proprietary business metrics are included. The Monzo references are public-context
+inspiration for a realistic fintech product analytics workflow.
