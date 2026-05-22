@@ -16,6 +16,11 @@ clean-targets:
 
 models:
   neobank:
-    +materialized: view
+    +materialized: table
     staging:
       +schema: staging
+      +materialized: view
+    intermediate:
+      +schema: intermediate
+    marts:
+      +schema: marts
