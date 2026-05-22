@@ -1,6 +1,6 @@
 # Decision Memo: Personalised Onboarding A/B Test
 
-## TL;DR
+## Executive Summary
 
 SHIP: launch the personalised prompt with rollout monitoring.
 

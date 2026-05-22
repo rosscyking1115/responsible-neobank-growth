@@ -213,7 +213,7 @@ def render_markdown(analysis: OnboardingAnalysis) -> str:
 
     return f"""# Decision Memo: Personalised Onboarding A/B Test
 
-## TL;DR
+## Executive Summary
 
 {analysis.recommendation}
 
