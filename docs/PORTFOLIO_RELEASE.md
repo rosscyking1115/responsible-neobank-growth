@@ -34,8 +34,8 @@ narrative.
    post-activation retention, feature adoption, and CLV by income segment.
 3. Switch to experiments and explain why onboarding ships while referral incentives
    need cheaper unit economics.
-4. Open the decision memo tab and show how the same analysis becomes an executive
-   recommendation.
+4. Open the memo files in `docs/memos/` and show how the same analysis becomes
+   executive recommendations.
 5. Point to dbt marts, tests, and CI to show that the dashboard is backed by a
    reproducible analytics layer rather than a one-off notebook.
 
@@ -45,7 +45,7 @@ Recommended portfolio captures:
 
 - Dashboard top metrics and product health.
 - Experiments tab with onboarding and referral readouts.
-- Decision memo tab with the two one-page recommendations.
+- Decision memos with the two one-page recommendations.
 - dbt lineage or docs page after running `dbt docs generate` and `dbt docs serve`.
 - CI run showing lint, tests, notebook checks, data generation, and dbt build.
 
