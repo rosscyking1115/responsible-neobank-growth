@@ -140,7 +140,7 @@ uv run streamlit run app/streamlit_app.py
 ```
 
 The dashboard reads the dbt marts in `neobank.duckdb` and displays product health,
-onboarding A/B results, referral geo incrementality, and the two decision memos.
+onboarding A/B results, and referral geo incrementality.
 If `neobank.duckdb` does not exist, the dashboard automatically generates a
 5,000-user synthetic demo dataset and builds the dbt marts on first load.
 

@@ -8,24 +8,20 @@ import streamlit as st
 try:
     from app.dashboard_data import (
         DEFAULT_DB_PATH,
-        DEFAULT_MEMO_DIR,
         DashboardData,
         ensure_demo_database,
         load_dashboard_data,
         onboarding_lift_pp,
-        read_decision_memos,
         referral_economics,
         referral_grouped_daily,
     )
 except ModuleNotFoundError:
     from dashboard_data import (  # type: ignore[no-redef]
         DEFAULT_DB_PATH,
-        DEFAULT_MEMO_DIR,
         DashboardData,
         ensure_demo_database,
         load_dashboard_data,
         onboarding_lift_pp,
-        read_decision_memos,
         referral_economics,
         referral_grouped_daily,
     )
@@ -85,11 +81,6 @@ def cached_dashboard_data(db_path: str) -> DashboardData:
     return load_dashboard_data(prepared_db_path)
 
 
-@st.cache_data(show_spinner=False)
-def cached_memos(memo_dir: str) -> dict[str, str]:
-    return read_decision_memos(Path(memo_dir))
-
-
 def _pct(value: float) -> str:
     return f"{value * 100:.1f}%"
 
@@ -106,20 +97,6 @@ def _apply_chart_layout(fig, *, height: int) -> None:
         font={"family": "Inter, Segoe UI, sans-serif"},
         legend_title_text="",
     )
-
-
-def _dashboard_memo(markdown: str) -> str:
-    rendered_lines = []
-    for line in markdown.splitlines():
-        if line.startswith("# "):
-            continue
-        if line.startswith("## "):
-            rendered_lines.append(f"### {line[3:]}")
-        elif line.startswith("### "):
-            rendered_lines.append(f"#### {line[4:]}")
-        else:
-            rendered_lines.append(line)
-    return "\n".join(rendered_lines).strip()
 
 
 def _metric_grid(data: DashboardData) -> None:
@@ -261,23 +238,11 @@ def _render_experiments(data: DashboardData) -> None:
         st.plotly_chart(fig, width="stretch")
 
 
-def _render_memos(memo_dir: str) -> None:
-    memos = cached_memos(memo_dir)
-    left, right = st.columns(2)
-    with left:
-        st.subheader("Onboarding Decision")
-        st.markdown(_dashboard_memo(memos["Onboarding A/B"]))
-    with right:
-        st.subheader("Referral Decision")
-        st.markdown(_dashboard_memo(memos["Referral Geo"]))
-
-
 def main() -> None:
     _apply_app_style()
     st.title("Neobank Product Analytics")
 
     db_path = str(DEFAULT_DB_PATH)
-    memo_dir = str(DEFAULT_MEMO_DIR)
 
     try:
         data = cached_dashboard_data(db_path)
@@ -286,15 +251,11 @@ def main() -> None:
         st.stop()
 
     _metric_grid(data)
-    product_tab, experiment_tab, memo_tab = st.tabs(
-        ["Product health", "Experiments", "Decision memos"]
-    )
+    product_tab, experiment_tab = st.tabs(["Product health", "Experiments"])
     with product_tab:
         _render_product_health(data)
     with experiment_tab:
         _render_experiments(data)
-    with memo_tab:
-        _render_memos(memo_dir)
 
 
 if __name__ == "__main__":
