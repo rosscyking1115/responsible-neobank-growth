@@ -1,7 +1,7 @@
 # Neobank Product Analytics
 
-A Monzo-inspired product analytics case study using dbt, DuckDB, Python,
-experimentation, activation modelling, and synthetic-control geo lift analysis.
+A synthetic neobank product analytics case study using dbt, DuckDB, Python,
+experimentation, activation modelling, and geo-lift analysis.
 
 This repo simulates the end-to-end workflow of a Product Data Scientist working
 in a modern fintech squad: generate realistic event data, build trusted metrics,
