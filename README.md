@@ -1,20 +1,20 @@
 # Neobank Product Analytics
 
-A Monzo-inspired product analytics portfolio project using dbt, DuckDB, Python,
-experimentation, and synthetic-control geo lift analysis.
+A Monzo-inspired product analytics case study using dbt, DuckDB, Python,
+experimentation, activation modelling, and synthetic-control geo lift analysis.
 
-This is a complete synthetic analytics case study for a Product Data Scientist /
-Growth Data Scientist role. It starts with generated fintech event data, builds a
-tested metrics layer, runs causal analyses and an activation model, then packages
-the findings into a dashboard, decision memos, and a public-release narrative.
+This repo simulates the end-to-end workflow of a Product Data Scientist working
+in a modern fintech squad: generate realistic event data, build trusted metrics,
+analyse product experiments, document model guardrails, and translate the work
+into PM-ready dashboard and decision outputs.
 
-## How to Read This Repo in 5 Minutes
+## How to Review This Repo
 
-1. Start with the one-page decision memos in `docs/memos/`.
-2. Open the Streamlit dashboard in `app/streamlit_app.py` for the PM-facing view.
+1. Start with the decision memos in `docs/memos/`.
+2. Open the Streamlit dashboard in `app/streamlit_app.py` for the product view.
 3. Check the dbt models in `dbt_neobank/models/` for the trusted metrics layer.
 4. Read the activation model card in `docs/model_cards/`.
-5. Open the Marimo notebook in `notebooks/` for the EDA narrative.
+5. Open the Marimo notebooks in `notebooks/` for the analytical narrative.
 
 ## Portfolio Highlights
 
@@ -42,9 +42,9 @@ It keeps activation, retention, primary-bank engagement, and customer lifetime v
 central, while using a regional referral incrementality chapter to show causal
 thinking around network effects.
 
-## Current Monzo-Aligned Signals
+## Fintech Product Analytics Themes
 
-The plan is refreshed against Monzo's public 2026 direction:
+The case study is designed around public fintech product analytics themes:
 
 - Product analytics in embedded squads: metrics, experimentation, targeting models,
   ambiguity, and communication.
@@ -99,7 +99,7 @@ uv run dbt docs serve --project-dir dbt_neobank --profiles-dir dbt_neobank
 ## Generate Synthetic Data
 
 ```powershell
-uv run python -m data_generator.generate --users 50000 --months 12 --output-dir raw/phase1_full
+uv run python -m data_generator.generate --users 50000 --months 12 --output-dir raw/portfolio_full
 ```
 
 The generator writes parquet files for users, experiment assignments, activation
@@ -110,32 +110,32 @@ is gitignored so the data is reproducible without committing generated artifacts
 ## Reproduce the Onboarding A/B Memo
 
 ```powershell
-uv run python -m data_generator.generate --users 50000 --months 12 --output-dir raw/phase1_full
-uv run dbt build --project-dir dbt_neobank --profiles-dir dbt_neobank --vars "{raw_path: raw/phase1_full}"
+uv run python -m data_generator.generate --users 50000 --months 12 --output-dir raw/portfolio_full
+uv run dbt build --project-dir dbt_neobank --profiles-dir dbt_neobank --vars "{raw_path: raw/portfolio_full}"
 uv run python -m src.experiments.run_onboarding_ab
 ```
 
 ## Reproduce the Activation Model Card
 
 ```powershell
-uv run python -m data_generator.generate --users 50000 --months 12 --output-dir raw/phase1_full
-uv run dbt build --project-dir dbt_neobank --profiles-dir dbt_neobank --vars "{raw_path: raw/phase1_full}"
+uv run python -m data_generator.generate --users 50000 --months 12 --output-dir raw/portfolio_full
+uv run dbt build --project-dir dbt_neobank --profiles-dir dbt_neobank --vars "{raw_path: raw/portfolio_full}"
 uv run python -m src.modelling.run_activation_model
 ```
 
 ## Reproduce the Referral Geo Memo
 
 ```powershell
-uv run python -m data_generator.generate --users 50000 --months 12 --output-dir raw/phase1_full
-uv run dbt build --project-dir dbt_neobank --profiles-dir dbt_neobank --vars "{raw_path: raw/phase1_full}"
+uv run python -m data_generator.generate --users 50000 --months 12 --output-dir raw/portfolio_full
+uv run dbt build --project-dir dbt_neobank --profiles-dir dbt_neobank --vars "{raw_path: raw/portfolio_full}"
 uv run python -m src.experiments.run_referral_incrementality
 ```
 
 ## Run the Product Dashboard
 
 ```powershell
-uv run python -m data_generator.generate --users 50000 --months 12 --output-dir raw/phase1_full
-uv run dbt build --project-dir dbt_neobank --profiles-dir dbt_neobank --vars "{raw_path: raw/phase1_full}"
+uv run python -m data_generator.generate --users 50000 --months 12 --output-dir raw/portfolio_full
+uv run dbt build --project-dir dbt_neobank --profiles-dir dbt_neobank --vars "{raw_path: raw/portfolio_full}"
 uv run streamlit run app/streamlit_app.py
 ```
 
@@ -152,18 +152,6 @@ Setup. For portfolio screenshots, use the 50,000-user commands above.
 Use `app/streamlit_app.py` as the app entrypoint and `requirements.txt` for
 dependencies. No secrets are required. See `docs/STREAMLIT_DEPLOYMENT.md` for the
 full deployment checklist and cold-start behavior.
-
-## Phase Status
-
-- Phase 0: setup and scaffolding complete.
-- Phase 1: synthetic data generator complete.
-- Phase 2: dbt metrics layer complete.
-- Phase 3: EDA product insights complete.
-- Phase 4: A/B experimentation with CUPED complete.
-- Phase 5: activation decisioning model complete.
-- Phase 6: regional referral experiment complete.
-- Phase 7: dashboard and memos complete.
-- Phase 8: polish and public release complete.
 
 ## Public Release Notes
 
