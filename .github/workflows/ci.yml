@@ -43,3 +43,19 @@ jobs:
 
       - name: dbt build
         run: uv run dbt build --project-dir dbt_neobank --profiles-dir dbt_neobank
+
+      - name: Build API container
+        run: docker build -f Dockerfile.api -t neobank-api:ci .
+
+      - name: Smoke test API container
+        run: |
+          docker run --rm -d -p 8080:8080 --name neobank-api neobank-api:ci
+          trap 'docker stop neobank-api' EXIT
+          for attempt in {1..20}; do
+            if curl --fail --silent http://127.0.0.1:8080/health; then
+              exit 0
+            fi
+            sleep 1
+          done
+          docker logs neobank-api
+          exit 1

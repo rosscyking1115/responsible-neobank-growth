@@ -39,6 +39,7 @@ Already strong:
   the full check table.
 - GCP raw warehouse load manifest with BigQuery `bq load` command rendering,
   Cloud Storage path conventions, and a private BigQuery dbt profile example.
+- Cloud Run-compatible API container with CI build and `/health` smoke test.
 - Onboarding A/B and referral geo analyses with causal inference and memos.
 - CI for linting, notebooks, tests, data generation, and dbt build.
 - Model card and public-release notes.
@@ -54,7 +55,8 @@ Main product-readiness gaps:
   storage/warehouse loading, and rollback documentation.
 - Monitoring is local snapshot-based with dashboard surfacing; it still needs
   score-distribution drift, calibration monitoring, and an operational runbook.
-- No container, deployment gate, or Cloud Run job/service workflow.
+- Cloud Run service deployment is documented and container-gated in CI; Cloud Run
+  jobs for batch scoring and monitoring remain future work.
 
 ## Target Product
 
@@ -267,7 +269,8 @@ Recommended first build sequence:
    local manifest and command renderer; live cloud execution remains optional.
 8. Monitoring dashboard summary, drift checks, and operational runbook. The
    dashboard summary is done; drift checks and the runbook remain.
-9. Cloud Run deployment docs and container smoke test workflow.
+9. Cloud Run deployment docs and container smoke test workflow. Done for the API
+   service; batch and monitoring jobs remain future work.
 
 This order gives the fastest visible jump from portfolio project to product
 platform: API first, then model serving, then pricing, then cloud hardening.
