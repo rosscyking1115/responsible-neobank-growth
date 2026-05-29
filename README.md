@@ -166,6 +166,15 @@ The snapshot writes JSON and Markdown reports under `artifacts/monitoring/` with
 data quality, activation, experiment, pricing, batch-scoring, and API-readiness
 checks. See `docs/MONITORING.md`.
 
+## Render the GCP Warehouse Load Plan
+
+```powershell
+uv run python -m src.cloud.gcp_load_plan
+```
+
+The load plan turns the tracked Cloud Storage/BigQuery manifest into `bq load`
+commands for the raw parquet warehouse landing layer. See `docs/GCP_WAREHOUSE.md`.
+
 ## Reproduce Pricing Intelligence Marts
 
 ```powershell

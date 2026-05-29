@@ -1,0 +1,13 @@
+neobank:
+  target: bigquery
+  outputs:
+    bigquery:
+      type: bigquery
+      method: service-account
+      project: "{{ env_var('GCP_PROJECT_ID') }}"
+      dataset: "{{ env_var('NEOBANK_BQ_STAGING_DATASET', 'neobank_staging') }}"
+      location: "{{ env_var('NEOBANK_BQ_LOCATION', 'EU') }}"
+      keyfile: "{{ env_var('GOOGLE_APPLICATION_CREDENTIALS') }}"
+      threads: 4
+      timeout_seconds: 300
+      priority: interactive

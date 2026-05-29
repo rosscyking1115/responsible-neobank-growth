@@ -35,15 +35,19 @@ Already strong:
   acceptance outcomes, margin assumptions, and guardrail recommendation marts.
 - Local monitoring snapshot command for DuckDB mart availability, activation,
   experiment, pricing, batch-score, and API readiness checks.
+- GCP raw warehouse load manifest with BigQuery `bq load` command rendering,
+  Cloud Storage path conventions, and a private BigQuery dbt profile example.
 - Onboarding A/B and referral geo analyses with causal inference and memos.
 - CI for linting, notebooks, tests, data generation, and dbt build.
 - Model card and public-release notes.
 
 Main product-readiness gaps:
 
-- Pricing scenario simulation is still API-only logic; it is not yet connected to
-  the new pricing marts or shown in the dashboard.
-- No BigQuery or Cloud Storage path; the warehouse is local DuckDB only.
+- Pricing scenario simulation is backed by the recommendation mart for the
+  default portfolio scenario; it still needs persisted scenario runs and
+  sensitivity analysis output.
+- BigQuery and Cloud Storage are scaffolded as a documented raw-load path; they
+  are not yet exercised by a live cloud CI job.
 - Batch scoring is local only; it still needs scheduling, scoring logs, cloud
   storage/warehouse loading, and rollback documentation.
 - Monitoring is local snapshot-based; it still needs dashboard surfacing,
@@ -257,7 +261,8 @@ Recommended first build sequence:
 4. Batch scoring and model registry metadata.
 5. Pricing synthetic data and pricing marts.
 6. Pricing scenario endpoint and dashboard section.
-7. BigQuery target documentation and Cloud Storage landing pattern.
+7. BigQuery target documentation and Cloud Storage landing pattern. Done as a
+   local manifest and command renderer; live cloud execution remains optional.
 8. Monitoring dashboard summary, drift checks, and operational runbook.
 9. Cloud Run deployment docs and container smoke test workflow.
 

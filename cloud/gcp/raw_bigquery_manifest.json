@@ -1,0 +1,116 @@
+{
+  "manifest_version": 1,
+  "description": "Raw parquet landing manifest for the synthetic neobank warehouse.",
+  "project_env_var": "GCP_PROJECT_ID",
+  "dataset_env_var": "NEOBANK_BQ_RAW_DATASET",
+  "location_env_var": "NEOBANK_BQ_LOCATION",
+  "bucket_env_var": "NEOBANK_GCS_RAW_BUCKET",
+  "prefix_env_var": "NEOBANK_GCS_RAW_PREFIX",
+  "source_format": "PARQUET",
+  "tables": [
+    {
+      "name": "users",
+      "file": "users.parquet",
+      "grain": "one row per synthetic user",
+      "partition_field": "signup_date",
+      "cluster_fields": ["region", "signup_channel", "income_segment"],
+      "write_disposition": "WRITE_TRUNCATE"
+    },
+    {
+      "name": "experiment_assignments",
+      "file": "experiment_assignments.parquet",
+      "grain": "one row per experiment assignment",
+      "partition_field": "assigned_at",
+      "cluster_fields": ["experiment_name", "variant"],
+      "write_disposition": "WRITE_TRUNCATE"
+    },
+    {
+      "name": "activation_ground_truth",
+      "file": "activation_ground_truth.parquet",
+      "grain": "one row per synthetic user activation label",
+      "partition_field": null,
+      "cluster_fields": ["variant"],
+      "write_disposition": "WRITE_TRUNCATE"
+    },
+    {
+      "name": "transactions",
+      "file": "transactions.parquet",
+      "grain": "one row per card transaction",
+      "partition_field": "occurred_date",
+      "cluster_fields": ["region", "merchant_category"],
+      "write_disposition": "WRITE_TRUNCATE"
+    },
+    {
+      "name": "sessions",
+      "file": "sessions.parquet",
+      "grain": "one row per app session",
+      "partition_field": "started_date",
+      "cluster_fields": ["region", "device_os"],
+      "write_disposition": "WRITE_TRUNCATE"
+    },
+    {
+      "name": "feature_events",
+      "file": "feature_events.parquet",
+      "grain": "one row per feature event",
+      "partition_field": "event_date",
+      "cluster_fields": ["feature_name", "region"],
+      "write_disposition": "WRITE_TRUNCATE"
+    },
+    {
+      "name": "support_contacts",
+      "file": "support_contacts.parquet",
+      "grain": "one row per support contact",
+      "partition_field": "contact_date",
+      "cluster_fields": ["region", "topic"],
+      "write_disposition": "WRITE_TRUNCATE"
+    },
+    {
+      "name": "referrals",
+      "file": "referrals.parquet",
+      "grain": "one row per referral edge",
+      "partition_field": "created_date",
+      "cluster_fields": ["referrer_region", "referee_region"],
+      "write_disposition": "WRITE_TRUNCATE"
+    },
+    {
+      "name": "region_daily_signups",
+      "file": "region_daily_signups.parquet",
+      "grain": "one row per region per day",
+      "partition_field": "date",
+      "cluster_fields": ["region", "treated_region"],
+      "write_disposition": "WRITE_TRUNCATE"
+    },
+    {
+      "name": "pricing_offer_catalog",
+      "file": "pricing_offer_catalog.parquet",
+      "grain": "one row per pricing offer",
+      "partition_field": null,
+      "cluster_fields": ["product_area", "offer_type"],
+      "write_disposition": "WRITE_TRUNCATE"
+    },
+    {
+      "name": "pricing_exposures",
+      "file": "pricing_exposures.parquet",
+      "grain": "one row per pricing offer exposure",
+      "partition_field": "exposure_date",
+      "cluster_fields": ["offer_id", "price_variant", "eligibility_reason_code"],
+      "write_disposition": "WRITE_TRUNCATE"
+    },
+    {
+      "name": "pricing_outcomes",
+      "file": "pricing_outcomes.parquet",
+      "grain": "one row per pricing exposure outcome",
+      "partition_field": "outcome_ts",
+      "cluster_fields": ["offer_id"],
+      "write_disposition": "WRITE_TRUNCATE"
+    },
+    {
+      "name": "experiment_ground_truth",
+      "file": "experiment_ground_truth.parquet",
+      "grain": "one row per embedded experiment parameter",
+      "partition_field": null,
+      "cluster_fields": ["metric"],
+      "write_disposition": "WRITE_TRUNCATE"
+    }
+  ]
+}
