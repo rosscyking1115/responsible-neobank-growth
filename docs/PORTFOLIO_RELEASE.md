@@ -22,6 +22,8 @@ scenario artifacts, model monitoring, and operational release gates.
 
 ## Suggested LinkedIn Wording
 
+For a ready-to-post version, use `docs/PUBLIC_LAUNCH.md`.
+
 I built a synthetic neobank product analytics project to mirror how a modern
 fintech growth data team works: generate event data, model trusted dbt marts, run
 activation and referral analyses, train a decisioning model with guardrails, and
