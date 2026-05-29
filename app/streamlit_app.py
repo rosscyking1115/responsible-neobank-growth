@@ -2,8 +2,17 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pandas as pd
 import plotly.express as px
 import streamlit as st
+
+try:
+    from src.monitoring.snapshot import MonitoringSnapshot, build_monitoring_snapshot
+except ModuleNotFoundError:
+    import sys
+
+    sys.path.append(str(Path(__file__).resolve().parents[1]))
+    from src.monitoring.snapshot import MonitoringSnapshot, build_monitoring_snapshot
 
 try:
     from app.dashboard_data import (
@@ -51,6 +60,7 @@ PRICING_ACTION_COLORS = {
     "human_review": "#7C6FE8",
 }
 PRIMARY_BLUE = "#0B66C3"
+STATUS_COLORS = {"pass": "#00A88F", "warn": "#F2B544", "fail": "#EF4444"}
 
 
 def _apply_app_style() -> None:
@@ -90,6 +100,12 @@ def _apply_app_style() -> None:
 def cached_dashboard_data(db_path: str) -> DashboardData:
     prepared_db_path = ensure_demo_database(Path(db_path))
     return load_dashboard_data(prepared_db_path)
+
+
+@st.cache_data(show_spinner=False)
+def cached_monitoring_snapshot(db_path: str) -> MonitoringSnapshot:
+    prepared_db_path = ensure_demo_database(Path(db_path))
+    return build_monitoring_snapshot(db_path=prepared_db_path)
 
 
 def _pct(value: float) -> str:
@@ -343,6 +359,76 @@ def _render_pricing(data: DashboardData) -> None:
     st.plotly_chart(fig, width="stretch")
 
 
+def _render_monitoring(snapshot: MonitoringSnapshot) -> None:
+    checks = pd.DataFrame(
+        [
+            {
+                "check": check.name,
+                "status": check.status,
+                "value": check.value,
+                "threshold": check.threshold,
+                "message": check.message,
+            }
+            for check in snapshot.checks
+        ]
+    )
+    status_counts = (
+        checks["status"]
+        .value_counts()
+        .reindex(["fail", "warn", "pass"], fill_value=0)
+        .rename_axis("status")
+        .reset_index(name="checks")
+    )
+
+    cols = st.columns(4)
+    cols[0].metric("Overall status", snapshot.overall_status.upper())
+    cols[1].metric("Failing checks", int(status_counts.loc[0, "checks"]))
+    cols[2].metric("Warnings", int(status_counts.loc[1, "checks"]))
+    cols[3].metric("Passing checks", int(status_counts.loc[2, "checks"]))
+
+    left, right = st.columns([0.8, 1.2])
+    with left:
+        st.subheader("Check Status")
+        fig = px.bar(
+            status_counts,
+            x="status",
+            y="checks",
+            color="status",
+            color_discrete_map=STATUS_COLORS,
+            labels={"status": "Status", "checks": "Checks"},
+        )
+        _apply_chart_layout(fig, height=300)
+        fig.update_layout(showlegend=False)
+        st.plotly_chart(fig, width="stretch")
+
+    with right:
+        st.subheader("Attention Required")
+        attention = checks[checks["status"].isin(["fail", "warn"])].copy()
+        if attention.empty:
+            st.dataframe(
+                checks[["check", "status", "value", "threshold"]],
+                width="stretch",
+                hide_index=True,
+            )
+        else:
+            st.dataframe(
+                attention[["check", "status", "value", "threshold", "message"]],
+                width="stretch",
+                hide_index=True,
+            )
+
+    st.subheader("All Checks")
+    status_order = {"fail": 0, "warn": 1, "pass": 2}
+    ordered = checks.assign(status_order=checks["status"].map(status_order)).sort_values(
+        ["status_order", "check"]
+    )
+    st.dataframe(
+        ordered[["check", "status", "value", "threshold"]],
+        width="stretch",
+        hide_index=True,
+    )
+
+
 def main() -> None:
     _apply_app_style()
     st.title("Neobank Product Analytics")
@@ -351,13 +437,14 @@ def main() -> None:
 
     try:
         data = cached_dashboard_data(db_path)
+        monitoring_snapshot = cached_monitoring_snapshot(db_path)
     except Exception as exc:  # pragma: no cover - Streamlit-only failure path.
         st.error(str(exc))
         st.stop()
 
     _metric_grid(data)
-    product_tab, pricing_tab, experiment_tab = st.tabs(
-        ["Product health", "Pricing intelligence", "Experiments"]
+    product_tab, pricing_tab, experiment_tab, monitoring_tab = st.tabs(
+        ["Product health", "Pricing intelligence", "Experiments", "Monitoring"]
     )
     with product_tab:
         _render_product_health(data)
@@ -365,6 +452,8 @@ def main() -> None:
         _render_pricing(data)
     with experiment_tab:
         _render_experiments(data)
+    with monitoring_tab:
+        _render_monitoring(monitoring_snapshot)
 
 
 if __name__ == "__main__":

@@ -25,3 +25,7 @@ The snapshot checks:
 
 `fail` means the release should stop. `warn` means the project can still run, but
 the result needs human review before a public release or ramp-up.
+
+The Streamlit dashboard also includes a Monitoring tab that computes the same
+snapshot against the current DuckDB path and shows the overall status, status
+counts, attention items, and full check table.

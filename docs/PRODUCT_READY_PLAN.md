@@ -35,6 +35,8 @@ Already strong:
   acceptance outcomes, margin assumptions, and guardrail recommendation marts.
 - Local monitoring snapshot command for DuckDB mart availability, activation,
   experiment, pricing, batch-score, and API readiness checks.
+- Streamlit monitoring tab for operational status counts, attention items, and
+  the full check table.
 - GCP raw warehouse load manifest with BigQuery `bq load` command rendering,
   Cloud Storage path conventions, and a private BigQuery dbt profile example.
 - Onboarding A/B and referral geo analyses with causal inference and memos.
@@ -50,7 +52,7 @@ Main product-readiness gaps:
   are not yet exercised by a live cloud CI job.
 - Batch scoring is local only; it still needs scheduling, scoring logs, cloud
   storage/warehouse loading, and rollback documentation.
-- Monitoring is local snapshot-based; it still needs dashboard surfacing,
+- Monitoring is local snapshot-based with dashboard surfacing; it still needs
   score-distribution drift, calibration monitoring, and an operational runbook.
 - No container, deployment gate, or Cloud Run job/service workflow.
 
@@ -263,7 +265,8 @@ Recommended first build sequence:
 6. Pricing scenario endpoint and dashboard section.
 7. BigQuery target documentation and Cloud Storage landing pattern. Done as a
    local manifest and command renderer; live cloud execution remains optional.
-8. Monitoring dashboard summary, drift checks, and operational runbook.
+8. Monitoring dashboard summary, drift checks, and operational runbook. The
+   dashboard summary is done; drift checks and the runbook remain.
 9. Cloud Run deployment docs and container smoke test workflow.
 
 This order gives the fastest visible jump from portfolio project to product
