@@ -9,6 +9,8 @@ Use Streamlit Community Cloud for the public portfolio dashboard.
 - Main file path: `app/streamlit_app.py`
 - Python dependencies: `requirements.txt`
 - Secrets: none required
+- Viewer config: `.streamlit/config.toml` hides developer toolbar actions and
+  applies the public dashboard theme.
 
 ## Runtime Behavior
 
