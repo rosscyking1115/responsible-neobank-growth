@@ -1,4 +1,4 @@
-# Neobank Product Analytics
+# Customer Growth & Pricing Intelligence Platform
 
 A synthetic neobank product analytics case study using dbt, DuckDB, Python,
 experimentation, activation modelling, and geo-lift analysis.
@@ -7,6 +7,11 @@ This repo simulates the end-to-end workflow of a Product Data Scientist working
 in a modern fintech squad: generate realistic event data, build trusted metrics,
 analyse product experiments, document model guardrails, and translate the work
 into PM-ready dashboard and decision outputs.
+
+The next product-ready upgrade path is documented in
+`docs/PRODUCT_READY_PLAN.md`. It reframes the project as a cloud-ready customer
+growth and pricing intelligence platform with prediction APIs, BigQuery/dbt
+readiness, batch scoring, monitoring, and deployment gates.
 
 ## How to Review This Repo
 

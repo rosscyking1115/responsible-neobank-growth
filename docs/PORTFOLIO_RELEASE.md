@@ -2,10 +2,15 @@
 
 ## Recruiter Scan
 
-Neobank Product Analytics is a synthetic, end-to-end product analytics project for
-a fintech growth/product data science role. It demonstrates warehouse modelling,
-experimentation, causal inference, model decisioning, dashboarding, and executive
-communication in one reproducible repo.
+Customer Growth & Pricing Intelligence Platform is a synthetic, end-to-end
+product analytics project for a fintech growth/product data science role. It
+demonstrates warehouse modelling, experimentation, causal inference, model
+decisioning, dashboarding, and executive communication in one reproducible repo.
+
+The product-ready upgrade roadmap is documented in `docs/PRODUCT_READY_PLAN.md`.
+It should be treated as the build plan for the BigQuery, Cloud Run API, pricing
+intelligence, batch scoring, and monitoring layers rather than claimed as already
+shipped work.
 
 ## Suggested CV Bullet
 
