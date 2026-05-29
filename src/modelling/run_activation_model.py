@@ -8,6 +8,10 @@ from pathlib import Path
 
 import pandas as pd
 
+from src.modelling.artifacts import (
+    DEFAULT_ACTIVATION_ARTIFACT_DIR,
+    write_activation_model_artifact,
+)
 from src.modelling.evaluate import (
     GuardrailCheck,
     ModelMetrics,
@@ -206,14 +210,22 @@ def parse_args() -> argparse.Namespace:
         type=Path,
         default=Path("docs/model_cards/MODEL_ACTIVATION_DECISIONING.md"),
     )
+    parser.add_argument(
+        "--artifact-dir",
+        type=Path,
+        default=DEFAULT_ACTIVATION_ARTIFACT_DIR,
+        help="Directory for model.joblib, metadata.json, and registry.json.",
+    )
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
-    run, _model = train_and_evaluate(args.db)
+    run, model = train_and_evaluate(args.db)
     write_model_card(run, args.output)
+    metadata = write_activation_model_artifact(model, run, args.artifact_dir)
     print(f"Wrote activation model card to {args.output}")
+    print(f"Wrote activation model artifact {metadata.model_version} to {args.artifact_dir}")
     print(run.recommendation)
 
 
