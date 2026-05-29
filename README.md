@@ -1,5 +1,7 @@
 # Customer Growth & Pricing Intelligence Platform
 
+[![CI](https://github.com/rosscyking1115/neobank-product-analytics/actions/workflows/ci.yml/badge.svg)](https://github.com/rosscyking1115/neobank-product-analytics/actions/workflows/ci.yml)
+
 A synthetic neobank product analytics case study using dbt, DuckDB, Python,
 experimentation, activation modelling, and geo-lift analysis.
 
