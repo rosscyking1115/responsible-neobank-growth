@@ -23,6 +23,15 @@ database on first load:
 Both `raw/` and DuckDB files are gitignored, so the deployed app remains
 reproducible without committing generated data.
 
+The deployed dashboard has four review tabs:
+
+- Product health: activation, engagement, retention, feature adoption, and value.
+- Pricing intelligence: offer economics, guarded recommendations, scenario runs,
+  and sensitivity checks.
+- Experiments: onboarding A/B and referral geo incrementality readouts.
+- Monitoring: local release-gate status for mart, pricing, API, and scoring
+  readiness.
+
 ## Operational Notes
 
 - First cold start can take a few minutes while synthetic data and dbt models are

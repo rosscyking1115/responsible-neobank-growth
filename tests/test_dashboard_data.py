@@ -9,7 +9,6 @@ from app.dashboard_data import (
     onboarding_lift_pp,
     pricing_economics,
     pricing_margin_by_offer,
-    read_decision_memos,
     referral_economics,
     referral_grouped_daily,
     trim_partial_week,
@@ -361,12 +360,3 @@ def test_pricing_helpers_compute_economics_and_offer_margin(tmp_path: Path) -> N
     assert economics["net_margin_30d_gbp"] == 15.0
     assert round(economics["human_review_rate"], 4) == 0.2
     assert margin.loc[0, "offer_id"] == "easy_access_savings_boost"
-
-
-def test_read_decision_memos_handles_missing_files(tmp_path: Path) -> None:
-    (tmp_path / "MEMO_AB_ONBOARDING.md").write_text("# Ship it", encoding="utf-8")
-
-    memos = read_decision_memos(tmp_path)
-
-    assert memos["Onboarding A/B"] == "# Ship it"
-    assert memos["Referral Geo"] == "Memo has not been generated."

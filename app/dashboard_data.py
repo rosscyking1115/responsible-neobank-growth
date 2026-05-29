@@ -13,10 +13,7 @@ import pandas as pd
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_DB_PATH = Path("neobank.duckdb")
-DEFAULT_MEMO_DIR = Path("docs/memos")
 DEFAULT_DEMO_RAW_PATH = Path("raw/streamlit_demo")
-ONBOARDING_MEMO = "MEMO_AB_ONBOARDING.md"
-REFERRAL_MEMO = "MEMO_REFERRAL_INCREMENTALITY.md"
 PARTIAL_WEEK_DROP_RATIO = 0.70
 DEMO_USERS = 5_000
 DEMO_MONTHS = 6
@@ -364,18 +361,6 @@ def load_dashboard_data(db_path: Path = DEFAULT_DB_PATH) -> DashboardData:
         experiment_variants=experiment_variants,
         referral_daily=referral_daily,
     )
-
-
-def read_decision_memos(memo_dir: Path = DEFAULT_MEMO_DIR) -> dict[str, str]:
-    """Read the two published decision memos for display in the dashboard."""
-    memo_paths = {
-        "Onboarding A/B": memo_dir / ONBOARDING_MEMO,
-        "Referral Geo": memo_dir / REFERRAL_MEMO,
-    }
-    return {
-        title: path.read_text(encoding="utf-8") if path.exists() else "Memo has not been generated."
-        for title, path in memo_paths.items()
-    }
 
 
 def onboarding_lift_pp(experiment_variants: pd.DataFrame) -> float | None:
