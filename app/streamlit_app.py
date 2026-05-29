@@ -12,6 +12,8 @@ try:
         ensure_demo_database,
         load_dashboard_data,
         onboarding_lift_pp,
+        pricing_economics,
+        pricing_margin_by_offer,
         referral_economics,
         referral_grouped_daily,
     )
@@ -22,6 +24,8 @@ except ModuleNotFoundError:
         ensure_demo_database,
         load_dashboard_data,
         onboarding_lift_pp,
+        pricing_economics,
+        pricing_margin_by_offer,
         referral_economics,
         referral_grouped_daily,
     )
@@ -39,6 +43,13 @@ FEATURE_COLORS = {
     "savings_pot": "#7C6FE8",
 }
 VARIANT_COLORS = {"control": "#6B7280", "treatment": "#00A88F"}
+PRICING_ACTION_COLORS = {
+    "scale": "#00A88F",
+    "test": "#0B66C3",
+    "hold_margin": "#F2B544",
+    "hold_guardrail": "#EF4444",
+    "human_review": "#7C6FE8",
+}
 PRIMARY_BLUE = "#0B66C3"
 
 
@@ -238,6 +249,100 @@ def _render_experiments(data: DashboardData) -> None:
         st.plotly_chart(fig, width="stretch")
 
 
+def _render_pricing(data: DashboardData) -> None:
+    economics = pricing_economics(data.pricing_outcomes)
+    cols = st.columns(5)
+    cols[0].metric("Offer exposures", f"{economics['exposures']:,.0f}")
+    cols[1].metric("Acceptance rate", _pct(economics["acceptance_rate"]))
+    cols[2].metric("Net margin 30d", _gbp(economics["net_margin_30d_gbp"]))
+    cols[3].metric("Incentive cost", _gbp(economics["incentive_cost_gbp"]))
+    cols[4].metric("Human review rate", _pct(economics["human_review_rate"]))
+
+    if data.pricing_recommendations.empty:
+        st.info("Pricing marts are not available in this DuckDB build.")
+        return
+
+    left, right = st.columns([1.1, 1])
+    with left:
+        st.subheader("Recommendation Actions")
+        action_frame = (
+            data.pricing_recommendations.groupby(
+                ["recommended_action", "recommendation_reason_code"],
+                as_index=False,
+            )
+            .agg(exposures=("exposures", "sum"))
+            .sort_values("exposures", ascending=False)
+        )
+        fig = px.bar(
+            action_frame,
+            x="recommended_action",
+            y="exposures",
+            color="recommended_action",
+            color_discrete_map=PRICING_ACTION_COLORS,
+            labels={
+                "recommended_action": "Action",
+                "exposures": "Eligible exposures",
+                "recommendation_reason_code": "Reason",
+            },
+            hover_data=["recommendation_reason_code"],
+        )
+        _apply_chart_layout(fig, height=320)
+        fig.update_layout(showlegend=False)
+        st.plotly_chart(fig, width="stretch")
+
+    with right:
+        st.subheader("Margin By Offer")
+        margin_frame = pricing_margin_by_offer(data.pricing_recommendations)
+        fig = px.bar(
+            margin_frame,
+            x="total_net_margin_30d_gbp",
+            y="offer_id",
+            orientation="h",
+            color="human_review_rate",
+            color_continuous_scale=["#DCEFF7", "#8DD7D0", "#006C67"],
+            labels={
+                "total_net_margin_30d_gbp": "Net margin 30d",
+                "offer_id": "Offer",
+                "human_review_rate": "Human review",
+            },
+            hover_data=["product_area", "exposures", "acceptance_rate"],
+        )
+        _apply_chart_layout(fig, height=320)
+        st.plotly_chart(fig, width="stretch")
+
+    st.subheader("Pricing Guardrails By Variant")
+    variant_frame = (
+        data.pricing_recommendations.groupby(["price_variant"], as_index=False)
+        .agg(
+            exposures=("exposures", "sum"),
+            acceptance_rate=("acceptance_rate", "mean"),
+            avg_net_margin_30d_gbp=("avg_net_margin_30d_gbp", "mean"),
+            complaint_rate_14d=("complaint_rate_14d", "mean"),
+            human_review_rate=("human_review_rate", "mean"),
+        )
+        .sort_values("price_variant")
+    )
+    fig = px.scatter(
+        variant_frame,
+        x="acceptance_rate",
+        y="avg_net_margin_30d_gbp",
+        size="exposures",
+        color="human_review_rate",
+        color_continuous_scale=["#DCEFF7", "#8DD7D0", "#006C67"],
+        labels={
+            "acceptance_rate": "Acceptance rate",
+            "avg_net_margin_30d_gbp": "Avg net margin 30d",
+            "exposures": "Exposures",
+            "human_review_rate": "Human review",
+        },
+        hover_name="price_variant",
+        hover_data=["complaint_rate_14d"],
+    )
+    _apply_chart_layout(fig, height=330)
+    fig.update_xaxes(tickformat=".0%")
+    st.plotly_chart(fig, width="stretch")
+
+
 def main() -> None:
     _apply_app_style()
     st.title("Neobank Product Analytics")
@@ -251,9 +356,13 @@ def main() -> None:
         st.stop()
 
     _metric_grid(data)
-    product_tab, experiment_tab = st.tabs(["Product health", "Experiments"])
+    product_tab, pricing_tab, experiment_tab = st.tabs(
+        ["Product health", "Pricing intelligence", "Experiments"]
+    )
     with product_tab:
         _render_product_health(data)
+    with pricing_tab:
+        _render_pricing(data)
     with experiment_tab:
         _render_experiments(data)
 

@@ -30,12 +30,69 @@ class DashboardData:
     retention_curve: pd.DataFrame
     feature_adoption: pd.DataFrame
     clv_by_segment: pd.DataFrame
+    pricing_outcomes: pd.DataFrame
+    pricing_recommendations: pd.DataFrame
     experiment_variants: pd.DataFrame
     referral_daily: pd.DataFrame
 
 
 def _fetch_frame(con: duckdb.DuckDBPyConnection, query: str) -> pd.DataFrame:
     return con.execute(query).fetchdf()
+
+
+def _table_exists(con: duckdb.DuckDBPyConnection, schema_name: str, table_name: str) -> bool:
+    result = con.execute(
+        """
+        select count(*) > 0
+        from information_schema.tables
+        where table_schema = ?
+          and table_name = ?
+        """,
+        [schema_name, table_name],
+    ).fetchone()
+    return bool(result[0]) if result else False
+
+
+def _empty_pricing_outcomes() -> pd.DataFrame:
+    return pd.DataFrame(
+        columns=[
+            "offer_id",
+            "exposure_date",
+            "region",
+            "price_variant",
+            "exposures",
+            "accepted_offers",
+            "activated_offers",
+            "acceptance_rate",
+            "gross_margin_30d_gbp",
+            "incentive_cost_gbp",
+            "net_margin_30d_gbp",
+            "support_contact_rate_14d",
+            "complaint_rate_14d",
+            "human_review_required_exposures",
+        ]
+    )
+
+
+def _empty_pricing_recommendations() -> pd.DataFrame:
+    return pd.DataFrame(
+        columns=[
+            "offer_id",
+            "product_area",
+            "offer_type",
+            "income_segment",
+            "price_variant",
+            "exposures",
+            "acceptance_rate",
+            "avg_net_margin_30d_gbp",
+            "total_net_margin_30d_gbp",
+            "support_contact_rate_14d",
+            "complaint_rate_14d",
+            "human_review_rate",
+            "recommended_action",
+            "recommendation_reason_code",
+        ]
+    )
 
 
 def resolve_project_path(path: Path) -> Path:
@@ -211,6 +268,56 @@ def load_dashboard_data(db_path: Path = DEFAULT_DB_PATH) -> DashboardData:
             order by avg_clv_proxy_12m_gbp desc
             """,
         )
+        if _table_exists(con, "main_marts", "fct_pricing_outcomes"):
+            pricing_outcomes = _fetch_frame(
+                con,
+                """
+                select
+                    offer_id,
+                    exposure_date,
+                    region,
+                    price_variant,
+                    exposures,
+                    accepted_offers,
+                    activated_offers,
+                    acceptance_rate,
+                    gross_margin_30d_gbp,
+                    incentive_cost_gbp,
+                    net_margin_30d_gbp,
+                    support_contact_rate_14d,
+                    complaint_rate_14d,
+                    human_review_required_exposures
+                from main_marts.fct_pricing_outcomes
+                order by exposure_date, offer_id, region, price_variant
+                """,
+            )
+        else:
+            pricing_outcomes = _empty_pricing_outcomes()
+        if _table_exists(con, "main_marts", "mart_pricing_recommendations"):
+            pricing_recommendations = _fetch_frame(
+                con,
+                """
+                select
+                    offer_id,
+                    product_area,
+                    offer_type,
+                    income_segment,
+                    price_variant,
+                    exposures,
+                    acceptance_rate,
+                    avg_net_margin_30d_gbp,
+                    total_net_margin_30d_gbp,
+                    support_contact_rate_14d,
+                    complaint_rate_14d,
+                    human_review_rate,
+                    recommended_action,
+                    recommendation_reason_code
+                from main_marts.mart_pricing_recommendations
+                order by product_area, offer_id, income_segment, price_variant
+                """,
+            )
+        else:
+            pricing_recommendations = _empty_pricing_recommendations()
         experiment_variants = _fetch_frame(
             con,
             """
@@ -252,6 +359,8 @@ def load_dashboard_data(db_path: Path = DEFAULT_DB_PATH) -> DashboardData:
         retention_curve=retention_curve,
         feature_adoption=feature_adoption,
         clv_by_segment=clv_by_segment,
+        pricing_outcomes=pricing_outcomes,
+        pricing_recommendations=pricing_recommendations,
         experiment_variants=experiment_variants,
         referral_daily=referral_daily,
     )
@@ -319,4 +428,47 @@ def referral_grouped_daily(referral_daily: pd.DataFrame) -> pd.DataFrame:
             reward_cost_gbp=("reward_cost_gbp", "sum"),
         )
         .sort_values(["date_day", "geo_group"])
+    )
+
+
+def pricing_economics(pricing_outcomes: pd.DataFrame) -> dict[str, float]:
+    """Summarise pricing exposure, conversion, margin, and guardrail load."""
+    if pricing_outcomes.empty:
+        return {
+            "exposures": 0.0,
+            "acceptance_rate": 0.0,
+            "net_margin_30d_gbp": 0.0,
+            "incentive_cost_gbp": 0.0,
+            "human_review_rate": 0.0,
+            "complaint_rate_14d": 0.0,
+        }
+    exposures = float(pricing_outcomes["exposures"].sum())
+    accepted = float(pricing_outcomes["accepted_offers"].sum())
+    human_review = float(pricing_outcomes["human_review_required_exposures"].sum())
+    weighted_complaints = (
+        pricing_outcomes["complaint_rate_14d"] * pricing_outcomes["exposures"]
+    ).sum()
+    return {
+        "exposures": exposures,
+        "acceptance_rate": accepted / exposures if exposures else 0.0,
+        "net_margin_30d_gbp": float(pricing_outcomes["net_margin_30d_gbp"].sum()),
+        "incentive_cost_gbp": float(pricing_outcomes["incentive_cost_gbp"].sum()),
+        "human_review_rate": human_review / exposures if exposures else 0.0,
+        "complaint_rate_14d": float(weighted_complaints / exposures) if exposures else 0.0,
+    }
+
+
+def pricing_margin_by_offer(pricing_recommendations: pd.DataFrame) -> pd.DataFrame:
+    """Aggregate recommendation mart rows into offer-level margin and guardrail summaries."""
+    if pricing_recommendations.empty:
+        return pricing_recommendations.copy()
+    return (
+        pricing_recommendations.groupby(["offer_id", "product_area"], as_index=False)
+        .agg(
+            exposures=("exposures", "sum"),
+            total_net_margin_30d_gbp=("total_net_margin_30d_gbp", "sum"),
+            acceptance_rate=("acceptance_rate", "mean"),
+            human_review_rate=("human_review_rate", "mean"),
+        )
+        .sort_values("total_net_margin_30d_gbp", ascending=False)
     )
