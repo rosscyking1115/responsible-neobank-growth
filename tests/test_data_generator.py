@@ -21,12 +21,18 @@ def test_generator_writes_expected_parquet_files(tmp_path) -> None:
         "support_contacts",
         "referrals",
         "region_daily_signups",
+        "pricing_offer_catalog",
+        "pricing_exposures",
+        "pricing_outcomes",
         "experiment_ground_truth",
     }
     assert {path.stem for path in tmp_path.glob("*.parquet")} == expected
     assert frames["users"].height == 500
     assert frames["experiment_assignments"].height == 500
     assert frames["activation_ground_truth"].height == 500
+    assert frames["pricing_offer_catalog"].height == 4
+    assert frames["pricing_exposures"].height > 0
+    assert frames["pricing_outcomes"].height == frames["pricing_exposures"].height
 
 
 def test_generator_is_deterministic_for_same_seed() -> None:
@@ -48,6 +54,8 @@ def test_business_invariants_hold() -> None:
     users = frames["users"]
     transactions = frames["transactions"]
     activation = frames["activation_ground_truth"]
+    pricing_exposures = frames["pricing_exposures"]
+    pricing_outcomes = frames["pricing_outcomes"]
 
     assert users.get_column("age").min() >= 18
     assert transactions.get_column("amount_gbp").min() > 0
@@ -74,3 +82,5 @@ def test_business_invariants_hold() -> None:
         ).height
         == 0
     )
+    assert pricing_exposures.get_column("displayed_incentive_value_gbp").min() >= 0
+    assert pricing_outcomes.get_column("gross_margin_30d_gbp").min() >= 0

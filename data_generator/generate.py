@@ -12,6 +12,7 @@ import polars as pl
 from data_generator.config import GeneratorConfig
 from data_generator.experiments import assign_onboarding_experiment, experiment_ground_truth
 from data_generator.features import generate_feature_usage
+from data_generator.pricing import generate_pricing
 from data_generator.referrals import generate_referrals
 from data_generator.sessions import generate_sessions
 from data_generator.support import generate_support_contacts
@@ -28,6 +29,7 @@ def build_dataset(config: GeneratorConfig) -> dict[str, pl.DataFrame]:
     features = generate_feature_usage(users, activation, config)
     support_contacts = generate_support_contacts(users, config)
     referrals, region_daily_signups = generate_referrals(users, activation, config)
+    offer_catalog, pricing_exposures, pricing_outcomes = generate_pricing(users, activation, config)
     ground_truth = experiment_ground_truth(config)
 
     return {
@@ -40,6 +42,9 @@ def build_dataset(config: GeneratorConfig) -> dict[str, pl.DataFrame]:
         "support_contacts": support_contacts,
         "referrals": referrals,
         "region_daily_signups": region_daily_signups,
+        "pricing_offer_catalog": offer_catalog,
+        "pricing_exposures": pricing_exposures,
+        "pricing_outcomes": pricing_outcomes,
         "experiment_ground_truth": ground_truth,
     }
 

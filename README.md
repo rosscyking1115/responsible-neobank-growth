@@ -65,10 +65,12 @@ The case study is designed around public fintech product analytics themes:
 - Synthetic neobank event data for users, transactions, sessions, features,
   referrals, support contacts, and experiments.
 - dbt metrics layer with activation, retention, engagement, feature adoption, CLV
-  proxy, experiment user metrics, and geo daily signups.
+  proxy, experiment user metrics, pricing outcomes, and geo daily signups.
 - Marimo notebooks for EDA, A/B testing with CUPED, activation decisioning, and
   regional referral incrementality.
 - Calibrated activation model with explainability and customer-outcome guardrails.
+- Pricing intelligence marts with offer exposure, unit economics, and guardrail
+  recommendation reason codes.
 - Streamlit dashboard for product metrics and experiment readouts.
 - One-page decision memos for the A/B onboarding test and referral geo experiment.
 - Portfolio release notes with CV and LinkedIn wording in `docs/PORTFOLIO_RELEASE.md`.
@@ -152,6 +154,16 @@ uv run python -m src.modelling.batch_score_activation --score-date 2025-06-30
 The batch scorer writes an ignored daily parquet extract under
 `artifacts/scoring/activation/`. See `docs/BATCH_SCORING.md` for the output
 contract.
+
+## Reproduce Pricing Intelligence Marts
+
+```powershell
+uv run python -m data_generator.generate --users 50000 --months 12 --output-dir raw/portfolio_full
+uv run dbt build --project-dir dbt_neobank --profiles-dir dbt_neobank --vars "{raw_path: raw/portfolio_full}" --select marts/pricing
+```
+
+The pricing marts model synthetic offer exposures, acceptance, incentive cost,
+30-day margin, support/complaint guardrails, and recommendation reason codes.
 
 ## Reproduce the Referral Geo Memo
 

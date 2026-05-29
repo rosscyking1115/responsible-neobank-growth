@@ -31,14 +31,16 @@ Already strong:
   schema, training window, metrics, and model-card linkage.
 - Local daily activation batch scorer that writes a partitioned
   `customer_scores_daily` extract.
+- Pricing-domain foundation with synthetic offer catalogue, incentive exposures,
+  acceptance outcomes, margin assumptions, and guardrail recommendation marts.
 - Onboarding A/B and referral geo analyses with causal inference and memos.
 - CI for linting, notebooks, tests, data generation, and dbt build.
 - Model card and public-release notes.
 
 Main product-readiness gaps:
 
-- No pricing domain yet: no offer catalogue, price or incentive history,
-  elasticity proxy, margin simulation, or guarded pricing recommendation output.
+- Pricing scenario simulation is still API-only logic; it is not yet connected to
+  the new pricing marts or shown in the dashboard.
 - No BigQuery or Cloud Storage path; the warehouse is local DuckDB only.
 - Batch scoring is local only; it still needs scheduling, scoring logs, cloud
   storage/warehouse loading, and rollback documentation.

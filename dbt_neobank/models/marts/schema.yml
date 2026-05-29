@@ -76,3 +76,31 @@ models:
       - name: referral_signups
         description: Referral-attributed signups observed in the region-day row.
         tests: [not_null]
+  - name: fct_offer_exposures
+    description: Customer-level pricing and incentive exposures joined to outcomes and guardrails.
+    columns:
+      - name: exposure_id
+        tests: [not_null, unique]
+      - name: offer_id
+        tests: [not_null]
+      - name: net_margin_30d_gbp
+        tests: [not_null]
+  - name: fct_pricing_outcomes
+    description: Daily pricing outcome aggregates by offer, region, and price variant.
+    columns:
+      - name: offer_id
+        tests: [not_null]
+      - name: exposure_date
+        tests: [not_null]
+      - name: exposures
+        tests: [not_null]
+  - name: mart_pricing_recommendations
+    description: Segment-level pricing recommendations with margin and guardrail reason codes.
+    columns:
+      - name: offer_id
+        tests: [not_null]
+      - name: recommended_action
+        tests:
+          - accepted_values:
+              arguments:
+                values: [scale, test, hold_margin, hold_guardrail, human_review]
