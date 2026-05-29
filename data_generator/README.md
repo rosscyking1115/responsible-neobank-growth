@@ -21,6 +21,12 @@ known causal ground truth for later experimentation chapters.
 - `referrals.parquet`: referral graph with regional incentive treatment and
   incrementality ground truth.
 - `region_daily_signups.parquet`: region-day panel for DiD and synthetic control.
+- `pricing_offer_catalog.parquet`: synthetic product offers, fee assumptions,
+  incentive cost, and expected margin assumptions.
+- `pricing_exposures.parquet`: customer-level offer and incentive exposures with
+  eligibility reason codes and customer-understanding flags.
+- `pricing_outcomes.parquet`: simulated offer acceptance, margin, incentive cost,
+  support, and complaint outcomes.
 - `experiment_ground_truth.parquet`: true causal parameters embedded in the data.
 
 ## Run

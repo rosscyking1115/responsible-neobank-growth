@@ -85,3 +85,34 @@ models:
     columns:
       - name: metric
         tests: [not_null, unique]
+  - name: stg_pricing_offer_catalog
+    description: Synthetic offer catalogue with pricing, incentive, and margin assumptions.
+    columns:
+      - name: offer_id
+        tests: [not_null, unique]
+      - name: product_area
+        tests:
+          - accepted_values:
+              arguments:
+                values: [savings, subscription, business_banking, growth]
+  - name: stg_pricing_exposures
+    description: Customer-level offer and incentive exposures.
+    columns:
+      - name: exposure_id
+        tests: [not_null, unique]
+      - name: user_id
+        tests: [not_null]
+      - name: offer_id
+        tests: [not_null]
+      - name: price_variant
+        tests:
+          - accepted_values:
+              arguments:
+                values: [holdout, standard, incentive]
+  - name: stg_pricing_outcomes
+    description: Simulated offer acceptance, margin, incentive cost, and guardrail outcomes.
+    columns:
+      - name: exposure_id
+        tests: [not_null, unique]
+      - name: net_margin_30d_gbp
+        tests: [not_null]
