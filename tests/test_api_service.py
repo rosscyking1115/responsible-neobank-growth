@@ -4,6 +4,7 @@ import numpy as np
 from fastapi.testclient import TestClient
 
 from api.main import app
+from api.pricing_mart import PricingMartSummary
 
 client = TestClient(app)
 
@@ -124,3 +125,40 @@ def test_pricing_scenario_contract() -> None:
     assert payload["projected_lift_pp"] > 0
     assert payload["incremental_activated_customers"] > 0
     assert payload["recommendation"] in {"ship", "iterate", "hold"}
+
+
+def test_pricing_scenario_uses_pricing_mart_when_available(monkeypatch) -> None:
+    monkeypatch.setattr(
+        "api.scoring.load_pricing_mart_summary",
+        lambda _request: PricingMartSummary(
+            source="segment_variant",
+            price_variant="incentive",
+            exposures=120,
+            acceptance_rate=0.32,
+            avg_net_margin_30d_gbp=1.4,
+            complaint_rate_14d=0.01,
+            human_review_rate=0.08,
+            recommended_action="scale",
+            recommendation_reason_code="positive_margin_and_conversion",
+        ),
+    )
+
+    response = client.post(
+        "/simulate/pricing",
+        json={
+            "segment": "student",
+            "eligible_customers": 2500,
+            "baseline_activation_rate": 0.44,
+            "current_incentive_gbp": 0.0,
+            "proposed_incentive_gbp": 3.0,
+            "expected_monthly_margin_per_activated_customer_gbp": 4.0,
+            "vulnerable_customer_share": 0.05,
+        },
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["recommendation"] == "ship"
+    assert "pricing_mart_response" in payload["reason_codes"]
+    assert "price_variant_incentive" in payload["reason_codes"]
+    assert any(flag["name"] == "pricing_mart_available" for flag in payload["guardrails"])

@@ -5,6 +5,7 @@ from __future__ import annotations
 from math import exp
 
 from api.activation_model import activation_feature_frame, load_configured_activation_artifact
+from api.pricing_mart import PricingMartSummary, load_pricing_mart_summary
 from api.schemas import (
     CustomerFeatures,
     GuardrailFlag,
@@ -212,6 +213,10 @@ def recommend_offer(
 
 
 def simulate_pricing_scenario(request: PricingScenarioRequest) -> PricingScenarioResponse:
+    mart_summary = load_pricing_mart_summary(request)
+    if mart_summary is not None:
+        return simulate_pricing_scenario_from_mart(request, mart_summary)
+
     incentive_delta = request.proposed_incentive_gbp - request.current_incentive_gbp
     segment_sensitivity = {
         "student": 0.018,
@@ -260,5 +265,81 @@ def simulate_pricing_scenario(request: PricingScenarioRequest) -> PricingScenari
         expected_monthly_margin_gbp=round(expected_margin, 2),
         recommendation=recommendation,
         reason_codes=["segment_price_response", "unit_economics", "customer_guardrails"],
+        guardrails=guardrails,
+    )
+
+
+def simulate_pricing_scenario_from_mart(
+    request: PricingScenarioRequest,
+    mart_summary: PricingMartSummary,
+) -> PricingScenarioResponse:
+    incentive_delta = max(request.proposed_incentive_gbp - request.current_incentive_gbp, 0.0)
+    incentive_scale = incentive_delta / max(request.proposed_incentive_gbp, 1.0)
+    projected_lift = max(
+        0.0,
+        min(
+            mart_summary.acceptance_rate * 0.20 * incentive_scale
+            - request.vulnerable_customer_share * 0.02,
+            0.08,
+        ),
+    )
+    projected_rate = min(request.baseline_activation_rate + projected_lift, 0.95)
+    incremental_customers = round(request.eligible_customers * projected_lift)
+    incremental_cost = incremental_customers * request.proposed_incentive_gbp
+    expected_margin = (
+        request.eligible_customers * mart_summary.avg_net_margin_30d_gbp
+        - incremental_cost
+    )
+
+    guardrails = [
+        GuardrailFlag(
+            name="positive_unit_economics",
+            severity="warn",
+            passed=expected_margin >= 0,
+            message="Projected first-month margin is non-negative.",
+        ),
+        GuardrailFlag(
+            name="vulnerable_customer_share",
+            severity="warn",
+            passed=request.vulnerable_customer_share <= 0.20,
+            message="Vulnerable-customer share is within review threshold.",
+        ),
+        GuardrailFlag(
+            name="pricing_mart_guardrails",
+            severity="warn",
+            passed=mart_summary.complaint_rate_14d <= 0.025
+            and mart_summary.human_review_rate <= 0.20,
+            message="Observed pricing mart guardrails are within review thresholds.",
+        ),
+        GuardrailFlag(
+            name="pricing_mart_available",
+            severity="info",
+            passed=True,
+            message=f"Scenario calibrated from pricing mart source: {mart_summary.source}.",
+        ),
+    ]
+
+    if not all(flag.passed for flag in guardrails if flag.severity != "info"):
+        recommendation = "hold"
+    elif mart_summary.recommended_action == "scale" and expected_margin > 0:
+        recommendation = "ship"
+    elif mart_summary.recommended_action in {"hold_margin", "hold_guardrail", "human_review"}:
+        recommendation = "hold"
+    else:
+        recommendation = "iterate"
+
+    return PricingScenarioResponse(
+        segment=request.segment,
+        projected_activation_rate=round(projected_rate, 4),
+        projected_lift_pp=round(projected_lift * 100, 2),
+        incremental_activated_customers=incremental_customers,
+        incremental_incentive_cost_gbp=round(incremental_cost, 2),
+        expected_monthly_margin_gbp=round(expected_margin, 2),
+        recommendation=recommendation,
+        reason_codes=[
+            "pricing_mart_response",
+            mart_summary.recommendation_reason_code,
+            f"price_variant_{mart_summary.price_variant}",
+        ],
         guardrails=guardrails,
     )
