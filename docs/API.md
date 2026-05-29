@@ -37,6 +37,15 @@ Pricing scenario simulation also has a deterministic fallback. When
 scenario from the pricing mart and includes `pricing_mart_response` in the
 response reason codes.
 
+For portfolio-level scenario runs and sensitivity outputs, use:
+
+```powershell
+uv run python -m src.pricing.scenario_runs --run-date 2025-06-30
+```
+
+That command writes JSON, Markdown, and CSV artifacts under
+`artifacts/pricing/scenario_runs/`. See `docs/PRICING_SCENARIOS.md`.
+
 ## Container Smoke Run
 
 ```powershell

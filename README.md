@@ -185,10 +185,13 @@ commands for the raw parquet warehouse landing layer. See `docs/GCP_WAREHOUSE.md
 ```powershell
 uv run python -m data_generator.generate --users 50000 --months 12 --output-dir raw/portfolio_full
 uv run dbt build --project-dir dbt_neobank --profiles-dir dbt_neobank --vars "{raw_path: raw/portfolio_full}" --select marts/pricing
+uv run python -m src.pricing.scenario_runs --run-date 2025-06-30
 ```
 
 The pricing marts model synthetic offer exposures, acceptance, incentive cost,
 30-day margin, support/complaint guardrails, and recommendation reason codes.
+The scenario runner persists incentive scenarios and sensitivity analysis under
+`artifacts/pricing/scenario_runs/`. See `docs/PRICING_SCENARIOS.md`.
 
 ## Reproduce the Referral Geo Memo
 

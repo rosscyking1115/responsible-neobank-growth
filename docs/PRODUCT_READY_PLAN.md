@@ -48,9 +48,8 @@ Already strong:
 
 Main product-readiness gaps:
 
-- Pricing scenario simulation is backed by the recommendation mart for the
-  default portfolio scenario; it still needs persisted scenario runs and
-  sensitivity analysis output.
+- Pricing scenario simulation is backed by the recommendation mart, with
+  persisted scenario runs and sensitivity analysis output.
 - BigQuery and Cloud Storage are scaffolded as a documented raw-load path; they
   are not yet exercised by a live cloud CI job.
 - Batch scoring is local only; it still needs scheduling, scoring logs, cloud
@@ -267,7 +266,7 @@ Recommended first build sequence:
 3. Existing activation model packaged as the first served model.
 4. Batch scoring and model registry metadata.
 5. Pricing synthetic data and pricing marts.
-6. Pricing scenario endpoint and dashboard section.
+6. Pricing scenario endpoint, persisted scenario runs, and dashboard section.
 7. BigQuery target documentation and Cloud Storage landing pattern. Done as a
    local manifest and command renderer; live cloud execution remains optional.
 8. Monitoring dashboard summary, drift checks, and operational runbook. Done for
