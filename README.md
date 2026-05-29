@@ -113,6 +113,8 @@ uv run uvicorn api.main:app --reload --port 8000
 The API exposes activation, churn, upsell, offer recommendation, and pricing
 scenario contracts. See `docs/API.md` for request examples and guardrail fields.
 
+For the API container and Cloud Run path, see `docs/CLOUD_RUN_DEPLOYMENT.md`.
+
 ## Generate Synthetic Data
 
 ```powershell
