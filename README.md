@@ -162,11 +162,13 @@ contract.
 
 ```powershell
 uv run python -m src.monitoring.snapshot --snapshot-date 2025-06-30
+uv run python -m src.monitoring.model_report --report-date 2025-06-30
 ```
 
-The snapshot writes JSON and Markdown reports under `artifacts/monitoring/` with
-data quality, activation, experiment, pricing, batch-scoring, and API-readiness
-checks. See `docs/MONITORING.md`.
+The monitoring commands write JSON and Markdown reports under
+`artifacts/monitoring/` with data quality, activation, experiment, pricing,
+batch-scoring, API-readiness, score-distribution, and drift checks. See
+`docs/MONITORING.md`.
 
 ## Render the GCP Warehouse Load Plan
 
