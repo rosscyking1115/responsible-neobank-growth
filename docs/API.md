@@ -1,9 +1,9 @@
 # API Contract
 
-The Customer Growth & Pricing Intelligence API is the first product-service
-boundary for the project. It is intentionally contract-first: the current scorer
-is a deterministic baseline, and the next milestone will connect the existing
-activation model artifact to the same endpoint shape.
+The Customer Growth & Pricing Intelligence API is the product-service boundary
+for the project. It is intentionally contract-first: endpoints keep stable
+request and response shapes while the backing logic can move from deterministic
+baselines to model artifacts and warehouse marts.
 
 ## Run Locally
 
@@ -30,6 +30,12 @@ Then set the registry path before starting the API:
 $env:NEOBANK_ACTIVATION_MODEL_REGISTRY="artifacts/models/activation/registry.json"
 uv run uvicorn api.main:app --reload --port 8000
 ```
+
+Pricing scenario simulation also has a deterministic fallback. When
+`NEOBANK_DUCKDB_PATH` points to a DuckDB database containing
+`main_marts.mart_pricing_recommendations`, `/simulate/pricing` calibrates the
+scenario from the pricing mart and includes `pricing_mart_response` in the
+response reason codes.
 
 ## Container Smoke Run
 
@@ -87,7 +93,8 @@ docker run --rm -p 8080:8080 neobank-api
 ## Guardrails
 
 Responses include guardrail flags so downstream consumers can separate a high
-score from a safe decision. The baseline service currently checks minimum age,
-vulnerable-customer review, unit economics, and vulnerable-customer share. Future
-model-backed versions should preserve these response fields so the dashboard and
-batch scoring jobs do not break when the scoring engine changes.
+score from a safe decision. The service currently checks minimum age,
+vulnerable-customer review, unit economics, vulnerable-customer share, and pricing
+mart guardrails when mart evidence is available. Future model-backed versions
+should preserve these response fields so the dashboard and batch scoring jobs do
+not break when the scoring engine changes.
