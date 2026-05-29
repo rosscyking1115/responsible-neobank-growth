@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from math import exp
 
+from api.activation_model import activation_feature_frame, load_configured_activation_artifact
 from api.schemas import (
     CustomerFeatures,
     GuardrailFlag,
@@ -14,7 +15,8 @@ from api.schemas import (
     ScoreType,
 )
 
-MODEL_VERSION = "baseline-rules-2026-05-29"
+BASELINE_MODEL_VERSION = "baseline-rules-2026-05-29"
+MODEL_VERSION = BASELINE_MODEL_VERSION
 CONTRACT_VERSION = "v1"
 DATA_VERSION = "synthetic-local"
 
@@ -79,6 +81,11 @@ def _feature_score(customer: CustomerFeatures) -> float:
 
 
 def score_customer(customer: CustomerFeatures, score_type: ScoreType) -> ScoreResponse:
+    if score_type == "activation":
+        artifact_response = score_activation_with_artifact(customer)
+        if artifact_response is not None:
+            return artifact_response
+
     raw = _feature_score(customer)
     if score_type == "activation":
         probability = _clip_probability(_sigmoid(-0.35 + raw - customer.days_since_signup * 0.015))
@@ -115,6 +122,48 @@ def score_customer(customer: CustomerFeatures, score_type: ScoreType) -> ScoreRe
         reason_codes=reason_codes,
         guardrails=guardrails,
     )
+
+
+def score_activation_with_artifact(customer: CustomerFeatures) -> ScoreResponse | None:
+    artifact = load_configured_activation_artifact()
+    if artifact is None:
+        return None
+
+    probability = _clip_probability(
+        float(artifact.model.predict_proba(activation_feature_frame(customer))[0])
+    )
+    threshold = round(float(artifact.metadata.threshold), 4)
+    guardrails = customer_guardrails(customer)
+    if any(flag.severity == "block" and not flag.passed for flag in guardrails):
+        decision = "do_not_target"
+    elif customer.vulnerable_customer_flag:
+        decision = "monitor"
+    elif probability <= threshold:
+        decision = "target"
+    else:
+        decision = "monitor"
+
+    return ScoreResponse(
+        customer_id=customer.customer_id,
+        score_type="activation",
+        probability=probability,
+        threshold=threshold,
+        decision=decision,
+        model_version=artifact.metadata.model_version,
+        reason_codes=[
+            "calibrated_activation_model",
+            "signup_time_features",
+            "threshold_economics",
+        ],
+        guardrails=guardrails,
+    )
+
+
+def active_activation_model_version() -> str:
+    artifact = load_configured_activation_artifact()
+    if artifact is None:
+        return BASELINE_MODEL_VERSION
+    return artifact.metadata.model_version
 
 
 def recommend_offer(

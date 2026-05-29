@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import date
 from typing import Literal
 
 from pydantic import BaseModel, Field
@@ -18,6 +19,7 @@ class CustomerFeatures(BaseModel):
     device_os: str = Field(..., min_length=1, examples=["ios"])
     income_segment: str = Field(..., min_length=1, examples=["middle"])
     age: int = Field(..., ge=16, le=100, examples=[31])
+    signup_date: date | None = Field(default=None, examples=["2025-01-15"])
     push_opt_in: bool = Field(default=True)
     vulnerable_customer_flag: bool = Field(default=False)
     business_account_flag: bool = Field(default=False)

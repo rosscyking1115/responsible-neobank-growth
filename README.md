@@ -137,6 +137,11 @@ uv run dbt build --project-dir dbt_neobank --profiles-dir dbt_neobank --vars "{r
 uv run python -m src.modelling.run_activation_model
 ```
 
+The model command writes the model card plus an ignored local artifact registry at
+`artifacts/models/activation/registry.json`. Set
+`NEOBANK_ACTIVATION_MODEL_REGISTRY` to that file when serving model-backed
+activation scores from the API.
+
 ## Reproduce the Referral Geo Memo
 
 ```powershell

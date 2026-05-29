@@ -17,6 +17,20 @@ Open the generated OpenAPI docs at:
 http://127.0.0.1:8000/docs
 ```
 
+By default, activation scoring uses the deterministic baseline scorer. To serve a
+trained activation model artifact, first run:
+
+```powershell
+uv run python -m src.modelling.run_activation_model
+```
+
+Then set the registry path before starting the API:
+
+```powershell
+$env:NEOBANK_ACTIVATION_MODEL_REGISTRY="artifacts/models/activation/registry.json"
+uv run uvicorn api.main:app --reload --port 8000
+```
+
 ## Container Smoke Run
 
 ```powershell

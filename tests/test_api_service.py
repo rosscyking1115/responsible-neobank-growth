@@ -1,3 +1,6 @@
+from types import SimpleNamespace
+
+import numpy as np
 from fastapi.testclient import TestClient
 
 from api.main import app
@@ -48,6 +51,29 @@ def test_activation_scoring_contract() -> None:
         "minimum_age",
         "vulnerable_customer_review",
     }
+
+
+def test_activation_scoring_uses_configured_artifact(monkeypatch) -> None:
+    class FakeActivationModel:
+        def predict_proba(self, _frame):
+            return np.array([0.21])
+
+    monkeypatch.setattr(
+        "api.scoring.load_configured_activation_artifact",
+        lambda: SimpleNamespace(
+            model=FakeActivationModel(),
+            metadata=SimpleNamespace(model_version="activation-test", threshold=0.3),
+        ),
+    )
+
+    response = client.post("/score/activation", json={"customer": sample_customer()})
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["model_version"] == "activation-test"
+    assert payload["probability"] == 0.21
+    assert payload["threshold"] == 0.3
+    assert payload["decision"] == "target"
 
 
 def test_vulnerable_customer_is_not_directly_targeted() -> None:
