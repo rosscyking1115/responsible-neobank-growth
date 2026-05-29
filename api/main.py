@@ -16,7 +16,7 @@ from api.schemas import (
 from api.scoring import (
     CONTRACT_VERSION,
     DATA_VERSION,
-    MODEL_VERSION,
+    active_activation_model_version,
     recommend_offer,
     score_customer,
     simulate_pricing_scenario,
@@ -35,7 +35,7 @@ def health() -> HealthResponse:
         status="ok",
         service="customer-growth-pricing-api",
         contract_version=CONTRACT_VERSION,
-        model_version=MODEL_VERSION,
+        model_version=active_activation_model_version(),
         data_version=DATA_VERSION,
     )
 

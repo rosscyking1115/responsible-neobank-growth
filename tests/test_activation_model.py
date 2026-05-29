@@ -3,6 +3,11 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
+from src.modelling.artifacts import (
+    REGISTRY_FILENAME,
+    load_activation_model_artifact,
+    write_activation_model_artifact,
+)
 from src.modelling.evaluate import (
     choose_threshold,
     classification_metrics,
@@ -118,3 +123,46 @@ def test_model_card_renders_from_real_run(monkeypatch, tmp_path) -> None:
     assert "Model Card: Activation Decisioning" in card
     assert "Customer-Outcome Guardrails" in card
     assert run.rows == len(frame)
+
+
+def test_activation_model_artifact_round_trips(tmp_path) -> None:
+    frame = _activation_frame()
+    split = temporal_train_calibration_test_split(frame)
+    model = fit_calibrated_activation_model(split.train, split.calibration)
+    probabilities = model.predict_proba(feature_matrix(split.test))
+    metrics = classification_metrics(target_vector(split.test), probabilities)
+    thresholds = threshold_sweep(
+        split.test,
+        probabilities,
+        value_per_activation_gbp=activated_user_value(split.train),
+    )
+    threshold = choose_threshold(thresholds)
+    guardrails = customer_outcome_guardrails(split.test, probabilities, threshold.threshold)
+
+    from src.modelling.run_activation_model import ActivationModelRun
+
+    run = ActivationModelRun(
+        rows=len(frame),
+        train_rows=len(split.train),
+        calibration_rows=len(split.calibration),
+        test_rows=len(split.test),
+        value_per_activation_gbp=activated_user_value(split.train),
+        metrics=metrics,
+        threshold=threshold,
+        guardrails=guardrails,
+        importance=coefficient_importance(model),
+        segment_summary=pd.DataFrame(),
+    )
+
+    metadata = write_activation_model_artifact(
+        model,
+        run,
+        tmp_path,
+        model_version="activation-test",
+    )
+    bundle = load_activation_model_artifact(tmp_path / REGISTRY_FILENAME)
+    loaded_probabilities = bundle.model.predict_proba(feature_matrix(split.test.head(5)))
+
+    assert metadata.model_version == "activation-test"
+    assert bundle.metadata.threshold == threshold.threshold
+    assert len(loaded_probabilities) == 5
