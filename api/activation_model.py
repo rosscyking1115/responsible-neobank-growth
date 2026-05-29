@@ -6,11 +6,14 @@ import os
 from datetime import date
 from functools import lru_cache
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pandas as pd
 
 from api.schemas import CustomerFeatures
-from src.modelling.artifacts import ActivationModelBundle, load_activation_model_artifact
+
+if TYPE_CHECKING:
+    from src.modelling.artifacts import ActivationModelBundle
 
 ACTIVATION_REGISTRY_ENV = "NEOBANK_ACTIVATION_MODEL_REGISTRY"
 
@@ -23,6 +26,8 @@ def load_configured_activation_artifact() -> ActivationModelBundle | None:
     registry_path = Path(registry_value)
     if not registry_path.exists():
         return None
+    from src.modelling.artifacts import load_activation_model_artifact
+
     return load_activation_model_artifact(registry_path)
 
 
