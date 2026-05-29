@@ -1,4 +1,4 @@
-.PHONY: install lint test dbt app api docker-api all
+.PHONY: install lint test dbt app api docker-api monitor all
 
 install:
 	uv sync --group dev
@@ -20,5 +20,10 @@ api:
 
 docker-api:
 	docker build -f Dockerfile.api -t neobank-api .
+
+monitor:
+	uv run python -m src.monitoring.snapshot --snapshot-date 2025-06-30
+	uv run python -m src.monitoring.model_report --report-date 2025-06-30
+	uv run python -m src.monitoring.calibration_report --db neobank.duckdb --report-date 2025-07-07
 
 all: lint test dbt

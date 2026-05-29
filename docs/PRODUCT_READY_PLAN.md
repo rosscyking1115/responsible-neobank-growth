@@ -55,9 +55,9 @@ Main product-readiness gaps:
   are not yet exercised by a live cloud CI job.
 - Batch scoring is local only; it still needs scheduling, scoring logs, cloud
   storage/warehouse loading, and rollback documentation.
-- Monitoring is local snapshot-based with dashboard surfacing and score-drift
-  reporting; it still needs realised-label calibration monitoring and an
-  operational runbook.
+- Monitoring is local snapshot-based with dashboard surfacing, score-drift
+  reporting, realised-label calibration monitoring, and an operational runbook;
+  scheduled cloud execution and alert routing remain future work.
 - Cloud Run service deployment is documented and container-gated in CI; Cloud Run
   jobs for batch scoring and monitoring remain future work.
 
@@ -270,9 +270,9 @@ Recommended first build sequence:
 6. Pricing scenario endpoint and dashboard section.
 7. BigQuery target documentation and Cloud Storage landing pattern. Done as a
    local manifest and command renderer; live cloud execution remains optional.
-8. Monitoring dashboard summary, drift checks, and operational runbook. The
-   dashboard summary and score-drift report are done; realised-label calibration
-   and the runbook remain.
+8. Monitoring dashboard summary, drift checks, and operational runbook. Done for
+   local snapshots, dashboard surfacing, score drift, realised-label calibration,
+   and release triage; scheduled cloud jobs remain future work.
 9. Cloud Run deployment docs and container smoke test workflow. Done for the API
    service; batch and monitoring jobs remain future work.
 

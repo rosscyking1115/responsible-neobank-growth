@@ -58,3 +58,47 @@ The model report checks probability bounds, score volume, targeting rate,
 vulnerable-customer review load, threshold validity, and score-distribution PSI.
 Use `fail` as a release stop, and use `warn` as a human-review trigger before a
 rollout or public demo refresh.
+
+## Realised-Label Calibration Monitoring
+
+After D7 outcomes have matured for a scored cohort, generate the calibration
+report by joining score extracts to realised activation labels:
+
+```powershell
+uv run python -m src.monitoring.calibration_report `
+  --score-path artifacts/scoring/activation/score_date=2025-06-30/customer_scores_daily.parquet `
+  --db neobank.duckdb `
+  --report-date 2025-07-07
+```
+
+You can also provide a label extract with `--label-path` when labels are exported
+from a warehouse table. The file must contain `user_id` and `activated_d7`.
+
+Default output:
+
+```text
+artifacts/monitoring/model_activation_calibration/report_date=2025-07-07/activation_calibration_monitoring.json
+artifacts/monitoring/model_activation_calibration/report_date=2025-07-07/activation_calibration_monitoring.md
+```
+
+The calibration report checks matched label coverage, sample size, expected
+calibration error, Brier score, portfolio prediction bias, and the largest
+segment calibration gap across income segment, signup channel, and region. Run
+this after the prediction window closes; before then, use the score-distribution
+report as the early-warning signal.
+
+## Operational Policy
+
+Use this lightweight release gate before refreshing public screenshots or
+ramping a synthetic rollout:
+
+1. Run `dbt build`.
+2. Generate batch activation scores.
+3. Run the monitoring snapshot.
+4. Run the score-distribution report against a recent reference extract.
+5. After D7 labels mature, run the calibration report.
+
+Stop the release when any report returns `fail`. Review the affected check,
+regenerate upstream data only if the failure is caused by stale local artifacts,
+and document the decision before continuing. Treat `warn` as a human-review
+state: acceptable for a demo when explained, but not for an unattended rollout.

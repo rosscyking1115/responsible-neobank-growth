@@ -163,12 +163,13 @@ contract.
 ```powershell
 uv run python -m src.monitoring.snapshot --snapshot-date 2025-06-30
 uv run python -m src.monitoring.model_report --report-date 2025-06-30
+uv run python -m src.monitoring.calibration_report --db neobank.duckdb --report-date 2025-07-07
 ```
 
 The monitoring commands write JSON and Markdown reports under
 `artifacts/monitoring/` with data quality, activation, experiment, pricing,
-batch-scoring, API-readiness, score-distribution, and drift checks. See
-`docs/MONITORING.md`.
+batch-scoring, API-readiness, score-distribution, drift, and realised-label
+calibration checks. See `docs/MONITORING.md` and `docs/OPERATIONS_RUNBOOK.md`.
 
 ## Render the GCP Warehouse Load Plan
 
