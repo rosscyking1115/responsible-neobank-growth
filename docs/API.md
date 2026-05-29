@@ -44,6 +44,10 @@ docker build -f Dockerfile.api -t neobank-api .
 docker run --rm -p 8080:8080 neobank-api
 ```
 
+The container is Cloud Run compatible and reads the service port from `PORT`.
+See `docs/CLOUD_RUN_DEPLOYMENT.md` for deployment, runtime configuration, and
+rollback notes.
+
 ## Endpoints
 
 - `GET /health`: service, contract, model, and data version metadata.
