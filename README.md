@@ -15,11 +15,12 @@ or proprietary business metrics are used.
 
 1. Open the Streamlit dashboard: product health, pricing intelligence,
    experiments, and monitoring.
-2. Skim the API contract in `docs/API.md` for activation, churn, upsell, offer,
+2. Skim `docs/ARCHITECTURE.md` for the local and cloud-ready architecture.
+3. Skim the API contract in `docs/API.md` for activation, churn, upsell, offer,
    and pricing scenario endpoints.
-3. Review the dbt marts in `dbt_neobank/models/` for the trusted metrics layer.
-4. Read the activation model card in `docs/model_cards/`.
-5. Check the operational docs: `docs/MONITORING.md`,
+4. Review the dbt marts in `dbt_neobank/models/` for the trusted metrics layer.
+5. Read the activation model card in `docs/model_cards/`.
+6. Check the operational docs: `docs/MONITORING.md`,
    `docs/PRICING_SCENARIOS.md`, and `docs/OPERATIONS_RUNBOOK.md`.
 
 ## Portfolio Highlights
@@ -86,6 +87,8 @@ The case study is designed around public fintech product analytics themes:
 - One-page written recommendations for the A/B onboarding test and referral geo
   experiment in `docs/memos/`.
 - Portfolio release notes with CV and LinkedIn wording in `docs/PORTFOLIO_RELEASE.md`.
+- Public launch copy, repo description, screenshot checklist, and CV wording in
+  `docs/PUBLIC_LAUNCH.md`.
 
 ## Core Metrics
 
