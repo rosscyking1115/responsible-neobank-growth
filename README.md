@@ -5,21 +5,22 @@ experimentation, activation modelling, and geo-lift analysis.
 
 This repo simulates the end-to-end workflow of a Product Data Scientist working
 in a modern fintech squad: generate realistic event data, build trusted metrics,
-analyse product experiments, document model guardrails, and translate the work
-into PM-ready dashboard and decision outputs.
+analyse product experiments, package model and pricing decisioning, monitor the
+outputs, and translate the work into a PM-ready dashboard.
 
-The next product-ready upgrade path is documented in
-`docs/PRODUCT_READY_PLAN.md`. It reframes the project as a cloud-ready customer
-growth and pricing intelligence platform with prediction APIs, BigQuery/dbt
-readiness, batch scoring, monitoring, and deployment gates.
+The project is intentionally synthetic: no customer data, private fintech data,
+or proprietary business metrics are used.
 
-## How to Review This Repo
+## Five-Minute Review
 
-1. Start with the decision memos in `docs/memos/`.
-2. Open the Streamlit dashboard in `app/streamlit_app.py` for the product view.
-3. Check the dbt models in `dbt_neobank/models/` for the trusted metrics layer.
+1. Open the Streamlit dashboard: product health, pricing intelligence,
+   experiments, and monitoring.
+2. Skim the API contract in `docs/API.md` for activation, churn, upsell, offer,
+   and pricing scenario endpoints.
+3. Review the dbt marts in `dbt_neobank/models/` for the trusted metrics layer.
 4. Read the activation model card in `docs/model_cards/`.
-5. Open the Marimo notebooks in `notebooks/` for the analytical narrative.
+5. Check the operational docs: `docs/MONITORING.md`,
+   `docs/PRICING_SCENARIOS.md`, and `docs/OPERATIONS_RUNBOOK.md`.
 
 ## Portfolio Highlights
 
@@ -31,16 +32,22 @@ readiness, batch scoring, monitoring, and deployment gates.
   heterogeneous effects, and a launch recommendation.
 - Trained and documented an activation decisioning model with calibration,
   explainability, fairness-oriented segment checks, and customer-outcome guardrails.
+- Added FastAPI prediction and scenario contracts for activation, churn, upsell,
+  offer recommendation, and pricing simulation.
+- Added batch activation scoring, model drift reporting, realised-label
+  calibration monitoring, and an operational runbook.
+- Built pricing intelligence outputs with offer economics, guarded
+  recommendations, persisted scenario runs, and sensitivity analysis.
 - Estimated regional referral incrementality using DiD, synthetic control,
   spillover checks, placebos, and embedded ground-truth recovery.
-- Delivered a Streamlit dashboard and decision memos designed for product review.
+- Delivered a Streamlit dashboard designed for product and growth review.
 
 ## Why This Exists
 
 This project simulates a neobank product analytics workflow on a stack that mirrors
 how a modern fintech data team works: warehouse-backed metrics, dbt transformations,
-Python modelling, experimentation, and decision memos that a product manager could
-act on.
+Python modelling, experimentation, guarded model decisioning, and product
+surfaces that a product manager could act on.
 
 The project is aimed at a Product Data Scientist role with a Growth/Marketing accent.
 It keeps activation, retention, primary-bank engagement, and customer lifetime value
@@ -73,7 +80,11 @@ The case study is designed around public fintech product analytics themes:
   recommendation reason codes.
 - Streamlit dashboard for product metrics, pricing intelligence, and experiment
   readouts.
-- One-page decision memos for the A/B onboarding test and referral geo experiment.
+- FastAPI service boundary for prediction and scenario contracts.
+- Monitoring and operations docs for release gating, score drift, calibration,
+  and rollout triage.
+- One-page written recommendations for the A/B onboarding test and referral geo
+  experiment in `docs/memos/`.
 - Portfolio release notes with CV and LinkedIn wording in `docs/PORTFOLIO_RELEASE.md`.
 
 ## Core Metrics

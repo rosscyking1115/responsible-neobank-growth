@@ -8,11 +8,13 @@ import streamlit as st
 
 try:
     from src.monitoring.snapshot import MonitoringSnapshot, build_monitoring_snapshot
+    from src.pricing.scenario_runs import PricingScenarioRun, build_pricing_scenario_run
 except ModuleNotFoundError:
     import sys
 
     sys.path.append(str(Path(__file__).resolve().parents[1]))
     from src.monitoring.snapshot import MonitoringSnapshot, build_monitoring_snapshot
+    from src.pricing.scenario_runs import PricingScenarioRun, build_pricing_scenario_run
 
 try:
     from app.dashboard_data import (
@@ -90,6 +92,12 @@ def _apply_app_style() -> None:
         div[data-testid="stMarkdownContainer"] li {
             margin-bottom: 0.35rem;
         }
+        .section-caption {
+            color: #5f6b85;
+            font-size: 0.98rem;
+            margin: -0.2rem 0 1.1rem 0;
+            max-width: 820px;
+        }
         </style>
         """,
         unsafe_allow_html=True,
@@ -106,6 +114,12 @@ def cached_dashboard_data(db_path: str) -> DashboardData:
 def cached_monitoring_snapshot(db_path: str) -> MonitoringSnapshot:
     prepared_db_path = ensure_demo_database(Path(db_path))
     return build_monitoring_snapshot(db_path=prepared_db_path)
+
+
+@st.cache_data(show_spinner=False)
+def cached_pricing_scenario_run(db_path: str) -> PricingScenarioRun:
+    prepared_db_path = ensure_demo_database(Path(db_path))
+    return build_pricing_scenario_run(db_path=prepared_db_path)
 
 
 def _pct(value: float) -> str:
@@ -141,7 +155,14 @@ def _metric_grid(data: DashboardData) -> None:
     )
 
 
+def _section_caption(text: str) -> None:
+    st.markdown(f"<p class='section-caption'>{text}</p>", unsafe_allow_html=True)
+
+
 def _render_product_health(data: DashboardData) -> None:
+    _section_caption(
+        "Executive product readout across activation, engagement, retention, adoption, and value."
+    )
     left, right = st.columns([1.2, 1])
     with left:
         st.subheader("Weekly Engagement")
@@ -221,6 +242,10 @@ def _render_product_health(data: DashboardData) -> None:
 
 
 def _render_experiments(data: DashboardData) -> None:
+    _section_caption(
+        "Experiment readouts focus on decision metrics, incrementality, "
+        "unit economics, and guardrails."
+    )
     onboarding, referral = st.columns(2)
     with onboarding:
         st.subheader("Onboarding A/B")
@@ -265,7 +290,72 @@ def _render_experiments(data: DashboardData) -> None:
         st.plotly_chart(fig, width="stretch")
 
 
-def _render_pricing(data: DashboardData) -> None:
+def _render_pricing_scenarios(run: PricingScenarioRun) -> None:
+    summary = run.executive_summary
+    cols = st.columns(4)
+    cols[0].metric("Scenario runs", f"{int(summary['scenario_count']):,}")
+    cols[1].metric("Ship candidates", f"{int(summary['ship_count']):,}")
+    cols[2].metric("Best incentive", _gbp(float(summary["best_incentive_gbp"])))
+    cols[3].metric("Best margin", _gbp(float(summary["best_expected_margin_gbp"])))
+
+    scenario_frame = pd.DataFrame([row.__dict__ for row in run.scenarios])
+    sensitivity_frame = pd.DataFrame([row.__dict__ for row in run.sensitivity_rows])
+    if scenario_frame.empty:
+        return
+
+    left, right = st.columns([1.1, 1])
+    with left:
+        st.subheader("Scenario Portfolio")
+        top_scenarios = scenario_frame.sort_values(
+            ["expected_monthly_margin_gbp", "incremental_activated_customers"],
+            ascending=False,
+        ).head(8)
+        st.dataframe(
+            top_scenarios[
+                [
+                    "segment",
+                    "proposed_incentive_gbp",
+                    "projected_lift_pp",
+                    "incremental_activated_customers",
+                    "expected_monthly_margin_gbp",
+                    "recommendation",
+                ]
+            ],
+            width="stretch",
+            hide_index=True,
+        )
+    with right:
+        st.subheader("Sensitivity Check")
+        best_scenario_id = str(summary["best_scenario_id"])
+        best_sensitivity = sensitivity_frame[
+            sensitivity_frame["scenario_id"] == best_scenario_id
+        ].copy()
+        if not best_sensitivity.empty:
+            fig = px.bar(
+                best_sensitivity,
+                x="sensitivity_case",
+                y="expected_monthly_margin_gbp",
+                color="recommendation",
+                color_discrete_map={
+                    "ship": "#00A88F",
+                    "iterate": "#F2B544",
+                    "hold": "#EF4444",
+                },
+                labels={
+                    "sensitivity_case": "Case",
+                    "expected_monthly_margin_gbp": "Expected margin",
+                    "recommendation": "Recommendation",
+                },
+            )
+            _apply_chart_layout(fig, height=285)
+            st.plotly_chart(fig, width="stretch")
+
+
+def _render_pricing(data: DashboardData, scenario_run: PricingScenarioRun) -> None:
+    _section_caption(
+        "Pricing intelligence combines observed offer economics with scenario "
+        "simulation and guardrails."
+    )
     economics = pricing_economics(data.pricing_outcomes)
     cols = st.columns(5)
     cols[0].metric("Offer exposures", f"{economics['exposures']:,.0f}")
@@ -326,6 +416,9 @@ def _render_pricing(data: DashboardData) -> None:
         _apply_chart_layout(fig, height=320)
         st.plotly_chart(fig, width="stretch")
 
+    st.subheader("Scenario Runs")
+    _render_pricing_scenarios(scenario_run)
+
     st.subheader("Pricing Guardrails By Variant")
     variant_frame = (
         data.pricing_recommendations.groupby(["price_variant"], as_index=False)
@@ -360,6 +453,10 @@ def _render_pricing(data: DashboardData) -> None:
 
 
 def _render_monitoring(snapshot: MonitoringSnapshot) -> None:
+    _section_caption(
+        "Operational checks show whether the local data product is ready for a "
+        "demo refresh or rollout."
+    )
     checks = pd.DataFrame(
         [
             {
@@ -438,6 +535,7 @@ def main() -> None:
     try:
         data = cached_dashboard_data(db_path)
         monitoring_snapshot = cached_monitoring_snapshot(db_path)
+        pricing_scenario_run = cached_pricing_scenario_run(db_path)
     except Exception as exc:  # pragma: no cover - Streamlit-only failure path.
         st.error(str(exc))
         st.stop()
@@ -449,7 +547,7 @@ def main() -> None:
     with product_tab:
         _render_product_health(data)
     with pricing_tab:
-        _render_pricing(data)
+        _render_pricing(data, pricing_scenario_run)
     with experiment_tab:
         _render_experiments(data)
     with monitoring_tab:
