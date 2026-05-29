@@ -142,6 +142,17 @@ The model command writes the model card plus an ignored local artifact registry 
 `NEOBANK_ACTIVATION_MODEL_REGISTRY` to that file when serving model-backed
 activation scores from the API.
 
+## Reproduce Batch Activation Scores
+
+```powershell
+uv run python -m src.modelling.run_activation_model
+uv run python -m src.modelling.batch_score_activation --score-date 2025-06-30
+```
+
+The batch scorer writes an ignored daily parquet extract under
+`artifacts/scoring/activation/`. See `docs/BATCH_SCORING.md` for the output
+contract.
+
 ## Reproduce the Referral Geo Memo
 
 ```powershell

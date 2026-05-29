@@ -25,6 +25,12 @@ Already strong:
   CLV proxy, experiment, and geo incrementality marts.
 - Streamlit product dashboard for product health and experiment readouts.
 - Activation modelling with calibration, explainability, and guardrail checks.
+- FastAPI service boundary for activation, churn, upsell, offer recommendation,
+  and pricing scenario contracts.
+- Activation model artifact registry with persisted metadata, threshold, feature
+  schema, training window, metrics, and model-card linkage.
+- Local daily activation batch scorer that writes a partitioned
+  `customer_scores_daily` extract.
 - Onboarding A/B and referral geo analyses with causal inference and memos.
 - CI for linting, notebooks, tests, data generation, and dbt build.
 - Model card and public-release notes.
@@ -33,11 +39,9 @@ Main product-readiness gaps:
 
 - No pricing domain yet: no offer catalogue, price or incentive history,
   elasticity proxy, margin simulation, or guarded pricing recommendation output.
-- No API service boundary for prediction, offer recommendation, or scenario
-  simulation.
 - No BigQuery or Cloud Storage path; the warehouse is local DuckDB only.
-- No model artifact lifecycle: persisted model, feature schema, scoring contract,
-  scoring logs, registry metadata, or rollback story.
+- Batch scoring is local only; it still needs scheduling, scoring logs, cloud
+  storage/warehouse loading, and rollback documentation.
 - No monitoring layer beyond tests: source freshness, drift, calibration,
   scoring distribution, API health, and operational runbook are missing.
 - No container, deployment gate, or Cloud Run job/service workflow.
@@ -243,15 +247,15 @@ Acceptance criteria:
 
 Recommended first build sequence:
 
-1. Add product framing docs, architecture diagram, and README positioning.
-2. Add FastAPI skeleton with health endpoint, schemas, tests, and Dockerfile.
-3. Package the existing activation model as the first served model.
-4. Add batch scoring and model registry metadata.
-5. Add pricing synthetic data and pricing marts.
-6. Add pricing scenario endpoint and dashboard section.
-7. Add BigQuery target documentation and Cloud Storage landing pattern.
-8. Add monitoring reports and dashboard monitoring summary.
-9. Add Cloud Run deployment docs and container smoke test workflow.
+1. Product framing docs, architecture diagram, and README positioning.
+2. FastAPI skeleton with health endpoint, schemas, tests, and Dockerfile.
+3. Existing activation model packaged as the first served model.
+4. Batch scoring and model registry metadata.
+5. Pricing synthetic data and pricing marts.
+6. Pricing scenario endpoint and dashboard section.
+7. BigQuery target documentation and Cloud Storage landing pattern.
+8. Monitoring reports and dashboard monitoring summary.
+9. Cloud Run deployment docs and container smoke test workflow.
 
 This order gives the fastest visible jump from portfolio project to product
 platform: API first, then model serving, then pricing, then cloud hardening.
