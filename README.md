@@ -101,6 +101,15 @@ uv run dbt docs generate --project-dir dbt_neobank --profiles-dir dbt_neobank
 uv run dbt docs serve --project-dir dbt_neobank --profiles-dir dbt_neobank
 ```
 
+## Run the Prediction API
+
+```powershell
+uv run uvicorn api.main:app --reload --port 8000
+```
+
+The API exposes activation, churn, upsell, offer recommendation, and pricing
+scenario contracts. See `docs/API.md` for request examples and guardrail fields.
+
 ## Generate Synthetic Data
 
 ```powershell
