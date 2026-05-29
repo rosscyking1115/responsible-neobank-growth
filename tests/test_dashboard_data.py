@@ -7,6 +7,8 @@ from app.dashboard_data import (
     ensure_demo_database,
     load_dashboard_data,
     onboarding_lift_pp,
+    pricing_economics,
+    pricing_margin_by_offer,
     read_decision_memos,
     referral_economics,
     referral_grouped_daily,
@@ -145,6 +147,118 @@ def _build_dashboard_fixture(db_path: Path) -> None:
             )
             """
         )
+        con.execute(
+            """
+            create table main_marts.fct_pricing_outcomes as
+            select *
+            from (
+                values
+                    (
+                        'easy_access_savings_boost',
+                        date '2026-01-01',
+                        'London',
+                        'standard',
+                        10,
+                        3,
+                        2,
+                        0.30,
+                        18.0,
+                        6.0,
+                        12.0,
+                        0.02,
+                        0.01,
+                        1
+                    ),
+                    (
+                        'premium_bundle_trial',
+                        date '2026-01-01',
+                        'Wales',
+                        'incentive',
+                        5,
+                        1,
+                        1,
+                        0.20,
+                        7.0,
+                        4.0,
+                        3.0,
+                        0.03,
+                        0.00,
+                        2
+                    )
+            ) as t(
+                offer_id,
+                exposure_date,
+                region,
+                price_variant,
+                exposures,
+                accepted_offers,
+                activated_offers,
+                acceptance_rate,
+                gross_margin_30d_gbp,
+                incentive_cost_gbp,
+                net_margin_30d_gbp,
+                support_contact_rate_14d,
+                complaint_rate_14d,
+                human_review_required_exposures
+            )
+            """
+        )
+        con.execute(
+            """
+            create table main_marts.mart_pricing_recommendations as
+            select *
+            from (
+                values
+                    (
+                        'easy_access_savings_boost',
+                        'savings',
+                        'rate_boost',
+                        'student',
+                        'standard',
+                        10,
+                        0.30,
+                        1.20,
+                        12.0,
+                        0.02,
+                        0.01,
+                        0.10,
+                        'scale',
+                        'positive_margin_and_conversion'
+                    ),
+                    (
+                        'premium_bundle_trial',
+                        'subscription',
+                        'fee_trial',
+                        'middle',
+                        'incentive',
+                        5,
+                        0.20,
+                        0.60,
+                        3.0,
+                        0.03,
+                        0.00,
+                        0.40,
+                        'human_review',
+                        'customer_understanding_review'
+                    )
+            ) as t(
+                offer_id,
+                product_area,
+                offer_type,
+                income_segment,
+                price_variant,
+                exposures,
+                acceptance_rate,
+                avg_net_margin_30d_gbp,
+                total_net_margin_30d_gbp,
+                support_contact_rate_14d,
+                complaint_rate_14d,
+                human_review_rate,
+                recommended_action,
+                recommendation_reason_code
+            )
+            """
+        )
 
 
 def test_load_dashboard_data_summarises_marts(tmp_path: Path) -> None:
@@ -157,6 +271,10 @@ def test_load_dashboard_data_summarises_marts(tmp_path: Path) -> None:
     assert data.weekly_engagement["weekly_active_users"].tolist() == [2, 3]
     assert data.activation_by_region.loc[0, "region"] == "London"
     assert data.retention_curve["weeks_since_signup"].tolist() == [1]
+    assert data.pricing_recommendations["recommended_action"].tolist() == [
+        "scale",
+        "human_review",
+    ]
     assert onboarding_lift_pp(data.experiment_variants) == 50.0
 
 
@@ -228,6 +346,21 @@ def test_referral_helpers_compute_economics_and_groups(tmp_path: Path) -> None:
     assert economics["embedded_incremental_signups"] == 3.0
     assert economics["cost_per_embedded_incremental_signup"] == 30.0
     assert set(grouped["geo_group"]) == {"Control regions", "Treated regions"}
+
+
+def test_pricing_helpers_compute_economics_and_offer_margin(tmp_path: Path) -> None:
+    db_path = tmp_path / "dashboard.duckdb"
+    _build_dashboard_fixture(db_path)
+    data = load_dashboard_data(db_path)
+
+    economics = pricing_economics(data.pricing_outcomes)
+    margin = pricing_margin_by_offer(data.pricing_recommendations)
+
+    assert economics["exposures"] == 15.0
+    assert round(economics["acceptance_rate"], 4) == 0.2667
+    assert economics["net_margin_30d_gbp"] == 15.0
+    assert round(economics["human_review_rate"], 4) == 0.2
+    assert margin.loc[0, "offer_id"] == "easy_access_savings_boost"
 
 
 def test_read_decision_memos_handles_missing_files(tmp_path: Path) -> None:
