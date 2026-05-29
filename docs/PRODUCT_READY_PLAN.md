@@ -33,6 +33,8 @@ Already strong:
   `customer_scores_daily` extract.
 - Pricing-domain foundation with synthetic offer catalogue, incentive exposures,
   acceptance outcomes, margin assumptions, and guardrail recommendation marts.
+- Local monitoring snapshot command for DuckDB mart availability, activation,
+  experiment, pricing, batch-score, and API readiness checks.
 - Onboarding A/B and referral geo analyses with causal inference and memos.
 - CI for linting, notebooks, tests, data generation, and dbt build.
 - Model card and public-release notes.
@@ -44,8 +46,8 @@ Main product-readiness gaps:
 - No BigQuery or Cloud Storage path; the warehouse is local DuckDB only.
 - Batch scoring is local only; it still needs scheduling, scoring logs, cloud
   storage/warehouse loading, and rollback documentation.
-- No monitoring layer beyond tests: source freshness, drift, calibration,
-  scoring distribution, API health, and operational runbook are missing.
+- Monitoring is local snapshot-based; it still needs dashboard surfacing,
+  score-distribution drift, calibration monitoring, and an operational runbook.
 - No container, deployment gate, or Cloud Run job/service workflow.
 
 ## Target Product
@@ -256,7 +258,7 @@ Recommended first build sequence:
 5. Pricing synthetic data and pricing marts.
 6. Pricing scenario endpoint and dashboard section.
 7. BigQuery target documentation and Cloud Storage landing pattern.
-8. Monitoring reports and dashboard monitoring summary.
+8. Monitoring dashboard summary, drift checks, and operational runbook.
 9. Cloud Run deployment docs and container smoke test workflow.
 
 This order gives the fastest visible jump from portfolio project to product

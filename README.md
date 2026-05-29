@@ -156,6 +156,16 @@ The batch scorer writes an ignored daily parquet extract under
 `artifacts/scoring/activation/`. See `docs/BATCH_SCORING.md` for the output
 contract.
 
+## Generate a Monitoring Snapshot
+
+```powershell
+uv run python -m src.monitoring.snapshot --snapshot-date 2025-06-30
+```
+
+The snapshot writes JSON and Markdown reports under `artifacts/monitoring/` with
+data quality, activation, experiment, pricing, batch-scoring, and API-readiness
+checks. See `docs/MONITORING.md`.
+
 ## Reproduce Pricing Intelligence Marts
 
 ```powershell
