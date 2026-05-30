@@ -98,8 +98,9 @@ The demo raw landing path was exercised on 2026-05-30 against project
   tables, 12 mart tables, and 107 passing dbt checks.
 
 This proves the raw GCS-to-BigQuery warehouse path and dbt mart build are
-working for a small synthetic demo export. It does not yet mean batch scoring,
-monitoring jobs, or production security controls have been deployed on GCP.
+working for a small synthetic demo export. Batch scoring now has a reviewed GCS
+and BigQuery load plan, but scheduled scoring jobs, monitoring jobs, and
+production security controls have not yet been deployed on GCP.
 
 ## BigQuery Dataset Layout
 
@@ -109,11 +110,41 @@ Recommended datasets:
 - `neobank_staging`: dbt staging views.
 - `neobank_intermediate`: dbt intermediate models.
 - `neobank_marts`: product, experiment, pricing, geo, and finance marts.
+- `neobank_ml`: activation propensity score extracts and model outputs.
 - `neobank_monitoring`: monitoring snapshots and score-distribution checks.
 
 Use one GCP location for the Cloud Storage bucket and BigQuery datasets. BigQuery
 loads from Cloud Storage require location compatibility between the bucket and
 the destination dataset.
+
+## BigQuery Batch Scores
+
+Generate a daily activation score extract locally:
+
+```powershell
+uv run python -m src.modelling.run_activation_model
+uv run python -m src.modelling.batch_score_activation --score-date 2025-06-30
+```
+
+Then render the GCP upload, dataset, load, and verification commands:
+
+```powershell
+$env:NEOBANK_GCS_SCORING_PREFIX="neobank/scoring/activation"
+uv run python -m src.cloud.bigquery_score_load_plan `
+  --score-date 2025-06-30 `
+  --project neobank-growth-platform-ross `
+  --dataset neobank_ml `
+  --location EU `
+  --bucket neobank-growth-platform-ross-raw `
+  --prefix "$env:NEOBANK_GCS_SCORING_PREFIX"
+```
+
+The score table is loaded as
+`neobank_ml.customer_scores_daily`, partitioned by `score_date`, and clustered
+by `model_version`, `decision`, and `region`. The demo command uses `--replace`
+to keep the portfolio run idempotent. A live scheduled job should use partition
+replacement or a merge pattern so re-runs for one score date do not duplicate
+rows.
 
 ## dbt BigQuery Target
 
@@ -175,6 +206,9 @@ default. Set `NEOBANK_BQ_DATASET_PREFIX` to use a different prefix.
   the same pattern is later used for daily score exports.
 - Keep `NEOBANK_BQ_MAX_BYTES_BILLED` low in development and raise it only when
   a larger run is intentional.
+- Keep score extracts in a separate Cloud Storage prefix such as
+  `neobank/scoring/activation/` so model outputs can have a different lifecycle
+  and access policy from raw source files.
 - Store service-account credentials outside the repo and pass them through
   environment variables or CI secrets.
 - Run dbt tests and the monitoring snapshot after each cloud load.

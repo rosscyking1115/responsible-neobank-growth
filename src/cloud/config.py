@@ -25,6 +25,7 @@ class CloudConfig:
     bigquery_monitoring_dataset: str
     gcs_raw_bucket: str | None
     gcs_raw_prefix: str
+    gcs_scoring_prefix: str
     bigquery_max_bytes_billed: int
     require_gcp_confirmation: bool
 
@@ -94,6 +95,9 @@ def load_cloud_config(env: Mapping[str, str] | None = None) -> CloudConfig:
         ),
         gcs_raw_bucket=_optional_string(values, "NEOBANK_GCS_RAW_BUCKET"),
         gcs_raw_prefix=values.get("NEOBANK_GCS_RAW_PREFIX", "neobank/raw/demo").strip("/"),
+        gcs_scoring_prefix=values.get(
+            "NEOBANK_GCS_SCORING_PREFIX", "neobank/scoring/activation"
+        ).strip("/"),
         bigquery_max_bytes_billed=_int(values, "NEOBANK_BQ_MAX_BYTES_BILLED", 1_000_000_000),
         require_gcp_confirmation=_bool(values, "NEOBANK_REQUIRE_GCP_CONFIRMATION"),
     )
