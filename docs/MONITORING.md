@@ -30,6 +30,25 @@ The Streamlit dashboard also includes a Monitoring tab that computes the same
 snapshot against the current DuckDB path and shows the overall status, status
 counts, attention items, and full check table.
 
+## Scheduled Monitoring Workflow
+
+The repository includes a GitHub Actions workflow at
+`.github/workflows/monitoring-snapshot.yml` that can run manually or on a weekly
+schedule. It rebuilds a deterministic synthetic warehouse, trains the activation
+model artifact, generates batch activation scores, writes the product monitoring
+snapshot, writes the activation model monitoring report, and uploads the
+monitoring/scoring outputs as workflow artifacts.
+
+Run it from GitHub Actions with **Monitoring Snapshot > Run workflow** before a
+portfolio refresh or public demo review. The workflow is intentionally synthetic:
+it proves the operational path without requiring real customer data, secrets, or
+cloud warehouse credentials.
+
+On a first run, the activation model monitoring report can return `warn` for
+score-distribution drift because no previous score extract exists yet. In a live
+setup, the previous successful artifact or warehouse score table would be passed
+as the reference extract.
+
 ## Activation Model Monitoring
 
 After generating daily activation scores, create a model monitoring report:

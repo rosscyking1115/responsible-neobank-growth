@@ -1,6 +1,7 @@
 # Customer Growth & Pricing Intelligence Platform
 
 [![CI](https://github.com/rosscyking1115/neobank-product-analytics/actions/workflows/ci.yml/badge.svg)](https://github.com/rosscyking1115/neobank-product-analytics/actions/workflows/ci.yml)
+[![Monitoring Snapshot](https://github.com/rosscyking1115/neobank-product-analytics/actions/workflows/monitoring-snapshot.yml/badge.svg)](https://github.com/rosscyking1115/neobank-product-analytics/actions/workflows/monitoring-snapshot.yml)
 
 [Live Streamlit dashboard](https://neobank-appuct-analytics.streamlit.app/)
 
@@ -266,3 +267,19 @@ full deployment checklist and cold-start behavior.
 This repo uses synthetic data only. No Monzo internal data, customer data, or
 proprietary business metrics are included. The Monzo references are public-context
 inspiration for a realistic fintech product analytics workflow.
+
+## What I Would Productionise Next
+
+This portfolio version is designed to be public, reproducible, and easy to review.
+A real fintech production version would add:
+
+- A deployed API environment with authentication, rate limits, request logging,
+  and model version routing.
+- A managed warehouse such as BigQuery with governed raw, staging, mart, and
+  feature tables.
+- Scheduled ingestion and monitoring jobs with alerting, ownership, and runbook
+  escalation.
+- A model registry or feature store for reproducible training, shadow
+  deployments, and online/offline feature parity.
+- Formal privacy, Consumer Duty, model-risk, and audit controls before any live
+  customer decisioning.
