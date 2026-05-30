@@ -37,6 +37,7 @@ What it covers:
 All data is synthetic. The goal was to build something closer to a small data product than a notebook: reproducible warehouse, tested code, dashboard, API boundary, monitoring, and business-facing decision outputs.
 
 Repo: https://github.com/rosscyking1115/neobank-product-analytics
+Dashboard: https://neobank-appuct-analytics.streamlit.app/
 ```
 
 Shorter version:
@@ -50,6 +51,7 @@ The goal was to make a portfolio project that behaves like a small data product:
 
 All data is synthetic.
 Repo: https://github.com/rosscyking1115/neobank-product-analytics
+Dashboard: https://neobank-appuct-analytics.streamlit.app/
 ```
 
 ## CV Bullet
@@ -101,7 +103,6 @@ Capture these after deploying or running locally:
 - GitHub repository description and topics are set.
 - CI badge or latest GitHub Actions status is visible.
 - Dashboard screenshots are current.
-- LinkedIn post includes the GitHub URL. Add the Streamlit URL only after the
-  deployment is live.
+- LinkedIn post includes the GitHub URL and Streamlit URL.
 - CV bullet is copied into the right version of the CV.
 - Public wording says synthetic data only.

@@ -4,6 +4,7 @@ Use Streamlit Community Cloud for the public portfolio dashboard.
 
 ## App Settings
 
+- Live app: `https://neobank-appuct-analytics.streamlit.app/`
 - Repository: `rosscyking1115/neobank-product-analytics`
 - Branch: `main`
 - Main file path: `app/streamlit_app.py`
