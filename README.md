@@ -68,6 +68,8 @@ database is present.
   spillover checks, placebos, and embedded ground-truth recovery.
 - Exercised the GCS-to-BigQuery raw landing path and ran the dbt graph on
   BigQuery with 107 passing dbt checks.
+- Added a BigQuery activation-score load plan for the daily
+  `customer_scores_daily` model output table.
 - Delivered a Streamlit dashboard designed for product and growth review.
 
 ## Why This Exists
@@ -198,6 +200,16 @@ uv run python -m src.modelling.batch_score_activation --score-date 2025-06-30
 The batch scorer writes an ignored daily parquet extract under
 `artifacts/scoring/activation/`. See `docs/BATCH_SCORING.md` for the output
 contract.
+
+To load the same score extract into BigQuery, render the reviewed command plan:
+
+```powershell
+uv run python -m src.cloud.bigquery_score_load_plan --score-date 2025-06-30
+```
+
+The plan uploads the parquet extract to Cloud Storage, creates the ML dataset if
+needed, loads `customer_scores_daily` partitioned by `score_date`, and renders a
+row-count verification query.
 
 ## Generate a Monitoring Snapshot
 

@@ -63,8 +63,9 @@ Main product-readiness gaps:
 - BigQuery and Cloud Storage now have an exercised demo raw-load path and dbt
   mart build; BigQuery governance, cost controls, and scheduled execution still
   need hardening.
-- Batch scoring is local only; it still needs a BigQuery write path, scoring
-  logs, cloud storage/warehouse loading, and rollback documentation.
+- Batch scoring now has a BigQuery load plan; it still needs the live score load
+  to be exercised, scheduled execution, cloud score monitoring, and rollback
+  documentation.
 - Monitoring is local snapshot-based with dashboard surfacing, score-drift
   reporting, realised-label calibration monitoring, a weekly GitHub Actions
   artifact, and an operational runbook; scheduled cloud execution and alert
@@ -93,7 +94,12 @@ The finished product should have three surfaces:
      - `POST /simulate/pricing`
 
 3. Batch scoring and monitoring outputs
-   - Scheduled batch scoring writes `customer_scores_daily`.
+   - Batch scoring writes local `customer_scores_daily` extracts.
+   - BigQuery load plan for `neobank_ml.customer_scores_daily` is in place.
+   - Next: run the score upload/load commands against GCP and capture the
+     verification output.
+   - Scheduled batch scoring should write or merge one score-date partition per
+     run.
    - Monitoring writes data quality, freshness, model performance, calibration,
      drift, and guardrail reports.
 
@@ -145,7 +151,8 @@ product path":
 - Export synthetic data into cloud-ready files with a manifest.
 - Upload raw files to Cloud Storage and load BigQuery raw tables.
 - Run dbt against BigQuery while keeping DuckDB as the default local path.
-- Write propensity or activation scores back to BigQuery.
+- Write propensity or activation scores back to BigQuery. The command-rendered
+  load plan is done; the live GCP score load is next.
 - Harden Cloud Run deployment so production guidance is private-by-default.
 - Keep monitoring lightweight, reproducible, and evidence-based.
 

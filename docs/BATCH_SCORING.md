@@ -47,3 +47,28 @@ The `decision` field is intentionally conservative. Vulnerable customers are not
 directly targeted by the batch output; they stay in `monitor` with
 `vulnerable_customer_review=true` when their score is below the activation-help
 threshold.
+
+## BigQuery Load Plan
+
+After generating the score extract, render the reviewed GCP commands that upload
+the parquet file to Cloud Storage and load it into a partitioned BigQuery table:
+
+```powershell
+uv run python -m src.cloud.bigquery_score_load_plan --score-date 2025-06-30
+```
+
+The default BigQuery destination is:
+
+```text
+${GCP_PROJECT_ID}:${NEOBANK_BQ_ML_DATASET}.customer_scores_daily
+```
+
+The default Cloud Storage destination is:
+
+```text
+gs://${NEOBANK_GCS_RAW_BUCKET}/${NEOBANK_GCS_SCORING_PREFIX}/score_date=2025-06-30/customer_scores_daily.parquet
+```
+
+Set `NEOBANK_GCS_SCORING_PREFIX=neobank/scoring/activation` for the demo GCP
+path. The rendered `bq load` command creates a managed table partitioned by
+`score_date` and clustered by `model_version`, `decision`, and `region`.

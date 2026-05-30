@@ -17,6 +17,7 @@ def test_load_cloud_config_defaults_to_local_mode() -> None:
     assert config.duckdb_path == Path("neobank.duckdb")
     assert config.cloud_export_dir == Path("data/cloud_export/demo")
     assert config.bigquery_raw_dataset == "neobank_raw"
+    assert config.gcs_scoring_prefix == "neobank/scoring/activation"
     assert config.bigquery_max_bytes_billed == 1_000_000_000
     assert not config.require_gcp_confirmation
 

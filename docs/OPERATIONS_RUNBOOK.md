@@ -16,6 +16,7 @@ uv run pytest
 uv run dbt build --project-dir dbt_neobank --profiles-dir dbt_neobank
 uv run python -m src.modelling.run_activation_model
 uv run python -m src.modelling.batch_score_activation --score-date 2025-06-30
+uv run python -m src.cloud.bigquery_score_load_plan --score-date 2025-06-30
 uv run python -m src.monitoring.snapshot --snapshot-date 2025-06-30
 uv run python -m src.monitoring.model_report --report-date 2025-06-30
 ```
@@ -71,7 +72,8 @@ Rollback or disable model-backed targeting when any of these checks fail:
 The local commands map cleanly to a future GCP deployment:
 
 - dbt build: Cloud Build or GitHub Actions job against BigQuery.
-- Batch scoring: Cloud Run job writing daily score extracts.
+- Batch scoring: Cloud Run job writing daily score extracts, with GCS landing
+  and BigQuery `customer_scores_daily` loads.
 - Monitoring snapshot: Cloud Run job writing JSON and Markdown reports.
 - Calibration report: delayed Cloud Run job after D7 labels mature.
 - API health: Cloud Run service `/health` plus container smoke test.
