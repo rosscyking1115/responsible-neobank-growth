@@ -7,4 +7,4 @@ select
     topic,
     cast(is_complaint as boolean) as is_complaint,
     cast(resolved_first_contact as boolean) as resolved_first_contact
-from read_parquet('{{ var("raw_path", "raw/ci") }}/support_contacts.parquet')
+from {{ raw_table('support_contacts', 'support_contacts.parquet') }}

@@ -45,10 +45,12 @@ Already strong:
   report artifacts for product, model, and API checks.
 - GCP raw warehouse load manifest with BigQuery `bq load` command rendering,
   Cloud Storage path conventions, a raw row-count verification plan, and a
-  private BigQuery dbt profile example.
+  BigQuery dbt target.
 - Small demo raw landing path exercised against GCS and BigQuery on 2026-05-30:
   13 parquet files uploaded, 13 raw tables loaded, and all manifest row counts
   verified in BigQuery.
+- dbt graph exercised against BigQuery on 2026-05-30: staging views,
+  intermediate tables, mart tables, and 107 dbt tests passed.
 - Cloud Run-compatible API container with CI build and `/health` smoke test.
 - Onboarding A/B and referral geo analyses with causal inference and memos.
 - CI for linting, notebooks, tests, data generation, and dbt build.
@@ -58,8 +60,9 @@ Main product-readiness gaps:
 
 - Pricing scenario simulation is backed by the recommendation mart, but still
   needs cloud persistence and production-style audit history.
-- BigQuery and Cloud Storage now have an exercised demo raw-load path; dbt marts
-  still need to be ported and run against BigQuery.
+- BigQuery and Cloud Storage now have an exercised demo raw-load path and dbt
+  mart build; BigQuery governance, cost controls, and scheduled execution still
+  need hardening.
 - Batch scoring is local only; it still needs a BigQuery write path, scoring
   logs, cloud storage/warehouse loading, and rollback documentation.
 - Monitoring is local snapshot-based with dashboard surfacing, score-drift
@@ -129,9 +132,9 @@ Important distinction:
 
 - The Streamlit dashboard is already publicly deployed.
 - The API is Cloud Run compatible and container-tested.
-- The raw warehouse landing layer is **GCP-exercised** for the demo export.
-  dbt marts, batch scoring, monitoring jobs, and cloud security hardening are
-  still **GCP-ready**, not yet fully **GCP-deployed**.
+- The raw warehouse landing layer and dbt mart layer are **GCP-exercised** for
+  the demo export. Batch scoring, monitoring jobs, and cloud security hardening
+  are still **GCP-ready**, not yet fully **GCP-deployed**.
 - Do not claim Vertex AI or full GCP deployment unless those resources are
   actually created and exercised.
 
@@ -168,7 +171,7 @@ Immediate next build session:
      tables into BigQuery, and verified row counts.
    - Cost-control follow-up: render inventory, lifecycle, and scoped cleanup
      commands for the demo GCS prefix and raw BigQuery dataset.
-   - Next: prepare dbt BigQuery marts.
+   - dbt BigQuery marts: done for the demo path with 107 passing dbt checks.
 
 Near-term hardening:
 

@@ -1,6 +1,6 @@
 select
     user_id,
-    date_trunc('week', occurred_date)::date as activity_week,
+    {{ date_trunc_day('week', 'occurred_date') }} as activity_week,
     count(*) as transactions,
     sum(amount_gbp) as card_spend_gbp,
     sum(interchange_revenue_gbp) as interchange_revenue_gbp

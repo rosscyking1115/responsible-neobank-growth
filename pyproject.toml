@@ -28,6 +28,11 @@ dependencies = [
     "uvicorn>=0.47.0",
 ]
 
+[project.optional-dependencies]
+gcp = [
+    "dbt-bigquery>=1.11.1,<2",
+]
+
 [dependency-groups]
 dev = [
     "httpx>=0.28.1",

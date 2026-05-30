@@ -66,6 +66,8 @@ database is present.
   recommendations, persisted scenario runs, and sensitivity analysis.
 - Estimated regional referral incrementality using DiD, synthetic control,
   spillover checks, placebos, and embedded ground-truth recovery.
+- Exercised the GCS-to-BigQuery raw landing path and ran the dbt graph on
+  BigQuery with 107 passing dbt checks.
 - Delivered a Streamlit dashboard designed for product and growth review.
 
 ## Why This Exists
@@ -252,6 +254,15 @@ resources running:
 
 ```powershell
 uv run python -m src.cloud.gcp_cleanup_plan --project neobank-growth-platform-ross --dataset neobank_raw --bucket neobank-growth-platform-ross-raw --prefix neobank/raw/demo
+```
+
+To run the dbt graph against BigQuery after loading raw tables:
+
+```powershell
+uv sync --extra gcp --group dev
+$env:NEOBANK_BQ_DEFAULT_DATASET="neobank_dev"
+$env:NEOBANK_BQ_DATASET_PREFIX="neobank"
+uv run dbt build --project-dir dbt_neobank --profiles-dir dbt_neobank --profile neobank --target bigquery
 ```
 
 ## Reproduce Pricing Intelligence Marts
