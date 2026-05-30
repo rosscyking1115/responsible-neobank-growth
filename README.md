@@ -2,6 +2,8 @@
 
 [![CI](https://github.com/rosscyking1115/neobank-product-analytics/actions/workflows/ci.yml/badge.svg)](https://github.com/rosscyking1115/neobank-product-analytics/actions/workflows/ci.yml)
 
+[Live Streamlit dashboard](https://neobank-appuct-analytics.streamlit.app/)
+
 A synthetic neobank product analytics case study using dbt, DuckDB, Python,
 experimentation, activation modelling, and geo-lift analysis.
 
@@ -15,8 +17,9 @@ or proprietary business metrics are used.
 
 ## Five-Minute Review
 
-1. Open the Streamlit dashboard: product health, pricing intelligence,
-   experiments, and monitoring.
+1. Open the
+   [Streamlit dashboard](https://neobank-appuct-analytics.streamlit.app/):
+   product health, pricing intelligence, experiments, and monitoring.
 2. Skim `docs/ARCHITECTURE.md` for the local and cloud-ready architecture.
 3. Skim the API contract in `docs/API.md` for activation, churn, upsell, offer,
    and pricing scenario endpoints.
