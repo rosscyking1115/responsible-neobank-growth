@@ -1,6 +1,6 @@
 select
     feature_name,
-    date_trunc('month', event_date)::date as adoption_month,
+    {{ date_trunc_day('month', 'event_date') }} as adoption_month,
     count(distinct user_id) as adopting_users,
     count(*) as adoption_events
 from {{ ref('stg_feature_events') }}

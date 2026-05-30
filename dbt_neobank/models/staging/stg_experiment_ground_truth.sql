@@ -1,5 +1,5 @@
 select
     metric,
-    cast(value as double) as value,
+    cast(value as {{ float_type() }}) as value,
     description
-from read_parquet('{{ var("raw_path", "raw/ci") }}/experiment_ground_truth.parquet')
+from {{ raw_table('experiment_ground_truth', 'experiment_ground_truth.parquet') }}

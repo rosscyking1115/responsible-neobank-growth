@@ -1,5 +1,25 @@
 version: 2
 
+sources:
+  - name: neobank_raw
+    description: Raw parquet tables loaded into BigQuery from the cloud export manifest.
+    database: "{{ env_var('GCP_PROJECT_ID', '') }}"
+    schema: "{{ env_var('NEOBANK_BQ_RAW_DATASET', 'neobank_raw') }}"
+    tables:
+      - name: users
+      - name: experiment_assignments
+      - name: activation_ground_truth
+      - name: transactions
+      - name: sessions
+      - name: feature_events
+      - name: support_contacts
+      - name: referrals
+      - name: region_daily_signups
+      - name: pricing_offer_catalog
+      - name: pricing_exposures
+      - name: pricing_outcomes
+      - name: experiment_ground_truth
+
 models:
   - name: stg_users
     description: Cleaned synthetic user signup and customer attributes.

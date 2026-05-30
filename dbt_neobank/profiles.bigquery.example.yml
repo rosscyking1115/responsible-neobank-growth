@@ -3,11 +3,12 @@ neobank:
   outputs:
     bigquery:
       type: bigquery
-      method: service-account
+      method: oauth
       project: "{{ env_var('GCP_PROJECT_ID') }}"
-      dataset: "{{ env_var('NEOBANK_BQ_STAGING_DATASET', 'neobank_staging') }}"
+      dataset: "{{ env_var('NEOBANK_BQ_DEFAULT_DATASET', 'neobank_dev') }}"
       location: "{{ env_var('NEOBANK_BQ_LOCATION', 'EU') }}"
-      keyfile: "{{ env_var('GOOGLE_APPLICATION_CREDENTIALS') }}"
       threads: 4
-      timeout_seconds: 300
+      job_execution_timeout_seconds: 300
       priority: interactive
+      maximum_bytes_billed: "{{ env_var('NEOBANK_BQ_MAX_BYTES_BILLED', 1000000000) | as_number }}"
+      job_retries: 1

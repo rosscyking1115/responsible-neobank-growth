@@ -5,6 +5,6 @@ select
     cast(started_date as date) as started_date,
     region,
     device_os,
-    cast(duration_seconds as integer) as duration_seconds,
+    cast(duration_seconds as {{ integer_type() }}) as duration_seconds,
     cast(app_crashed as boolean) as app_crashed
-from read_parquet('{{ var("raw_path", "raw/ci") }}/sessions.parquet')
+from {{ raw_table('sessions', 'sessions.parquet') }}

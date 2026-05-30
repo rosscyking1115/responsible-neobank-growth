@@ -94,10 +94,12 @@ The demo raw landing path was exercised on 2026-05-30 against project
 - Manifest row-count verification passed for all 13 raw tables.
 - Partitioning and clustering appeared in `bq ls` for the configured fact
   tables.
+- dbt build completed against BigQuery with 13 staging views, 3 intermediate
+  tables, 12 mart tables, and 107 passing dbt checks.
 
-This proves the raw GCS-to-BigQuery warehouse path is working for a small
-synthetic demo export. It does not yet mean the dbt mart layer has been ported
-and run on BigQuery.
+This proves the raw GCS-to-BigQuery warehouse path and dbt mart build are
+working for a small synthetic demo export. It does not yet mean batch scoring,
+monitoring jobs, or production security controls have been deployed on GCP.
 
 ## BigQuery Dataset Layout
 
@@ -115,9 +117,11 @@ the destination dataset.
 
 ## dbt BigQuery Target
 
-Keep `dbt_neobank/profiles.yml` local-only for CI. For a BigQuery run, install
-`dbt-bigquery` in the execution environment and use the example profile at
-`dbt_neobank/profiles.bigquery.example.yml`:
+The default dbt target remains local DuckDB for CI and reproducibility. For a
+BigQuery run, install `dbt-bigquery` through the `gcp` extra and use the
+`bigquery` target already defined in `dbt_neobank/profiles.yml`. The standalone
+`dbt_neobank/profiles.bigquery.example.yml` mirrors the same settings for
+copy/paste into another environment:
 
 ```yaml
 neobank:
@@ -125,20 +129,43 @@ neobank:
   outputs:
     bigquery:
       type: bigquery
-      method: service-account
+      method: oauth
       project: "{{ env_var('GCP_PROJECT_ID') }}"
-      dataset: "{{ env_var('NEOBANK_BQ_STAGING_DATASET', 'neobank_staging') }}"
+      dataset: "{{ env_var('NEOBANK_BQ_DEFAULT_DATASET', 'neobank_dev') }}"
       location: "{{ env_var('NEOBANK_BQ_LOCATION', 'EU') }}"
-      keyfile: "{{ env_var('GOOGLE_APPLICATION_CREDENTIALS') }}"
       threads: 4
-      timeout_seconds: 300
+      job_execution_timeout_seconds: 300
       priority: interactive
+      maximum_bytes_billed: "{{ env_var('NEOBANK_BQ_MAX_BYTES_BILLED', 1000000000) | as_number }}"
+      job_retries: 1
 ```
 
 BigQuery uses `dataset` where other warehouses often say `schema`, so the dbt
 project's `+schema` model settings map naturally to separate BigQuery datasets.
 For larger event tables, use date partitioning plus clustering on common filter
 dimensions such as region, feature, offer, and merchant category.
+
+For local BigQuery execution, install the adapter extra and point dbt at the
+example profile:
+
+```powershell
+uv sync --extra gcp --group dev
+$env:GCP_PROJECT_ID="neobank-growth-platform-ross"
+$env:NEOBANK_BQ_LOCATION="EU"
+$env:NEOBANK_BQ_RAW_DATASET="neobank_raw"
+$env:NEOBANK_BQ_DEFAULT_DATASET="neobank_dev"
+$env:NEOBANK_BQ_DATASET_PREFIX="neobank"
+$env:NEOBANK_BQ_MAX_BYTES_BILLED="1000000000"
+uv run dbt build --project-dir dbt_neobank --profiles-dir dbt_neobank --profile neobank --target bigquery
+```
+
+The staging models use `read_parquet(...)` for DuckDB and `source('neobank_raw',
+...)` for BigQuery, so the same dbt graph can run against local parquet or the
+loaded raw BigQuery tables.
+
+For the BigQuery target, the custom schema macro maps dbt model layers to clean
+datasets: `neobank_staging`, `neobank_intermediate`, and `neobank_marts` by
+default. Set `NEOBANK_BQ_DATASET_PREFIX` to use a different prefix.
 
 ## Operational Notes
 

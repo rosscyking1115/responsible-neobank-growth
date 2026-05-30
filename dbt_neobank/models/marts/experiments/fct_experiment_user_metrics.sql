@@ -41,8 +41,14 @@ select
     users.primary_bank_propensity,
     activation.activated_d7,
     activation.activated_ever,
-    coalesce(feature_adoption.adopted_savings_pot, 0)::boolean as adopted_savings_pot,
-    coalesce(feature_adoption.adopted_salary_sorter, 0)::boolean as adopted_salary_sorter,
+    case
+        when coalesce(feature_adoption.adopted_savings_pot, 0) = 1 then true
+        else false
+    end as adopted_savings_pot,
+    case
+        when coalesce(feature_adoption.adopted_salary_sorter, 0) = 1 then true
+        else false
+    end as adopted_salary_sorter,
     coalesce(support.support_contacts, 0) as support_contacts,
     coalesce(support.complaints, 0) as complaints,
     coalesce(sessions.app_crashes, 0) as app_crashes
