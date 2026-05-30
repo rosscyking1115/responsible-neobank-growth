@@ -51,18 +51,19 @@ def test_render_raw_row_count_sql_covers_raw_manifest_tables() -> None:
     )
 
     assert sql.count("SELECT ") == 13
-    assert 'SELECT "users" AS table_name' in sql
-    assert 'SELECT "transactions" AS table_name' in sql
+    assert "SELECT 'users' AS table_name" in sql
+    assert "SELECT 'transactions' AS table_name" in sql
     assert "ORDER BY table_name" in sql
 
 
 def test_render_bq_query_command_is_powershell_safe() -> None:
     command = render_bq_query_command(
-        "SELECT COUNT(*) AS users FROM `neobank-growth-platform-ross.neobank_raw.users`"
+        "SELECT 'users' AS table_name FROM `neobank-growth-platform-ross.neobank_raw.users`"
     )
 
     assert command.startswith("bq query --use_legacy_sql=false '")
     assert command.endswith("'")
+    assert "SELECT ''users'' AS table_name" in command
     assert "`neobank-growth-platform-ross.neobank_raw.users`" in command
 
 

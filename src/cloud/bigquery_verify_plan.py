@@ -28,7 +28,7 @@ def render_table_count_select(
     expected_sql = "NULL" if expected_rows is None else str(expected_rows)
     passed_sql = "TRUE" if expected_rows is None else f"COUNT(*) = {expected_rows}"
     return (
-        f'SELECT "{table_name}" AS table_name, '
+        f"SELECT '{table_name}' AS table_name, "
         f"COUNT(*) AS actual_rows, "
         f"{expected_sql} AS expected_rows, "
         f"{passed_sql} AS passed "
@@ -51,7 +51,8 @@ def render_raw_row_count_sql(
 
 
 def render_bq_query_command(sql: str) -> str:
-    return f"bq query --use_legacy_sql=false '{sql}'"
+    powershell_sql = sql.replace("'", "''")
+    return f"bq query --use_legacy_sql=false '{powershell_sql}'"
 
 
 def render_verification_plan(
