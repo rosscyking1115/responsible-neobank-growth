@@ -47,7 +47,7 @@ Already strong:
   Cloud Storage path conventions, a raw row-count verification plan, and a
   private BigQuery dbt profile example.
 - Small demo raw landing path exercised against GCS and BigQuery on 2026-05-30:
-  13 parquet files uploaded, 13 raw tables loaded, and `users = 5,000`
+  13 parquet files uploaded, 13 raw tables loaded, and all manifest row counts
   verified in BigQuery.
 - Cloud Run-compatible API container with CI build and `/health` smoke test.
 - Onboarding A/B and referral geo analyses with causal inference and memos.
@@ -166,7 +166,9 @@ Immediate next build session:
 3. GCS and BigQuery raw-load path
    - Done for the demo path: generated parquet, uploaded to GCS, loaded 13 raw
      tables into BigQuery, and verified row counts.
-   - Next: add cleanup/cost-control commands and prepare dbt BigQuery marts.
+   - Cost-control follow-up: render inventory, lifecycle, and scoped cleanup
+     commands for the demo GCS prefix and raw BigQuery dataset.
+   - Next: prepare dbt BigQuery marts.
 
 Near-term hardening:
 

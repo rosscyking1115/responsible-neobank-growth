@@ -247,6 +247,13 @@ plan:
 uv run python -m src.cloud.bigquery_verify_plan --project neobank-growth-platform-ross --dataset neobank_raw --expected-export-manifest data/cloud_export/demo/manifest.json
 ```
 
+Render the matching cleanup and cost-control plan before leaving live GCP
+resources running:
+
+```powershell
+uv run python -m src.cloud.gcp_cleanup_plan --project neobank-growth-platform-ross --dataset neobank_raw --bucket neobank-growth-platform-ross-raw --prefix neobank/raw/demo
+```
+
 ## Reproduce Pricing Intelligence Marts
 
 ```powershell

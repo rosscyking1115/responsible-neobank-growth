@@ -64,6 +64,25 @@ uv run python -m src.cloud.bigquery_verify_plan `
 The verification plan renders PowerShell-safe `bq` commands. Run the rendered
 query after loading the raw tables; every row should have `passed = true`.
 
+## Cost Control and Cleanup
+
+Render the demo cleanup and cost-control plan:
+
+```powershell
+uv run python -m src.cloud.gcp_cleanup_plan `
+  --project neobank-growth-platform-ross `
+  --dataset neobank_raw `
+  --bucket neobank-growth-platform-ross-raw `
+  --prefix neobank/raw/demo
+```
+
+The plan separates non-destructive inventory checks from destructive cleanup
+commands. It also renders a Cloud Storage lifecycle command using
+`cloud/gcp/gcs_lifecycle_demo.json`, which deletes objects under
+`neobank/raw/demo/` after 30 days. Keep the raw demo resources while actively
+building the BigQuery/dbt path; run the destructive cleanup commands only when
+the live GCP slice is no longer needed.
+
 ## Exercised Demo Path
 
 The demo raw landing path was exercised on 2026-05-30 against project
@@ -72,7 +91,7 @@ The demo raw landing path was exercised on 2026-05-30 against project
 - 13 generated parquet files uploaded to
   `gs://neobank-growth-platform-ross-raw/neobank/raw/demo/`.
 - 13 raw BigQuery tables loaded into `neobank_raw`.
-- `users` row-count check returned `5,000`.
+- Manifest row-count verification passed for all 13 raw tables.
 - Partitioning and clustering appeared in `bq ls` for the configured fact
   tables.
 
@@ -158,6 +177,12 @@ service-account keys, generated parquet, or `.env` files.
   https://docs.cloud.google.com/bigquery/docs/partitioned-tables
 - Google BigQuery clustered tables:
   https://docs.cloud.google.com/bigquery/docs/clustered-tables
+- Google Cloud Storage bucket lifecycle updates:
+  https://docs.cloud.google.com/sdk/gcloud/reference/storage/buckets/update
+- Google Cloud Storage recursive deletion:
+  https://docs.cloud.google.com/sdk/gcloud/reference/storage/rm
+- Google BigQuery `bq` command-line reference:
+  https://cloud.google.com/bigquery/docs/reference/bq-cli-reference
 - Google Cloud Storage lifecycle management:
   https://docs.cloud.google.com/storage/docs/lifecycle
 - dbt BigQuery profile setup:
