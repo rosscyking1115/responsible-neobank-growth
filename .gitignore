@@ -27,6 +27,7 @@ notebooks/__marimo__/
 # Local app/editor files
 .env
 .env.*
+!.env.example
 .vscode/
 .idea/
 Thumbs.db

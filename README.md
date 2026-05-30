@@ -219,6 +219,21 @@ uv run python -m src.cloud.gcp_load_plan
 The load plan turns the tracked Cloud Storage/BigQuery manifest into `bq load`
 commands for the raw parquet warehouse landing layer. See `docs/GCP_WAREHOUSE.md`.
 
+## Export Cloud-Ready Raw Data
+
+```powershell
+uv run python -m src.cloud.export --profile demo
+```
+
+The cloud export command writes generated parquet files plus `manifest.json`
+under `NEOBANK_CLOUD_EXPORT_DIR`, which defaults to `data/cloud_export/demo`.
+The manifest records row counts, schema version, generation config, column
+types, and file sizes so the raw landing package can be checked before upload.
+
+Copy `.env.example` to `.env` for local overrides. Keep `NEOBANK_ENV=local` for
+the public demo path; switch to `NEOBANK_ENV=gcp` only when `GCP_PROJECT_ID` and
+`NEOBANK_GCS_RAW_BUCKET` are configured outside git.
+
 ## Reproduce Pricing Intelligence Marts
 
 ```powershell
