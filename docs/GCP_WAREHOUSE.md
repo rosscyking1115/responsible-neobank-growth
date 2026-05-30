@@ -52,6 +52,34 @@ They are intentionally command renderers first: review them, set environment
 variables, authenticate with `gcloud`, then run the commands when you are ready
 to create real cloud resources.
 
+Verify the loaded raw tables and row counts:
+
+```powershell
+uv run python -m src.cloud.bigquery_verify_plan `
+  --project neobank-growth-platform-ross `
+  --dataset neobank_raw `
+  --expected-export-manifest data/cloud_export/demo/manifest.json
+```
+
+The verification plan renders PowerShell-safe `bq` commands. Run the rendered
+query after loading the raw tables; every row should have `passed = true`.
+
+## Exercised Demo Path
+
+The demo raw landing path was exercised on 2026-05-30 against project
+`neobank-growth-platform-ross`:
+
+- 13 generated parquet files uploaded to
+  `gs://neobank-growth-platform-ross-raw/neobank/raw/demo/`.
+- 13 raw BigQuery tables loaded into `neobank_raw`.
+- `users` row-count check returned `5,000`.
+- Partitioning and clustering appeared in `bq ls` for the configured fact
+  tables.
+
+This proves the raw GCS-to-BigQuery warehouse path is working for a small
+synthetic demo export. It does not yet mean the dbt mart layer has been ported
+and run on BigQuery.
+
 ## BigQuery Dataset Layout
 
 Recommended datasets:
@@ -104,6 +132,8 @@ dimensions such as region, feature, offer, and merchant category.
 - Store service-account credentials outside the repo and pass them through
   environment variables or CI secrets.
 - Run dbt tests and the monitoring snapshot after each cloud load.
+- Run the BigQuery verification plan after each raw load and keep the output in
+  release notes or screenshots when using the project in portfolio material.
 
 ## What Ross Must Run Locally For Real GCP
 
