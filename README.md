@@ -15,6 +15,23 @@ outputs, and translate the work into a PM-ready dashboard.
 The project is intentionally synthetic: no customer data, private fintech data,
 or proprietary business metrics are used.
 
+## Live Demo
+
+[Open the Streamlit dashboard](https://neobank-appuct-analytics.streamlit.app/)
+to review the PM-facing product surfaces:
+
+- Product health: activation, engagement, retention, feature adoption, and CLV
+  proxy.
+- Pricing intelligence: offer economics, guarded recommendations, scenario
+  runs, and sensitivity analysis.
+- Experiments: onboarding A/B and referral geo-incrementality readouts.
+- Monitoring: release-gate checks for marts, pricing, API readiness, batch
+  scores, drift, and calibration.
+
+The first load may take a moment on Streamlit Community Cloud because the app can
+bootstrap a lightweight synthetic DuckDB demo warehouse when no persisted
+database is present.
+
 ## Five-Minute Review
 
 1. Open the
