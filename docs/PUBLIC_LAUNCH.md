@@ -87,8 +87,9 @@ Built a synthetic fintech growth analytics platform with dbt, DuckDB, Python, St
 
 Capture these after deploying or running locally:
 
-- README first viewport with project title and five-minute review.
-- Streamlit Product health tab top metrics and first charts.
+- README first viewport with project title, live link, and dashboard screenshot.
+- Streamlit Product health tab top metrics and first charts
+  (`docs/assets/streamlit-product-health.png`).
 - Streamlit Pricing intelligence tab with scenario runs and sensitivity checks.
 - Streamlit Experiments tab with onboarding and referral readouts.
 - Streamlit Monitoring tab showing release-gate status.

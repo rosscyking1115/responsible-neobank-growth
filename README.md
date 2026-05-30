@@ -4,6 +4,8 @@
 
 [Live Streamlit dashboard](https://neobank-appuct-analytics.streamlit.app/)
 
+![Neobank Product Analytics dashboard](docs/assets/streamlit-product-health.png)
+
 A synthetic neobank product analytics case study using dbt, DuckDB, Python,
 experimentation, activation modelling, and geo-lift analysis.
 
