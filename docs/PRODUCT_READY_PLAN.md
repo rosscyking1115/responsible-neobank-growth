@@ -2,7 +2,9 @@
 
 Target public title: **Customer Growth & Pricing Intelligence Platform**
 
-Research date: 2026-05-29
+Original research date: 2026-05-29
+
+Standards refresh: 2026-05-30
 
 ## Recommendation
 
@@ -39,6 +41,8 @@ Already strong:
   the full check table.
 - Activation model monitoring report for score distribution, PSI drift,
   targeting rate, and vulnerable-customer review load.
+- Weekly/manual GitHub Actions monitoring snapshot workflow with downloadable
+  report artifacts for product, model, and API checks.
 - GCP raw warehouse load manifest with BigQuery `bq load` command rendering,
   Cloud Storage path conventions, and a private BigQuery dbt profile example.
 - Cloud Run-compatible API container with CI build and `/health` smoke test.
@@ -48,17 +52,19 @@ Already strong:
 
 Main product-readiness gaps:
 
-- Pricing scenario simulation is backed by the recommendation mart, with
-  persisted scenario runs and sensitivity analysis output.
+- Pricing scenario simulation is backed by the recommendation mart, but still
+  needs cloud persistence and production-style audit history.
 - BigQuery and Cloud Storage are scaffolded as a documented raw-load path; they
-  are not yet exercised by a live cloud CI job.
-- Batch scoring is local only; it still needs scheduling, scoring logs, cloud
-  storage/warehouse loading, and rollback documentation.
+  are not yet exercised against a real GCP project.
+- Batch scoring is local only; it still needs a BigQuery write path, scoring
+  logs, cloud storage/warehouse loading, and rollback documentation.
 - Monitoring is local snapshot-based with dashboard surfacing, score-drift
-  reporting, realised-label calibration monitoring, and an operational runbook;
-  scheduled cloud execution and alert routing remain future work.
+  reporting, realised-label calibration monitoring, a weekly GitHub Actions
+  artifact, and an operational runbook; scheduled cloud execution and alert
+  routing remain future work.
 - Cloud Run service deployment is documented and container-gated in CI; Cloud Run
-  jobs for batch scoring and monitoring remain future work.
+  jobs for batch scoring and monitoring, private ingress, production auth, and
+  Secret Manager integration remain future work.
 
 ## Target Product
 
@@ -108,6 +114,85 @@ Cloud target:
 - Cloud Run jobs for batch scoring, data quality, and monitoring reports.
 - GitHub Actions gates for tests, dbt build, API contract tests, and container
   smoke checks.
+
+## GCP Upgrade Kit Alignment
+
+`NEOBANK_GCP_UPGRADE_KIT.md` is now part of the delivery plan. Treat it as the
+handoff document for turning the current public Streamlit demo into a
+production-style GCP portfolio project.
+
+Important distinction:
+
+- The Streamlit dashboard is already publicly deployed.
+- The API is Cloud Run compatible and container-tested.
+- The warehouse, batch scoring, monitoring jobs, and cloud security posture are
+  currently **GCP-ready**, not yet **GCP-deployed**.
+- Do not claim Vertex AI or full GCP deployment unless those resources are
+  actually created and exercised.
+
+The kit changes the next phase from "add more analysis" to "prove a cloud data
+product path":
+
+- Add local/GCP configuration and `.env.example` without committing secrets.
+- Export synthetic data into cloud-ready files with a manifest.
+- Upload raw files to Cloud Storage and load BigQuery raw tables.
+- Run dbt against BigQuery while keeping DuckDB as the default local path.
+- Write propensity or activation scores back to BigQuery.
+- Harden Cloud Run deployment so production guidance is private-by-default.
+- Keep monitoring lightweight, reproducible, and evidence-based.
+
+## Reassessed Roadmap
+
+Immediate next build session:
+
+1. Cloud configuration and security skeleton
+   - Add `.env.example` for `NEOBANK_ENV`, GCP project, region, bucket,
+     BigQuery dataset, and credential path placeholders.
+   - Add a typed config helper for local and GCP modes.
+   - Document local mode vs GCP mode and the rule that secrets stay outside git.
+
+2. Cloud export vertical slice
+   - Add a deterministic export command for generated synthetic data.
+   - Write cloud-ready files to an ignored export directory.
+   - Produce a manifest with row counts, schema version, generation config, and
+     run timestamp.
+   - Add tests for expected files and nonzero row counts.
+
+3. GCS and BigQuery raw-load path
+   - Add upload/load command renderers first, then real execution when
+     credentials are available.
+   - Keep reruns idempotent through run IDs or replaceable dev tables.
+   - Add cleanup and cost-control notes before any scheduled cloud job.
+
+Near-term hardening:
+
+4. dbt governance
+   - Add formal dbt `sources`, source freshness, exposures for Streamlit/API
+     consumers, owners/meta, and contracts for public marts.
+
+5. BigQuery governance
+   - Add an IAM matrix, table/dataset naming policy, query labels, maximum bytes
+     billed guidance, partitioning/clustering checks, and examples for row-level
+     or column-level controls where customer-sensitive fields would exist.
+
+6. Cloud Run and API security
+   - Make deployment docs private-by-default.
+   - Use a dedicated runtime service account, Secret Manager, restricted
+     ingress, explicit CORS, request IDs, structured logs, and a documented
+     auth option such as API key, IAP, API Gateway, or JWT.
+
+7. Supply-chain and CI controls
+   - Add least-privilege workflow permissions, Dependabot, dependency review or
+     equivalent scanning, and container vulnerability/SBOM guidance.
+
+Future phases:
+
+- Cloud Run jobs for batch scoring and monitoring snapshots.
+- GitHub OIDC to GCP for keyless deployment.
+- Cloud Monitoring alert examples and SLO notes.
+- Vertex AI only if it adds clear value beyond the current scikit-learn and
+  BigQuery path.
+- Terraform only after the manual GCP path is stable and worth codifying.
 
 ## Workstreams
 
@@ -308,3 +393,14 @@ The plan follows current public platform guidance as of 2026-05-29:
   <https://docs.getdbt.com/docs/build/sources>
   <https://docs.getdbt.com/docs/build/exposures>
   <https://docs.getdbt.com/docs/mesh/govern/model-contracts>
+- The 2026-05-30 standards refresh adds explicit security and governance
+  priorities from Google Cloud, OWASP, NIST, GitHub, FastAPI, and Streamlit:
+  <https://docs.cloud.google.com/architecture/framework/security>
+  <https://docs.cloud.google.com/run/docs/securing/security>
+  <https://docs.cloud.google.com/bigquery/docs/access-control-intro>
+  <https://owasp.org/API-Security/editions/2023/en/0x10-api-security-risks/>
+  <https://csrc.nist.gov/pubs/sp/800/218/final>
+  <https://www.nist.gov/publications/nist-cybersecurity-framework-csf-20>
+  <https://docs.github.com/en/actions/concepts/security/openid-connect>
+  <https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/>
+  <https://docs.streamlit.io/develop/concepts/connections/secrets-management>
