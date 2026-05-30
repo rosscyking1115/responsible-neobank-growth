@@ -44,7 +44,11 @@ Already strong:
 - Weekly/manual GitHub Actions monitoring snapshot workflow with downloadable
   report artifacts for product, model, and API checks.
 - GCP raw warehouse load manifest with BigQuery `bq load` command rendering,
-  Cloud Storage path conventions, and a private BigQuery dbt profile example.
+  Cloud Storage path conventions, a raw row-count verification plan, and a
+  private BigQuery dbt profile example.
+- Small demo raw landing path exercised against GCS and BigQuery on 2026-05-30:
+  13 parquet files uploaded, 13 raw tables loaded, and `users = 5,000`
+  verified in BigQuery.
 - Cloud Run-compatible API container with CI build and `/health` smoke test.
 - Onboarding A/B and referral geo analyses with causal inference and memos.
 - CI for linting, notebooks, tests, data generation, and dbt build.
@@ -54,8 +58,8 @@ Main product-readiness gaps:
 
 - Pricing scenario simulation is backed by the recommendation mart, but still
   needs cloud persistence and production-style audit history.
-- BigQuery and Cloud Storage are scaffolded as a documented raw-load path; they
-  are not yet exercised against a real GCP project.
+- BigQuery and Cloud Storage now have an exercised demo raw-load path; dbt marts
+  still need to be ported and run against BigQuery.
 - Batch scoring is local only; it still needs a BigQuery write path, scoring
   logs, cloud storage/warehouse loading, and rollback documentation.
 - Monitoring is local snapshot-based with dashboard surfacing, score-drift
@@ -125,8 +129,9 @@ Important distinction:
 
 - The Streamlit dashboard is already publicly deployed.
 - The API is Cloud Run compatible and container-tested.
-- The warehouse, batch scoring, monitoring jobs, and cloud security posture are
-  currently **GCP-ready**, not yet **GCP-deployed**.
+- The raw warehouse landing layer is **GCP-exercised** for the demo export.
+  dbt marts, batch scoring, monitoring jobs, and cloud security hardening are
+  still **GCP-ready**, not yet fully **GCP-deployed**.
 - Do not claim Vertex AI or full GCP deployment unless those resources are
   actually created and exercised.
 
@@ -159,10 +164,9 @@ Immediate next build session:
    - Add tests for expected files and nonzero row counts.
 
 3. GCS and BigQuery raw-load path
-   - Add upload/load command renderers first, then real execution when
-     credentials are available.
-   - Keep reruns idempotent through run IDs or replaceable dev tables.
-   - Add cleanup and cost-control notes before any scheduled cloud job.
+   - Done for the demo path: generated parquet, uploaded to GCS, loaded 13 raw
+     tables into BigQuery, and verified row counts.
+   - Next: add cleanup/cost-control commands and prepare dbt BigQuery marts.
 
 Near-term hardening:
 

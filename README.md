@@ -240,6 +240,13 @@ Render the matching Cloud Storage upload plan after export:
 uv run python -m src.cloud.gcs_upload_plan --manifest data/cloud_export/demo/manifest.json
 ```
 
+After the GCS upload and BigQuery raw loads, render a row-count verification
+plan:
+
+```powershell
+uv run python -m src.cloud.bigquery_verify_plan --project neobank-growth-platform-ross --dataset neobank_raw --expected-export-manifest data/cloud_export/demo/manifest.json
+```
+
 ## Reproduce Pricing Intelligence Marts
 
 ```powershell
