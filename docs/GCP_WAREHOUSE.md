@@ -6,16 +6,26 @@ tables in BigQuery, then run dbt against BigQuery datasets.
 
 ## Raw Landing Pattern
 
-Generate the reproducible synthetic data locally:
+Generate a reproducible, cloud-ready synthetic export locally:
 
 ```powershell
-uv run python -m data_generator.generate --users 50000 --months 12 --output-dir raw/portfolio_full
+uv run python -m src.cloud.export --profile demo
 ```
 
-Upload those parquet files to a dated Cloud Storage prefix such as:
+The command writes parquet files and `manifest.json` under
+`NEOBANK_CLOUD_EXPORT_DIR`, which defaults to `data/cloud_export/demo`.
+
+Render a checked Cloud Storage upload plan:
+
+```powershell
+uv run python -m src.cloud.gcs_upload_plan --manifest data/cloud_export/demo/manifest.json
+```
+
+The rendered commands upload those parquet files to a Cloud Storage prefix such
+as:
 
 ```text
-gs://<bucket>/neobank/raw/snapshot_date=2025-06-30/*.parquet
+gs://<bucket>/neobank/raw/demo/*.parquet
 ```
 
 The tracked manifest at `cloud/gcp/raw_bigquery_manifest.json` defines the raw
@@ -38,6 +48,9 @@ NEOBANK_GCS_RAW_PREFIX
 
 The rendered commands use BigQuery managed tables rather than external tables so
 the downstream dbt marts have stable performance and can use partition pruning.
+They are intentionally command renderers first: review them, set environment
+variables, authenticate with `gcloud`, then run the commands when you are ready
+to create real cloud resources.
 
 ## BigQuery Dataset Layout
 
@@ -86,9 +99,26 @@ dimensions such as region, feature, offer, and merchant category.
 - Use append or partition overwrite only after adding incremental source dates.
 - Keep Cloud Storage lifecycle rules for generated raw snapshots, especially if
   the same pattern is later used for daily score exports.
+- Keep `NEOBANK_BQ_MAX_BYTES_BILLED` low in development and raise it only when
+  a larger run is intentional.
 - Store service-account credentials outside the repo and pass them through
   environment variables or CI secrets.
 - Run dbt tests and the monitoring snapshot after each cloud load.
+
+## What Ross Must Run Locally For Real GCP
+
+These steps require a real Google Cloud account, billing/project access, and
+local `gcloud` authentication:
+
+```powershell
+gcloud auth login
+gcloud auth application-default login
+gcloud config set project <your-project-id>
+```
+
+Then set the project, bucket, and prefix in `.env` or the shell before running
+the rendered upload and load commands. The repo does not commit credentials,
+service-account keys, generated parquet, or `.env` files.
 
 ## References
 

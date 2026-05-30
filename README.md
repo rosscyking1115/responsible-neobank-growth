@@ -234,6 +234,12 @@ Copy `.env.example` to `.env` for local overrides. Keep `NEOBANK_ENV=local` for
 the public demo path; switch to `NEOBANK_ENV=gcp` only when `GCP_PROJECT_ID` and
 `NEOBANK_GCS_RAW_BUCKET` are configured outside git.
 
+Render the matching Cloud Storage upload plan after export:
+
+```powershell
+uv run python -m src.cloud.gcs_upload_plan --manifest data/cloud_export/demo/manifest.json
+```
+
 ## Reproduce Pricing Intelligence Marts
 
 ```powershell
