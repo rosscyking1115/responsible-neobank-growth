@@ -176,6 +176,18 @@ score_date    scored_users    unique_users    model_versions    targeted_users  
 2025-06-30    5,000           5,000           1                 1,390             0.2780            191                        0.0382                    pass
 ```
 
+To move from manual execution to scheduled operations, render the Cloud Scheduler
+plan for the Cloud Run scoring and monitoring jobs:
+
+```powershell
+uv run python -m src.cloud.cloud_run_scheduler_plan `
+  --project neobank-growth-platform-ross `
+  --project-number 319492039091 `
+  --run-region europe-west2 `
+  --scheduler-region europe-west2 `
+  --service-account-email neobank-scheduler@neobank-growth-platform-ross.iam.gserviceaccount.com
+```
+
 ## dbt BigQuery Target
 
 The default dbt target remains local DuckDB for CI and reproducibility. For a

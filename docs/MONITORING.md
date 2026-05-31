@@ -103,6 +103,23 @@ unique users, 1 model version, 1,390 targeted users, 27.80% targeting rate, 191
 vulnerable-review users, 3.82% vulnerable-review rate, and activation
 probabilities bounded from 0.0000 to 1.0000.
 
+For scheduled cloud monitoring, render Cloud Scheduler triggers for the Cloud Run
+Jobs:
+
+```powershell
+uv run python -m src.cloud.cloud_run_scheduler_plan `
+  --project neobank-growth-platform-ross `
+  --project-number 319492039091 `
+  --run-region europe-west2 `
+  --scheduler-region europe-west2 `
+  --service-account-email neobank-scheduler@neobank-growth-platform-ross.iam.gserviceaccount.com
+```
+
+The default monitoring cadence runs scoring at 06:00 Europe/London and score
+monitoring at 06:30 Europe/London. Keep the second job dependent in practice by
+scheduling it after the scoring job's usual completion window and by treating a
+missing or low-row score partition as a monitoring failure.
+
 ## Realised-Label Calibration Monitoring
 
 After D7 outcomes have matured for a scored cohort, generate the calibration

@@ -72,6 +72,8 @@ database is present.
   scores in `neobank_ml.customer_scores_daily`.
 - Exercised BigQuery score monitoring with a passing warehouse-side health check
   for volume, uniqueness, targeting, vulnerable-review, and probability bounds.
+- Added a Cloud Scheduler command plan for daily Cloud Run scoring and monitoring
+  jobs.
 - Delivered a Streamlit dashboard designed for product and growth review.
 
 ## Why This Exists
@@ -233,6 +235,18 @@ The demo GCP score monitoring query was exercised on 2026-05-31 and returned
 version, 1,390 targeted users, 27.80% targeting rate, 191 vulnerable-review
 users, 3.82% vulnerable-review rate, and activation probabilities bounded from
 0.0000 to 1.0000.
+
+To schedule Cloud Run scoring and monitoring jobs, render the Cloud Scheduler
+plan:
+
+```powershell
+uv run python -m src.cloud.cloud_run_scheduler_plan `
+  --project neobank-growth-platform-ross `
+  --project-number 319492039091 `
+  --run-region europe-west2 `
+  --scheduler-region europe-west2 `
+  --service-account-email neobank-scheduler@neobank-growth-platform-ross.iam.gserviceaccount.com
+```
 
 ## Generate a Monitoring Snapshot
 
