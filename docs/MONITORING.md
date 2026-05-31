@@ -139,6 +139,43 @@ monitoring at 06:30 Europe/London. Keep the second job dependent in practice by
 scheduling it after the scoring job's usual completion window and by treating a
 missing or low-row score partition as a monitoring failure.
 
+The demo GCP schedules were resumed and verified on 2026-05-31:
+
+```powershell
+gcloud scheduler jobs list --location=europe-west2
+```
+
+Expected active schedules:
+
+```text
+neobank-daily-activation-scoring  0 6 * * * (Europe/London)   ENABLED
+neobank-daily-score-monitoring    30 6 * * * (Europe/London)  ENABLED
+```
+
+An enabled log-based alert policy watches Cloud Run Job error logs:
+
+```powershell
+gcloud monitoring policies list --format="table(displayName,enabled)"
+```
+
+Expected alert policy:
+
+```text
+Neobank Cloud Run job failure alert  True
+```
+
+The alert filter is:
+
+```text
+resource.type="cloud_run_job"
+resource.labels.job_name=~"neobank-(activation-score-load|score-monitoring)"
+severity>=ERROR
+```
+
+A project budget alert is configured as the cost-control guardrail for the demo
+GCP project. Budget alerts are notifications, not hard spend caps, so pause the
+schedules if an alert fires unexpectedly.
+
 ## Realised-Label Calibration Monitoring
 
 After D7 outcomes have matured for a scored cohort, generate the calibration
