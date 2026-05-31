@@ -176,6 +176,8 @@ uv run python -m src.cloud.cloud_run_api_deploy_plan `
 The private Cloud Run API service was deployed and smoke-tested on 2026-05-31:
 `neobank-api-00002-qc4` served `/health` with `status = ok` and
 `data_version = synthetic-portfolio`.
+The private API also has an enabled log-based Cloud Monitoring policy:
+`Neobank API service failure alert`.
 
 ## Generate Synthetic Data
 
@@ -296,6 +298,9 @@ Cloud Run and Cloud Scheduler were exercised on 2026-05-31 in
 - The schedules were resumed and verified as `ENABLED` on 2026-05-31.
 - A log-based Cloud Monitoring policy, `Neobank Cloud Run job failure alert`,
   was created and verified as enabled.
+- A second log-based Cloud Monitoring policy,
+  `Neobank API service failure alert`, was created and verified as enabled for
+  private API service errors.
 - A project budget alert was configured as the cost-control guardrail for the
   demo GCP project.
 

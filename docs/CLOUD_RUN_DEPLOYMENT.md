@@ -57,6 +57,16 @@ Deployment evidence from the demo GCP project on 2026-05-31:
 - Authenticated `/health` returned `status = ok`, contract version `v1`,
   model version `baseline-rules-2026-05-29`, and data version
   `synthetic-portfolio`.
+- Cloud Monitoring policy `Neobank API service failure alert` was created and
+  verified as enabled for Cloud Run revision errors.
+
+API service alert filter:
+
+```text
+resource.type="cloud_run_revision"
+resource.labels.service_name="neobank-api"
+severity>=ERROR
+```
 
 Equivalent deployment flow:
 

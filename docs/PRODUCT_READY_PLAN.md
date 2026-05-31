@@ -78,11 +78,11 @@ Main product-readiness gaps:
 - Monitoring is local snapshot-based with dashboard surfacing, score-drift
   reporting, realised-label calibration monitoring, a weekly GitHub Actions
   artifact, an operational runbook, BigQuery score monitoring, and successful
-  Cloud Scheduler-triggered Cloud Run execution; alert routing remains future
-  work.
+  Cloud Scheduler-triggered Cloud Run execution with log-based Cloud Monitoring
+  failure alerts.
 - Cloud Run API service deployment is documented, command-rendered, private by
   default, live-deployed, smoke-tested, and container-gated in CI; Secret Manager
-  integration and API alert routing remain future work.
+  integration and deeper auth hardening remain future work.
 
 ## Target Product
 
@@ -217,8 +217,8 @@ Near-term hardening:
 Future phases:
 
 - GitHub OIDC to GCP for keyless deployment.
-- Cloud Monitoring alert examples and SLO notes for the scheduled Cloud Run
-  scoring and monitoring jobs.
+- SLO notes for the scheduled Cloud Run scoring jobs, monitoring jobs, and
+  private API service.
 - Vertex AI only if it adds clear value beyond the current scikit-learn and
   BigQuery path.
 - Terraform only after the manual GCP path is stable and worth codifying.

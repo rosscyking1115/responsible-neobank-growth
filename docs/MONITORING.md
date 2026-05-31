@@ -152,23 +152,33 @@ neobank-daily-activation-scoring  0 6 * * * (Europe/London)   ENABLED
 neobank-daily-score-monitoring    30 6 * * * (Europe/London)  ENABLED
 ```
 
-An enabled log-based alert policy watches Cloud Run Job error logs:
+Enabled log-based alert policies watch Cloud Run Job and private API service
+error logs:
 
 ```powershell
 gcloud monitoring policies list --format="table(displayName,enabled)"
 ```
 
-Expected alert policy:
+Expected alert policies:
 
 ```text
 Neobank Cloud Run job failure alert  True
+Neobank API service failure alert    True
 ```
 
-The alert filter is:
+The scheduled job alert filter is:
 
 ```text
 resource.type="cloud_run_job"
 resource.labels.job_name=~"neobank-(activation-score-load|score-monitoring)"
+severity>=ERROR
+```
+
+The private API service alert filter is:
+
+```text
+resource.type="cloud_run_revision"
+resource.labels.service_name="neobank-api"
 severity>=ERROR
 ```
 
