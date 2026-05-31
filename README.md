@@ -70,6 +70,8 @@ database is present.
   BigQuery with 107 passing dbt checks.
 - Exercised the BigQuery activation-score load path with 5,000 daily customer
   scores in `neobank_ml.customer_scores_daily`.
+- Exercised BigQuery score monitoring with a passing warehouse-side health check
+  for volume, uniqueness, targeting, vulnerable-review, and probability bounds.
 - Delivered a Streamlit dashboard designed for product and growth review.
 
 ## Why This Exists
@@ -225,6 +227,12 @@ uv run python -m src.cloud.bigquery_score_monitoring_plan `
   --location EU `
   --min-rows 5000
 ```
+
+The demo GCP score monitoring query was exercised on 2026-05-31 and returned
+`monitoring_status = pass`: 5,000 scored users, 5,000 unique users, 1 model
+version, 1,390 targeted users, 27.80% targeting rate, 191 vulnerable-review
+users, 3.82% vulnerable-review rate, and activation probabilities bounded from
+0.0000 to 1.0000.
 
 ## Generate a Monitoring Snapshot
 

@@ -97,6 +97,12 @@ targeting rate, vulnerable-customer review load, probability bounds, and score
 quantiles directly in BigQuery. Treat `monitoring_status = fail` as a release
 stop and `monitoring_status = warn` as a human-review trigger.
 
+The demo GCP score monitoring query was exercised on 2026-05-31 for score date
+2025-06-30 and returned `monitoring_status = pass`: 5,000 scored users, 5,000
+unique users, 1 model version, 1,390 targeted users, 27.80% targeting rate, 191
+vulnerable-review users, 3.82% vulnerable-review rate, and activation
+probabilities bounded from 0.0000 to 1.0000.
+
 ## Realised-Label Calibration Monitoring
 
 After D7 outcomes have matured for a scored cohort, generate the calibration
