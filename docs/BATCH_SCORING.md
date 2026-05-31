@@ -72,3 +72,8 @@ gs://${NEOBANK_GCS_RAW_BUCKET}/${NEOBANK_GCS_SCORING_PREFIX}/score_date=2025-06-
 Set `NEOBANK_GCS_SCORING_PREFIX=neobank/scoring/activation` for the demo GCP
 path. The rendered `bq load` command creates a managed table partitioned by
 `score_date` and clustered by `model_version`, `decision`, and `region`.
+
+The demo GCP path was exercised on 2026-05-31. The BigQuery table
+`neobank_ml.customer_scores_daily` was loaded with 5,000 score rows for
+`2025-06-30`, including 1,390 targeted users and 191 vulnerable-customer-review
+cases.
