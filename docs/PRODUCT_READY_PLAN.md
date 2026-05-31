@@ -66,7 +66,8 @@ Main product-readiness gaps:
   mart build; BigQuery governance, cost controls, and scheduled execution still
   need hardening.
 - Batch scoring now has an exercised BigQuery load path; it still needs
-  scheduled execution, cloud score monitoring, and rollback documentation.
+  scheduled execution, cloud score-monitoring execution, and rollback
+  documentation.
 - Monitoring is local snapshot-based with dashboard surfacing, score-drift
   reporting, realised-label calibration monitoring, a weekly GitHub Actions
   artifact, and an operational runbook; scheduled cloud execution and alert
@@ -97,6 +98,8 @@ The finished product should have three surfaces:
 3. Batch scoring and monitoring outputs
    - Batch scoring writes local `customer_scores_daily` extracts.
    - BigQuery load path for `neobank_ml.customer_scores_daily` is exercised.
+   - BigQuery score-monitoring query plan is in place for volume, duplicate,
+     targeting-rate, vulnerable-review, probability-bound, and quantile checks.
    - Scheduled batch scoring should write or merge one score-date partition per
      run.
    - Monitoring writes data quality, freshness, model performance, calibration,
