@@ -276,7 +276,7 @@ default. Set `NEOBANK_BQ_DATASET_PREFIX` to use a different prefix.
 - Run the BigQuery verification plan after each raw load and keep the output in
   release notes or screenshots when using the project in portfolio material.
 
-## What Ross Must Run Locally For Real GCP
+## Manual GCP Commands
 
 These steps require a real Google Cloud account, billing/project access, and
 local `gcloud` authentication:

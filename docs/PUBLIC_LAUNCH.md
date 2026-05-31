@@ -32,9 +32,9 @@ What it covers:
 - Causal inference: regional referral incrementality with DiD, synthetic control, and placebo checks.
 - ML decisioning: calibrated activation model, model card, batch scoring, score drift, and realised-label calibration monitoring.
 - Pricing intelligence: offer economics, guarded recommendations, persisted incentive scenario runs, and sensitivity analysis.
-- Productisation: FastAPI contracts, Cloud Run-ready API container, BigQuery/GCS load plan, CI, and operational runbook.
+- Productisation: private Cloud Run API, scheduled Cloud Run batch jobs, BigQuery/GCS warehouse path, Cloud Monitoring alerts, CI, and operational runbook.
 
-All data is synthetic. The goal was to build something closer to a small data product than a notebook: reproducible warehouse, tested code, dashboard, API boundary, monitoring, and business-facing decision outputs.
+All data is synthetic. The goal was to build something closer to a small data product than a notebook: reproducible warehouse, tested code, dashboard, API boundary, scheduled scoring, monitoring, and business-facing decision outputs.
 
 Repo: https://github.com/rosscyking1115/neobank-product-analytics
 Dashboard: https://neobank-appuct-analytics.streamlit.app/
@@ -47,7 +47,7 @@ I built a synthetic fintech Customer Growth & Pricing Intelligence Platform usin
 
 It covers activation and retention analytics, CUPED experimentation, geo-lift analysis, activation modelling, pricing scenario simulation, monitoring reports, and a PM-facing dashboard.
 
-The goal was to make a portfolio project that behaves like a small data product: reproducible marts, tested code, API contracts, batch scoring, model monitoring, pricing sensitivity outputs, and clear product decisions.
+The goal was to make a portfolio project that behaves like a small data product: reproducible marts, tested code, API contracts, batch scoring, cloud deployment evidence, model monitoring, pricing sensitivity outputs, and clear product decisions.
 
 All data is synthetic.
 Repo: https://github.com/rosscyking1115/neobank-product-analytics
@@ -57,13 +57,13 @@ Dashboard: https://neobank-appuct-analytics.streamlit.app/
 ## CV Bullet
 
 ```text
-Built a synthetic fintech customer growth and pricing intelligence platform using Python, SQL, dbt, DuckDB, Streamlit, FastAPI and scikit-learn, modelling activation, retention, CLV proxy, referral incrementality, pricing scenarios and guarded model decisioning with CI-tested marts, APIs, monitoring reports and product dashboards.
+Built a synthetic fintech customer growth and pricing intelligence platform using Python, SQL, dbt, DuckDB, Streamlit, FastAPI, scikit-learn, BigQuery and Cloud Run, modelling activation, retention, CLV proxy, referral incrementality, pricing scenarios and guarded decisioning with CI-tested marts, APIs, scheduled scoring, monitoring alerts and product dashboards.
 ```
 
 Shorter CV version:
 
 ```text
-Built a synthetic fintech growth analytics platform with dbt, DuckDB, Python, Streamlit and FastAPI, covering experimentation, activation modelling, pricing scenario analysis, geo incrementality, monitoring and product dashboarding.
+Built a synthetic fintech growth analytics platform with dbt, DuckDB, Python, Streamlit, FastAPI, BigQuery and Cloud Run, covering experimentation, activation modelling, pricing scenarios, geo incrementality, monitoring and product dashboarding.
 ```
 
 ## Portfolio Demo Script
@@ -81,7 +81,8 @@ Built a synthetic fintech growth analytics platform with dbt, DuckDB, Python, St
 6. In Monitoring, show release-gate checks for marts, pricing, API readiness,
    batch scores, drift, and calibration.
 7. Close with the technical spine: dbt marts, FastAPI contracts, tests, CI,
-   model card, BigQuery/GCS plan, and Cloud Run-ready container.
+   model card, BigQuery/GCS loads, private Cloud Run API, scheduled Cloud Run
+   jobs, and Cloud Monitoring alerts.
 
 ## Screenshot Checklist
 
@@ -93,7 +94,10 @@ Capture these after deploying or running locally:
 - Streamlit Pricing intelligence tab with scenario runs and sensitivity checks.
 - Streamlit Experiments tab with onboarding and referral readouts.
 - Streamlit Monitoring tab showing release-gate status.
-- API docs at `/docs`, showing scoring and pricing endpoints.
+- Authenticated API `/health` smoke test or local API docs at `/docs`, showing
+  scoring and pricing endpoints.
+- Cloud Run Jobs or Cloud Monitoring page showing scheduled jobs and failure
+  alerts.
 - dbt docs lineage for mart models.
 - GitHub Actions passing CI run.
 
