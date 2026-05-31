@@ -79,3 +79,6 @@ jobs:
           done
           docker logs neobank-api
           exit 1
+
+      - name: Build Cloud Run jobs container
+        run: docker build -f Dockerfile.jobs -t neobank-jobs:ci .

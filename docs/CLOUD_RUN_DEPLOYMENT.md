@@ -53,6 +53,41 @@ For batch scoring and monitoring, use Cloud Run Jobs rather than a long-running
 web service. Google Cloud's current pattern is to create Cloud Scheduler HTTP
 jobs that call the Cloud Run Jobs `:run` API with an OAuth service account.
 
+This repo includes a job image and two runnable job entrypoints:
+
+- `Dockerfile.jobs` packages the synthetic generator, dbt project, model code,
+  and Google Cloud client libraries.
+- `src.cloud.jobs.activation_score_load` generates a deterministic synthetic
+  slice, builds the DuckDB marts, trains the activation model, writes a daily
+  score parquet, uploads it to Cloud Storage, and loads
+  `neobank_ml.customer_scores_daily` in BigQuery.
+- `src.cloud.jobs.score_monitoring` runs the BigQuery score monitoring query,
+  writes the result to `neobank_monitoring.score_monitoring_daily`, and fails
+  the job if monitoring status is `fail`.
+
+Render the Cloud Run Job deployment commands with:
+
+```powershell
+uv run python -m src.cloud.cloud_run_job_deploy_plan `
+  --project neobank-growth-platform-ross `
+  --project-number 319492039091 `
+  --region europe-west2 `
+  --bucket neobank-growth-platform-ross-raw `
+  --bq-location EU `
+  --bq-ml-dataset neobank_ml `
+  --bq-monitoring-dataset neobank_monitoring `
+  --score-date 2025-06-30 `
+  --users 5000 `
+  --months 6
+```
+
+The deploy plan renders commands for Artifact Registry, Cloud Build with
+`cloudbuild.jobs.yaml`, the job service account, IAM bindings, Cloud Run Job
+creation, and manual job smoke tests.
+
+For a rolling daily schedule, omit `--score-date` so the jobs use the runtime UTC
+date. Keep `--score-date 2025-06-30` only for reproducible portfolio smoke tests.
+
 Render the scheduler commands with:
 
 ```powershell
