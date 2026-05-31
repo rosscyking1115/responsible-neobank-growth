@@ -109,6 +109,21 @@ service account `roles/run.invoker` on each job. The rendered plan includes IAM
 binding commands, scheduler creation commands, manual smoke execution commands,
 and pause/resume/delete commands for rollback.
 
+Deployment evidence from the demo GCP project on 2026-05-31:
+
+- `neobank-activation-score-load` completed as a manual Cloud Run Job execution:
+  `neobank-activation-score-load-khjjs`.
+- `neobank-score-monitoring` completed as a manual Cloud Run Job execution:
+  `neobank-score-monitoring-tl447`.
+- Cloud Scheduler triggered `neobank-activation-score-load-6459k` successfully
+  using `neobank-scheduler@neobank-growth-platform-ross.iam.gserviceaccount.com`.
+- Cloud Scheduler triggered `neobank-score-monitoring-2pjlb` successfully using
+  the same scheduler service account.
+
+For the rolling daily schedule, remove `NEOBANK_SCORE_DATE` from both Cloud Run
+Jobs so the scoring and monitoring jobs use the runtime UTC date. Keep
+`NEOBANK_SCORE_DATE=2025-06-30` only for reproducible smoke tests.
+
 Reference docs:
 
 - Cloud Run jobs on a schedule:
