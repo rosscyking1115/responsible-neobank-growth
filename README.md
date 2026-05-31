@@ -215,6 +215,17 @@ The demo GCP score load was exercised on 2026-05-31: 5,000 scored users, 1,390
 targeted users, and 191 vulnerable-customer-review cases were verified in
 `neobank_ml.customer_scores_daily`.
 
+To monitor the loaded score table in BigQuery:
+
+```powershell
+uv run python -m src.cloud.bigquery_score_monitoring_plan `
+  --score-date 2025-06-30 `
+  --project neobank-growth-platform-ross `
+  --dataset neobank_ml `
+  --location EU `
+  --min-rows 5000
+```
+
 ## Generate a Monitoring Snapshot
 
 ```powershell
