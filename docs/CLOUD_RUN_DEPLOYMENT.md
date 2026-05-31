@@ -45,6 +45,19 @@ The plan creates or reuses:
 It also renders an authenticated `/health` smoke test using
 `gcloud auth print-identity-token`.
 
+Deployment evidence from the demo GCP project on 2026-05-31:
+
+- Cloud Build pushed
+  `europe-west2-docker.pkg.dev/neobank-growth-platform-ross/neobank/neobank-api:latest`.
+- Private Cloud Run service `neobank-api` deployed revision
+  `neobank-api-00002-qc4`.
+- Service URL:
+  `https://neobank-api-319492039091.europe-west2.run.app`.
+- `roles/run.invoker` was granted to `rosscyking@gmail.com`.
+- Authenticated `/health` returned `status = ok`, contract version `v1`,
+  model version `baseline-rules-2026-05-29`, and data version
+  `synthetic-portfolio`.
+
 Equivalent deployment flow:
 
 ```bash
