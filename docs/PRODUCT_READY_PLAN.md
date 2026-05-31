@@ -60,6 +60,8 @@ Already strong:
 - Cloud Scheduler schedules deployed and exercised on 2026-05-31 for daily Cloud
   Run scoring and monitoring jobs.
 - Cloud Run-compatible API container with CI build and `/health` smoke test.
+- Private-by-default Cloud Run API deployment plan added with an authenticated
+  `/health` smoke test.
 - Onboarding A/B and referral geo analyses with causal inference and memos.
 - CI for linting, notebooks, tests, data generation, and dbt build.
 - Model card and public-release notes.
@@ -78,10 +80,9 @@ Main product-readiness gaps:
   artifact, an operational runbook, BigQuery score monitoring, and successful
   Cloud Scheduler-triggered Cloud Run execution; alert routing remains future
   work.
-- Cloud Run service deployment is documented and container-gated in CI; Cloud Run
-  jobs for batch scoring and monitoring are implemented and scheduled; private
-  API ingress, production auth, Secret Manager integration, and alert routing
-  remain future work.
+- Cloud Run API service deployment is documented, command-rendered, private by
+  default, and container-gated in CI; live API deployment, Secret Manager
+  integration, and API alert routing remain future work.
 
 ## Target Product
 
@@ -133,7 +134,7 @@ Cloud target:
 - BigQuery datasets: `raw`, `staging`, `intermediate`, `mart_growth`,
   `mart_pricing`, `mart_experiments`, `ml_features`, and `monitoring`.
 - dbt targets for local DuckDB and BigQuery.
-- Cloud Run service for the API.
+- Cloud Run service for the API, private by default with explicit invokers.
 - Cloud Run jobs for batch scoring, data quality, and monitoring reports.
 - GitHub Actions gates for tests, dbt build, API contract tests, and container
   smoke checks.
@@ -147,7 +148,8 @@ production-style GCP portfolio project.
 Important distinction:
 
 - The Streamlit dashboard is already publicly deployed.
-- The API is Cloud Run compatible and container-tested.
+- The API is Cloud Run compatible, container-tested, and has a private
+  deployment command plan.
 - The raw warehouse landing layer and dbt mart layer are **GCP-exercised** for
   the demo export. Batch scoring and monitoring jobs are **GCP-deployed and
   scheduler-exercised** for the demo project. Cloud security hardening is still
