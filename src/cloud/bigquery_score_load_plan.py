@@ -73,12 +73,12 @@ def render_dataset_command(
     dataset: str = DATASET_ENV_REF,
     location: str = LOCATION_ENV_REF,
 ) -> str:
-    return f"bq --location={location} mk --dataset --if_not_exists {project}:{dataset}"
+    return f"bq --location={location} mk --dataset {project}:{dataset}"
 
 
 def render_plan_dataset_command(plan: ScoreLoadPlan, *, location: str = LOCATION_ENV_REF) -> str:
     dataset_ref = plan.table_ref.rsplit(".", 1)[0]
-    return f"bq --location={location} mk --dataset --if_not_exists {dataset_ref}"
+    return f"bq --location={location} mk --dataset {dataset_ref}"
 
 
 def render_load_command(plan: ScoreLoadPlan, *, location: str = LOCATION_ENV_REF) -> str:
@@ -109,7 +109,7 @@ def render_verification_command(plan: ScoreLoadPlan) -> str:
         "GROUP BY score_date"
     )
     powershell_sql = sql.replace("'", "''")
-    return f"bq query --use_legacy_sql=false '{powershell_sql}'"
+    return f"bq --location={plan.location} query --use_legacy_sql=false '{powershell_sql}'"
 
 
 def validate_score_file(plan: ScoreLoadPlan) -> None:

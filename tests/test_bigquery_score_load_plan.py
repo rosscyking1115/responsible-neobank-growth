@@ -70,13 +70,13 @@ def test_render_commands_cover_upload_dataset_load_and_verification() -> None:
 
     assert upload.startswith("gcloud storage cp artifacts/scoring/activation/")
     assert dataset == (
-        "bq --location=EU mk --dataset --if_not_exists "
-        "neobank-growth-platform-ross:neobank_ml"
+        "bq --location=EU mk --dataset neobank-growth-platform-ross:neobank_ml"
     )
     assert plan_dataset == dataset
     assert "--time_partitioning_field=score_date" in load
     assert "--clustering_fields=model_version,decision,region" in load
     assert "neobank-growth-platform-ross:neobank_ml.customer_scores_daily" in load
+    assert verify.startswith("bq --location=EU query")
     assert "COUNTIF(decision = ''target'')" in verify
     assert "DATE ''2025-06-30''" in verify
 
@@ -90,7 +90,7 @@ def test_render_score_load_plan_lists_environment_variables() -> None:
     assert "`NEOBANK_BQ_ML_DATASET`" in rendered
     assert "`NEOBANK_GCS_SCORING_PREFIX`" in rendered
     assert "bq --location=${NEOBANK_BQ_LOCATION} load" in rendered
-    assert "bq query --use_legacy_sql=false" in rendered
+    assert "bq --location=${NEOBANK_BQ_LOCATION} query --use_legacy_sql=false" in rendered
 
 
 def test_render_score_load_plan_uses_explicit_destination_refs() -> None:
