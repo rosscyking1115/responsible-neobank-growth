@@ -180,6 +180,25 @@ To move from manual execution to scheduled operations, render the Cloud Schedule
 plan for the Cloud Run scoring and monitoring jobs:
 
 ```powershell
+uv run python -m src.cloud.cloud_run_job_deploy_plan `
+  --project neobank-growth-platform-ross `
+  --project-number 319492039091 `
+  --region europe-west2 `
+  --bucket neobank-growth-platform-ross-raw `
+  --bq-location EU `
+  --bq-ml-dataset neobank_ml `
+  --bq-monitoring-dataset neobank_monitoring `
+  --score-date 2025-06-30 `
+  --users 5000 `
+  --months 6
+```
+
+Omit `--score-date` for a rolling daily schedule; keep it for the reproducible
+portfolio demo run.
+
+Then render the scheduler triggers:
+
+```powershell
 uv run python -m src.cloud.cloud_run_scheduler_plan `
   --project neobank-growth-platform-ross `
   --project-number 319492039091 `

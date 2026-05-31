@@ -1,0 +1,15 @@
+substitutions:
+  _IMAGE_URI: "europe-west2-docker.pkg.dev/neobank-growth-platform-ross/neobank/neobank-jobs:latest"
+
+steps:
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - "build"
+      - "-f"
+      - "Dockerfile.jobs"
+      - "-t"
+      - "${_IMAGE_URI}"
+      - "."
+
+images:
+  - "${_IMAGE_URI}"
