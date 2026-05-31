@@ -77,8 +77,9 @@ def test_render_commands_cover_upload_dataset_load_and_verification() -> None:
     assert "--clustering_fields=model_version,decision,region" in load
     assert "neobank-growth-platform-ross:neobank_ml.customer_scores_daily" in load
     assert verify.startswith("bq --location=EU query")
+    assert "DATE(score_date) AS score_date" in verify
     assert "COUNTIF(decision = ''target'')" in verify
-    assert "DATE ''2025-06-30''" in verify
+    assert "WHERE DATE(score_date) = DATE ''2025-06-30''" in verify
 
 
 def test_render_score_load_plan_lists_environment_variables() -> None:
