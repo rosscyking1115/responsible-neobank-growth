@@ -156,6 +156,17 @@ score_date    scored_users    targeted_users    vulnerable_review_users
 2025-06-30    5,000           1,390             191
 ```
 
+Render the matching warehouse-side score monitoring query with:
+
+```powershell
+uv run python -m src.cloud.bigquery_score_monitoring_plan `
+  --score-date 2025-06-30 `
+  --project neobank-growth-platform-ross `
+  --dataset neobank_ml `
+  --location EU `
+  --min-rows 5000
+```
+
 ## dbt BigQuery Target
 
 The default dbt target remains local DuckDB for CI and reproducibility. For a

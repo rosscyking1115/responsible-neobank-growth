@@ -78,6 +78,25 @@ vulnerable-customer review load, threshold validity, and score-distribution PSI.
 Use `fail` as a release stop, and use `warn` as a human-review trigger before a
 rollout or public demo refresh.
 
+## BigQuery Score Monitoring
+
+After loading `neobank_ml.customer_scores_daily`, render the warehouse-side score
+monitoring query:
+
+```powershell
+uv run python -m src.cloud.bigquery_score_monitoring_plan `
+  --score-date 2025-06-30 `
+  --project neobank-growth-platform-ross `
+  --dataset neobank_ml `
+  --location EU `
+  --min-rows 5000
+```
+
+The query checks scored-user volume, duplicate users, model-version count,
+targeting rate, vulnerable-customer review load, probability bounds, and score
+quantiles directly in BigQuery. Treat `monitoring_status = fail` as a release
+stop and `monitoring_status = warn` as a human-review trigger.
+
 ## Realised-Label Calibration Monitoring
 
 After D7 outcomes have matured for a scored cohort, generate the calibration
