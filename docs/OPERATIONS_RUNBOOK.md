@@ -52,6 +52,9 @@ Rollback or disable model-backed targeting when any of these checks fail:
   portfolio bias, or segment calibration gap.
 - Pricing recommendation guardrails show negative economics, high complaint
   rate, or excessive human-review load.
+- Cloud Run scoring or monitoring jobs fail in GCP.
+- The Cloud Monitoring policy `Neobank Cloud Run job failure alert` opens an
+  incident.
 
 ## Triage
 
@@ -66,6 +69,50 @@ Rollback or disable model-backed targeting when any of these checks fail:
 5. For model failures, keep the deterministic baseline API path available,
    retrain the activation artifact, and compare calibration before restoring the
    model-backed registry.
+
+## GCP Scheduled Job Triage
+
+Check the current production-style scheduler state:
+
+```powershell
+gcloud scheduler jobs list --location=europe-west2
+gcloud monitoring policies list --format="table(displayName,enabled)"
+```
+
+Expected state:
+
+```text
+neobank-daily-activation-scoring  ENABLED
+neobank-daily-score-monitoring    ENABLED
+Neobank Cloud Run job failure alert  True
+```
+
+If a job fails, inspect recent executions:
+
+```powershell
+gcloud run jobs executions list --job=neobank-activation-score-load --region=europe-west2 --limit=5
+gcloud run jobs executions list --job=neobank-score-monitoring --region=europe-west2 --limit=5
+```
+
+Pause schedules while investigating repeated failures or unexpected spend:
+
+```powershell
+gcloud scheduler jobs pause neobank-daily-activation-scoring --location=europe-west2
+gcloud scheduler jobs pause neobank-daily-score-monitoring --location=europe-west2
+```
+
+Resume after the failed execution is understood and the next manual smoke run
+passes:
+
+```powershell
+gcloud scheduler jobs resume neobank-daily-activation-scoring --location=europe-west2
+gcloud scheduler jobs resume neobank-daily-score-monitoring --location=europe-west2
+```
+
+The demo GCP project also has a budget alert configured. Treat unexpected budget
+emails as an operational incident: check scheduler state, Cloud Run executions,
+BigQuery query volume, and Cloud Storage lifecycle configuration before leaving
+the jobs enabled.
 
 ## Cloud Operations Mapping
 

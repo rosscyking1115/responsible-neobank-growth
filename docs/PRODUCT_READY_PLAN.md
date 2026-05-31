@@ -380,12 +380,13 @@ Recommended first build sequence:
 5. Pricing synthetic data and pricing marts.
 6. Pricing scenario endpoint, persisted scenario runs, and dashboard section.
 7. BigQuery target documentation and Cloud Storage landing pattern. Done as a
-   local manifest and command renderer; live cloud execution remains optional.
+   local manifest, command renderer, and exercised demo GCP path.
 8. Monitoring dashboard summary, drift checks, and operational runbook. Done for
    local snapshots, dashboard surfacing, score drift, realised-label calibration,
-   and release triage; scheduled cloud jobs remain future work.
+   release triage, scheduled Cloud Run jobs, and Cloud Monitoring failure
+   alerting.
 9. Cloud Run deployment docs and container smoke test workflow. Done for the API
-   service; batch and monitoring jobs remain future work.
+   service and for scheduled batch scoring and monitoring jobs.
 
 This order gives the fastest visible jump from portfolio project to product
 platform: API first, then model serving, then pricing, then cloud hardening.

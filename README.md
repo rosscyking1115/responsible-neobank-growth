@@ -280,6 +280,11 @@ Cloud Run and Cloud Scheduler were exercised on 2026-05-31 in
   successfully from `neobank-scheduler@neobank-growth-platform-ross.iam.gserviceaccount.com`.
 - Cloud Scheduler triggered `neobank-score-monitoring-2pjlb`
   successfully from the same scheduler service account.
+- The schedules were resumed and verified as `ENABLED` on 2026-05-31.
+- A log-based Cloud Monitoring policy, `Neobank Cloud Run job failure alert`,
+  was created and verified as enabled.
+- A project budget alert was configured as the cost-control guardrail for the
+  demo GCP project.
 
 ## Generate a Monitoring Snapshot
 
