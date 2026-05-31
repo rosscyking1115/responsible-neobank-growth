@@ -51,12 +51,12 @@ def test_job_deploy_commands_create_scoring_and_monitoring_jobs() -> None:
         "neobank/neobank-jobs:latest ."
     )
     assert "gcloud run jobs create neobank-activation-score-load" in scoring
-    assert "--args=-m,src.cloud.jobs.activation_score_load" in scoring
+    assert "--args='^@^-m@src.cloud.jobs.activation_score_load'" in scoring
     assert "NEOBANK_JOB_USERS=5000" in scoring
     assert "NEOBANK_SCORE_DATE=2025-06-30" in scoring
     assert "NEOBANK_SCORE_MONITORING_MIN_ROWS=5000" in scoring
     assert "gcloud run jobs create neobank-score-monitoring" in monitoring
-    assert "--args=-m,src.cloud.jobs.score_monitoring" in monitoring
+    assert "--args='^@^-m@src.cloud.jobs.score_monitoring'" in monitoring
     assert "--role=roles/bigquery.jobUser" in iam[0]
     assert "--role=roles/bigquery.dataEditor" in iam[1]
     assert "--role=roles/storage.objectAdmin" in iam[2]

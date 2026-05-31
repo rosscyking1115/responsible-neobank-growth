@@ -168,6 +168,10 @@ def _env_vars(plan: CloudRunJobDeployPlan) -> str:
     return ",".join(env_vars)
 
 
+def _python_module_args(module: str) -> str:
+    return f"--args='^@^-m@{module}'"
+
+
 def render_scoring_job_create_command(plan: CloudRunJobDeployPlan) -> str:
     return " ".join(
         [
@@ -182,7 +186,7 @@ def render_scoring_job_create_command(plan: CloudRunJobDeployPlan) -> str:
             "--cpu=1",
             f"--set-env-vars={_env_vars(plan)}",
             "--command=python",
-            "--args=-m,src.cloud.jobs.activation_score_load",
+            _python_module_args("src.cloud.jobs.activation_score_load"),
         ]
     )
 
@@ -201,7 +205,7 @@ def render_monitoring_job_create_command(plan: CloudRunJobDeployPlan) -> str:
             "--cpu=1",
             f"--set-env-vars={_env_vars(plan)}",
             "--command=python",
-            "--args=-m,src.cloud.jobs.score_monitoring",
+            _python_module_args("src.cloud.jobs.score_monitoring"),
         ]
     )
 
