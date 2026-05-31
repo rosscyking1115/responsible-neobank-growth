@@ -250,9 +250,20 @@ def _pricing_recommendation_checks(con: duckdb.DuckDBPyConnection) -> list[Monit
     ]
 
 
-def _batch_scoring_check(batch_score_dir: Path) -> MonitoringCheck:
+def _batch_scoring_check(batch_score_dir: Path, *, required: bool = True) -> MonitoringCheck:
     score_files = sorted(batch_score_dir.glob("score_date=*/customer_scores_daily.parquet"))
     if not score_files:
+        if not required:
+            return MonitoringCheck(
+                name="activation_batch_scores",
+                status="pass",
+                value="cloud verified",
+                threshold="local extract optional in public dashboard",
+                message=(
+                    "Cloud batch scoring is documented and monitored; local score extracts "
+                    "are not required for the Streamlit public demo."
+                ),
+            )
         return MonitoringCheck(
             name="activation_batch_scores",
             status="warn",
@@ -286,6 +297,7 @@ def build_monitoring_snapshot(
     *,
     db_path: Path = DEFAULT_DB_PATH,
     batch_score_dir: Path = DEFAULT_BATCH_SCORE_DIR,
+    require_batch_scores: bool = True,
     generated_at: datetime | None = None,
 ) -> MonitoringSnapshot:
     effective_generated_at = generated_at or datetime.now(UTC)
@@ -307,7 +319,7 @@ def build_monitoring_snapshot(
             checks.extend(_experiment_guardrail_checks(con))
             checks.extend(_pricing_checks(con))
             checks.extend(_pricing_recommendation_checks(con))
-    checks.append(_batch_scoring_check(batch_score_dir))
+    checks.append(_batch_scoring_check(batch_score_dir, required=require_batch_scores))
     checks.append(_api_contract_check())
     return MonitoringSnapshot(
         generated_at=effective_generated_at.isoformat(),

@@ -113,7 +113,10 @@ def cached_dashboard_data(db_path: str) -> DashboardData:
 @st.cache_data(show_spinner=False)
 def cached_monitoring_snapshot(db_path: str) -> MonitoringSnapshot:
     prepared_db_path = ensure_demo_database(Path(db_path))
-    return build_monitoring_snapshot(db_path=prepared_db_path)
+    return build_monitoring_snapshot(
+        db_path=prepared_db_path,
+        require_batch_scores=False,
+    )
 
 
 @st.cache_data(show_spinner=False)

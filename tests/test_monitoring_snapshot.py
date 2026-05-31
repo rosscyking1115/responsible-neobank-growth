@@ -108,6 +108,25 @@ def test_monitoring_snapshot_flags_missing_database(tmp_path: Path) -> None:
     assert snapshot.checks[0].status == "fail"
 
 
+def test_monitoring_snapshot_allows_optional_public_demo_batch_scores(tmp_path: Path) -> None:
+    db_path = tmp_path / "monitoring.duckdb"
+    _build_monitoring_fixture(db_path)
+
+    snapshot = build_monitoring_snapshot(
+        db_path=db_path,
+        batch_score_dir=tmp_path / "scores",
+        require_batch_scores=False,
+        generated_at=datetime(2025, 6, 30, tzinfo=UTC),
+    )
+
+    batch_check = next(
+        check for check in snapshot.checks if check.name == "activation_batch_scores"
+    )
+    assert snapshot.overall_status == "pass"
+    assert batch_check.status == "pass"
+    assert batch_check.value == "cloud verified"
+
+
 def test_write_monitoring_snapshot_outputs_json_and_markdown(tmp_path: Path) -> None:
     db_path = tmp_path / "monitoring.duckdb"
     _build_monitoring_fixture(db_path)
