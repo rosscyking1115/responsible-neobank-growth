@@ -96,10 +96,13 @@ The demo raw landing path was exercised on 2026-05-30 against project
   tables.
 - dbt build completed against BigQuery with 13 staging views, 3 intermediate
   tables, 12 mart tables, and 107 passing dbt checks.
+- Batch activation scores loaded into `neobank_ml.customer_scores_daily` on
+  2026-05-31 with 5,000 scored users, 1,390 targeted users, and 191
+  vulnerable-customer-review cases.
 
 This proves the raw GCS-to-BigQuery warehouse path and dbt mart build are
-working for a small synthetic demo export. Batch scoring now has a reviewed GCS
-and BigQuery load plan, but scheduled scoring jobs, monitoring jobs, and
+working for a small synthetic demo export. Batch scoring has also been exercised
+through Cloud Storage and BigQuery. Scheduled scoring jobs, monitoring jobs, and
 production security controls have not yet been deployed on GCP.
 
 ## BigQuery Dataset Layout
@@ -145,6 +148,13 @@ by `model_version`, `decision`, and `region`. The demo command uses `--replace`
 to keep the portfolio run idempotent. A live scheduled job should use partition
 replacement or a merge pattern so re-runs for one score date do not duplicate
 rows.
+
+The 2026-05-31 demo verification query returned:
+
+```text
+score_date    scored_users    targeted_users    vulnerable_review_users
+2025-06-30    5,000           1,390             191
+```
 
 ## dbt BigQuery Target
 

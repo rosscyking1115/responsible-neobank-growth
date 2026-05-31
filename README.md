@@ -68,8 +68,8 @@ database is present.
   spillover checks, placebos, and embedded ground-truth recovery.
 - Exercised the GCS-to-BigQuery raw landing path and ran the dbt graph on
   BigQuery with 107 passing dbt checks.
-- Added a BigQuery activation-score load plan for the daily
-  `customer_scores_daily` model output table.
+- Exercised the BigQuery activation-score load path with 5,000 daily customer
+  scores in `neobank_ml.customer_scores_daily`.
 - Delivered a Streamlit dashboard designed for product and growth review.
 
 ## Why This Exists
@@ -210,6 +210,10 @@ uv run python -m src.cloud.bigquery_score_load_plan --score-date 2025-06-30
 The plan uploads the parquet extract to Cloud Storage, creates the ML dataset if
 needed, loads `customer_scores_daily` partitioned by `score_date`, and renders a
 row-count verification query.
+
+The demo GCP score load was exercised on 2026-05-31: 5,000 scored users, 1,390
+targeted users, and 191 vulnerable-customer-review cases were verified in
+`neobank_ml.customer_scores_daily`.
 
 ## Generate a Monitoring Snapshot
 

@@ -51,6 +51,8 @@ Already strong:
   verified in BigQuery.
 - dbt graph exercised against BigQuery on 2026-05-30: staging views,
   intermediate tables, mart tables, and 107 dbt tests passed.
+- Batch scoring exercised against GCS and BigQuery on 2026-05-31: 5,000
+  activation score rows loaded into `neobank_ml.customer_scores_daily`.
 - Cloud Run-compatible API container with CI build and `/health` smoke test.
 - Onboarding A/B and referral geo analyses with causal inference and memos.
 - CI for linting, notebooks, tests, data generation, and dbt build.
@@ -63,9 +65,8 @@ Main product-readiness gaps:
 - BigQuery and Cloud Storage now have an exercised demo raw-load path and dbt
   mart build; BigQuery governance, cost controls, and scheduled execution still
   need hardening.
-- Batch scoring now has a BigQuery load plan; it still needs the live score load
-  to be exercised, scheduled execution, cloud score monitoring, and rollback
-  documentation.
+- Batch scoring now has an exercised BigQuery load path; it still needs
+  scheduled execution, cloud score monitoring, and rollback documentation.
 - Monitoring is local snapshot-based with dashboard surfacing, score-drift
   reporting, realised-label calibration monitoring, a weekly GitHub Actions
   artifact, and an operational runbook; scheduled cloud execution and alert
@@ -95,9 +96,7 @@ The finished product should have three surfaces:
 
 3. Batch scoring and monitoring outputs
    - Batch scoring writes local `customer_scores_daily` extracts.
-   - BigQuery load plan for `neobank_ml.customer_scores_daily` is in place.
-   - Next: run the score upload/load commands against GCP and capture the
-     verification output.
+   - BigQuery load path for `neobank_ml.customer_scores_daily` is exercised.
    - Scheduled batch scoring should write or merge one score-date partition per
      run.
    - Monitoring writes data quality, freshness, model performance, calibration,
