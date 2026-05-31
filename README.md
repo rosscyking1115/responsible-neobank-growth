@@ -48,6 +48,19 @@ database is present.
 6. Check the operational docs: `docs/MONITORING.md`,
    `docs/PRICING_SCENARIOS.md`, and `docs/OPERATIONS_RUNBOOK.md`.
 
+## What This Proves
+
+- Product judgement: clear activation, retention, pricing, referral, and
+  customer-outcome metrics tied to business decisions.
+- Analytical depth: CUPED experimentation, geo incrementality, synthetic
+  control, guardrails, calibration, and segment diagnostics.
+- Data product engineering: dbt marts, tested Python modules, FastAPI
+  contracts, batch scoring, monitoring reports, and CI.
+- Cloud readiness: GCS raw landing, BigQuery raw and mart builds, Cloud Run API,
+  scheduled Cloud Run Jobs, Cloud Scheduler, and Cloud Monitoring alerts.
+- Communication: PM-facing Streamlit dashboard, model card, operations runbook,
+  and release-ready public narrative.
+
 ## Portfolio Highlights
 
 - Built a reproducible synthetic neobank warehouse covering users, transactions,
@@ -424,12 +437,12 @@ inspiration for a realistic fintech product analytics workflow.
 This portfolio version is designed to be public, reproducible, and easy to review.
 A real fintech production version would add:
 
-- A deployed API environment with authentication, rate limits, request logging,
-  and model version routing.
-- A managed warehouse such as BigQuery with governed raw, staging, mart, and
-  feature tables.
-- Scheduled ingestion and monitoring jobs with alerting, ownership, and runbook
-  escalation.
+- Stronger API protection: API Gateway, IAP, JWT, or service-to-service auth,
+  plus rate limits, structured request logging, and model version routing.
+- Production data governance: row-level and column-level security, data
+  retention policy, lineage ownership, query labels, and cost controls.
+- CI/CD hardening: GitHub OIDC to GCP, container vulnerability scanning, SBOMs,
+  and infrastructure as code once the manual cloud path is stable.
 - A model registry or feature store for reproducible training, shadow
   deployments, and online/offline feature parity.
 - Formal privacy, Consumer Duty, model-risk, and audit controls before any live

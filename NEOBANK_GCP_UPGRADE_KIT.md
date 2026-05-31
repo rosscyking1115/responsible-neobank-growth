@@ -1,58 +1,68 @@
-# Neobank GCP Upgrade Kit
+# Neobank GCP Upgrade Brief
 
-Use this file as handoff context for upgrading the existing `neobank-product-analytics` project into a product-ready cloud/data-science portfolio project.
+This file records the cloud upgrade brief for `neobank-product-analytics`. It is
+kept as project context and implementation evidence for the GCP productisation
+path.
 
 ## Goal
 
-Upgrade the current local neobank product analytics project into a small but credible cloud-deployed data product:
+Upgrade the local neobank product analytics project into a small but credible
+cloud-deployed data product:
 
 **Customer Growth & Pricing ML Platform on GCP**
 
-The final project should prove that Ross can move beyond local analysis into a production-style workflow using cloud storage, a cloud warehouse, batch scoring, a deployed API or dashboard, tests, documentation, and business-facing outputs.
+The project should demonstrate a production-style workflow using Cloud Storage,
+BigQuery, Cloud Run, batch scoring, a deployed API/dashboard surface, tests,
+documentation, monitoring, and business-facing outputs.
 
-This upgrade is higher value than an entry-level cloud certificate because job posts repeatedly ask for:
+## Current Status
 
-- GCP / BigQuery / cloud warehouse experience
-- production-style deployment
-- APIs or batch scoring
-- orchestration or repeatable pipelines
-- model monitoring / drift checks
-- MLOps basics
-- stakeholder-facing business impact
+Implemented for the public portfolio version:
 
-## Candidate Context
+- Public Streamlit dashboard.
+- GCS raw landing path and BigQuery raw dataset for the synthetic demo export.
+- dbt mart build exercised against BigQuery with 107 passing checks.
+- Activation scores loaded to `neobank_ml.customer_scores_daily`.
+- BigQuery score monitoring written to `neobank_monitoring.score_monitoring_daily`.
+- Private Cloud Run FastAPI service with authenticated health smoke test.
+- Cloud Run Jobs for activation scoring and score monitoring.
+- Cloud Scheduler daily job triggers using a dedicated scheduler service account.
+- Cloud Monitoring log-based failure alerts for batch jobs and the API service.
+- Cost-control guardrails through lifecycle policy and budget alert.
 
-Ross is applying for UK data scientist / applied scientist / product analytics roles such as:
+Remaining hardening for a real fintech production environment:
 
-- ASOS Applied Scientist, Customer & Marketing ML
-- Trustpilot Data Scientist, GTM Applied AI / Pricing
-- Lendable Data Scientist, UK Cards
-- Guardian Data Scientist
-- Ipsos Data Scientist, Brand Health Tracking
+- Keyless CI/CD deployment through GitHub OIDC.
+- Infrastructure as code after the manual path is stable.
+- Stronger API auth such as API Gateway, IAP, JWT, or service-to-service IAM.
+- Secret Manager integration for any sensitive runtime configuration.
+- Formal privacy, model-risk, Consumer Duty, and audit controls before live
+  customer decisioning.
 
-The strongest existing project is `neobank-product-analytics`, which already demonstrates:
+## Project Capabilities
 
-- synthetic fintech customer-event generation
-- activation, retention, feature adoption, CLV proxy
-- onboarding A/B testing with CUPED and guardrails
-- referral incrementality with difference-in-differences and synthetic control
-- dbt + DuckDB analytics layer
-- Streamlit dashboard
-- decision memos and model card style documentation
+The project demonstrates:
 
-The missing signal is not more modelling. The missing signal is:
-
-> I can deploy a data/model product into a cloud/production-style environment.
+- Synthetic fintech customer-event generation.
+- Activation, retention, feature adoption, CLV proxy, pricing, and referral
+  incrementality marts.
+- Onboarding A/B testing with CUPED, SRM checks, guardrails, and power analysis.
+- Referral incrementality with difference-in-differences, synthetic control, and
+  placebo checks.
+- dbt plus DuckDB for local reproducibility.
+- GCS plus BigQuery for the cloud warehouse path.
+- FastAPI, Cloud Run, batch scoring, monitoring, and alerting.
+- Streamlit dashboard, model card, operations runbook, and public launch notes.
 
 ## Target CV Bullet
 
-After completion, Ross should be able to put this on his CV:
+Recommended CV wording:
 
 ```text
-Built a GCP-deployed customer growth ML platform using BigQuery, Cloud Storage, Cloud Run, Python, SQL/dbt and scikit-learn, modelling activation, retention, CLV and upsell propensity from customer-level event data with reproducible tests and business-facing dashboards.
+Built a synthetic fintech customer growth and pricing intelligence platform using BigQuery, Cloud Storage, Cloud Run, Python, SQL/dbt, Streamlit, FastAPI and scikit-learn, modelling activation, retention, CLV proxy, referral incrementality and pricing scenarios with CI-tested marts, scheduled scoring, monitoring alerts and business-facing dashboards.
 ```
 
-If Vertex AI is included:
+Optional wording if Vertex AI is added later:
 
 ```text
 Deployed a customer propensity modelling workflow on GCP using BigQuery, Cloud Storage, Vertex AI and Cloud Run, with reproducible data preparation, model evaluation, batch scoring and business-facing decision outputs.
@@ -383,7 +393,9 @@ Use language that maps to target roles:
 - reproducible analytics
 - business decisioning
 
-Avoid making it sound like only a toy fintech simulation. The synthetic data is acceptable if the engineering and methodology are strong.
+Position the project as a synthetic but production-style data product. The data
+is synthetic by design; the engineering, methodology, cloud deployment evidence,
+and decision outputs are the credibility signals.
 
 ## Job-Application Mapping
 
@@ -446,16 +458,18 @@ This upgrade is done when:
 - BigQuery contains raw + transformed marts.
 - A propensity model trains and scores.
 - Scores are written back to BigQuery.
-- Cloud Run API runs locally and has deployment instructions.
+- Cloud Run API is deployed privately and has reproducible deployment
+  instructions.
 - Dashboard shows model/business outputs.
 - Tests pass.
 - README includes architecture, screenshots, setup, limitations.
-- CV bullet can honestly say "GCP-deployed" or "GCP-ready" depending on whether deployment was actually completed.
+- CV bullet can honestly say "GCP-deployed" for the exercised demo project.
 
 Important wording:
 
-- If actually deployed to GCP, say **GCP-deployed**.
-- If only implemented with instructions and not deployed, say **GCP-ready** or **Cloud Run deployable**.
+- Say **GCP-deployed** for the current portfolio state.
+- Use **GCP-ready** or **Cloud Run deployable** only for future branches that
+  keep implementation instructions without live deployment evidence.
 - Do not claim Vertex AI unless it is actually used.
 
 ## Suggested First Build Session
@@ -469,4 +483,3 @@ Start with the smallest vertical slice:
 5. Document the setup.
 
 That first slice is enough to unlock the rest without getting trapped in architecture.
-

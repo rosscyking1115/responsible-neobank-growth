@@ -9,31 +9,35 @@ decisioning, pricing simulation, monitoring, and dashboarding in one
 reproducible repo.
 
 The product-ready upgrade roadmap is documented in `docs/PRODUCT_READY_PLAN.md`;
-the repo now includes the local versions of the dashboard, API contract, pricing
-scenario artifacts, model monitoring, and operational release gates.
+the repo now includes the public dashboard, API contract, pricing scenario
+artifacts, model monitoring, BigQuery/GCS warehouse path, private Cloud Run API,
+scheduled Cloud Run batch jobs, Cloud Monitoring alerts, and operational release
+gates.
 
 ## Suggested CV Bullet
 
-- Built a Monzo-inspired neobank analytics case study using synthetic event data,
-  dbt, DuckDB, Python, Streamlit, CUPED A/B testing, activation modelling, and
-  geo incrementality; delivered tested marts, model card, FastAPI contracts,
-  pricing scenario sensitivity outputs, monitoring reports, and a PM-facing
-  dashboard with CI validation.
+- Built a synthetic fintech customer growth and pricing intelligence platform
+  using dbt, DuckDB, BigQuery, Cloud Run, Python, Streamlit, FastAPI, CUPED A/B
+  testing, activation modelling, pricing scenarios, and geo incrementality;
+  delivered tested marts, model card, scheduled scoring jobs, monitoring alerts,
+  API contracts, and a PM-facing dashboard with CI validation.
 
 ## Suggested LinkedIn Wording
 
 For a ready-to-post version, use `docs/PUBLIC_LAUNCH.md`.
 
-I built a synthetic neobank product analytics project to mirror how a modern
-fintech growth data team works: generate event data, model trusted dbt marts, run
-activation and referral analyses, train a decisioning model with guardrails, and
-turn the outputs into a Streamlit dashboard, API contracts, monitoring reports,
-and pricing scenario artifacts.
+I built a synthetic fintech customer growth and pricing intelligence platform to
+mirror how a modern product data science team works: generate event data, model
+trusted dbt marts, run activation and referral analyses, train a guarded
+decisioning model, and turn the outputs into a Streamlit dashboard, API
+contracts, scheduled scoring jobs, monitoring reports, and pricing scenario
+artifacts.
 
 The project covers CUPED experimentation, sample-ratio checks, guardrails,
 heterogeneous effects, synthetic-control geo incrementality, placebo tests,
-activation model calibration, explainability, Cloud Run-ready API packaging,
-pricing sensitivity analysis, and a public-release-ready analytics narrative.
+activation model calibration, explainability, private Cloud Run API deployment,
+scheduled Cloud Run batch scoring, BigQuery/GCS loading, pricing sensitivity
+analysis, and a public-release-ready analytics narrative.
 
 ## Demo Script
 
@@ -45,8 +49,9 @@ pricing sensitivity analysis, and a public-release-ready analytics narrative.
    scenario portfolio, and sensitivity checks.
 4. Switch to experiments and explain why onboarding ships while referral
    incentives need cheaper unit economics.
-5. Point to API docs, monitoring reports, dbt marts, tests, and CI to show a
-   reproducible analytics layer rather than a one-off notebook.
+5. Point to API docs, Cloud Run deployment evidence, monitoring reports, dbt
+   marts, tests, and CI to show a reproducible analytics layer rather than a
+   one-off notebook.
 
 ## Screenshot Checklist
 
@@ -56,6 +61,7 @@ Recommended portfolio captures:
 - Pricing intelligence tab with scenario runs and sensitivity checks.
 - Experiments tab with onboarding and referral readouts.
 - Monitoring tab with release-gate status.
+- Cloud Run API health check and Cloud Monitoring alert policies.
 - dbt lineage or docs page after running `dbt docs generate` and `dbt docs serve`.
 - CI run showing lint, tests, notebook checks, data generation, and dbt build.
 
