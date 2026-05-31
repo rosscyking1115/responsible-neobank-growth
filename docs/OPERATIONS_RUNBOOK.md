@@ -55,6 +55,8 @@ Rollback or disable model-backed targeting when any of these checks fail:
 - Cloud Run scoring or monitoring jobs fail in GCP.
 - The Cloud Monitoring policy `Neobank Cloud Run job failure alert` opens an
   incident.
+- The Cloud Monitoring policy `Neobank API service failure alert` opens an
+  incident.
 
 ## Triage
 
@@ -85,6 +87,7 @@ Expected state:
 neobank-daily-activation-scoring  ENABLED
 neobank-daily-score-monitoring    ENABLED
 Neobank Cloud Run job failure alert  True
+Neobank API service failure alert    True
 ```
 
 If a job fails, inspect recent executions:
@@ -108,6 +111,21 @@ passes:
 gcloud scheduler jobs resume neobank-daily-activation-scoring --location=europe-west2
 gcloud scheduler jobs resume neobank-daily-score-monitoring --location=europe-west2
 ```
+
+## GCP API Service Triage
+
+Check the private API service, revision, and authenticated health endpoint:
+
+```powershell
+gcloud run services describe neobank-api --region=europe-west2
+$SERVICE_URL = gcloud run services describe neobank-api --region=europe-west2 --format="value(status.url)"
+$TOKEN = gcloud auth print-identity-token
+Invoke-RestMethod -Headers @{Authorization="Bearer $TOKEN"} "$SERVICE_URL/health"
+```
+
+If the `Neobank API service failure alert` opens an incident, inspect recent
+revision logs, confirm the latest revision is ready, and roll traffic back to
+the last healthy revision if the health check or prediction endpoints fail.
 
 The demo GCP project also has a budget alert configured. Treat unexpected budget
 emails as an operational incident: check scheduler state, Cloud Run executions,
