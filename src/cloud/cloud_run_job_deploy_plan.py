@@ -165,7 +165,7 @@ def _env_vars(plan: CloudRunJobDeployPlan) -> str:
     ]
     if plan.score_date:
         env_vars.append(f"NEOBANK_SCORE_DATE={plan.score_date}")
-    return ",".join(env_vars)
+    return f"'^@^{'@'.join(env_vars)}'"
 
 
 def _python_module_args(module: str) -> str:

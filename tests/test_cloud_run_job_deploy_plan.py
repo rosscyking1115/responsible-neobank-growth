@@ -52,6 +52,7 @@ def test_job_deploy_commands_create_scoring_and_monitoring_jobs() -> None:
     )
     assert "gcloud run jobs create neobank-activation-score-load" in scoring
     assert "--args='^@^-m@src.cloud.jobs.activation_score_load'" in scoring
+    assert "--set-env-vars='^@^GCP_PROJECT_ID=neobank-growth-platform-ross@" in scoring
     assert "NEOBANK_JOB_USERS=5000" in scoring
     assert "NEOBANK_SCORE_DATE=2025-06-30" in scoring
     assert "NEOBANK_SCORE_MONITORING_MIN_ROWS=5000" in scoring
