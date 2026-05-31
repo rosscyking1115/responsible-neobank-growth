@@ -99,6 +99,8 @@ The demo raw landing path was exercised on 2026-05-30 against project
 - Batch activation scores loaded into `neobank_ml.customer_scores_daily` on
   2026-05-31 with 5,000 scored users, 1,390 targeted users, and 191
   vulnerable-customer-review cases.
+- The BigQuery score monitoring query returned `monitoring_status = pass` on
+  2026-05-31 for the 2025-06-30 score partition.
 
 This proves the raw GCS-to-BigQuery warehouse path and dbt mart build are
 working for a small synthetic demo export. Batch scoring has also been exercised
@@ -165,6 +167,13 @@ uv run python -m src.cloud.bigquery_score_monitoring_plan `
   --dataset neobank_ml `
   --location EU `
   --min-rows 5000
+```
+
+The 2026-05-31 score monitoring query returned:
+
+```text
+score_date    scored_users    unique_users    model_versions    targeted_users    targeting_rate    vulnerable_review_users    vulnerable_review_rate    monitoring_status
+2025-06-30    5,000           5,000           1                 1,390             0.2780            191                        0.0382                    pass
 ```
 
 ## dbt BigQuery Target
