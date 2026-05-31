@@ -55,10 +55,10 @@ Already strong:
   activation score rows loaded into `neobank_ml.customer_scores_daily`.
 - BigQuery score monitoring exercised on 2026-05-31: the 2025-06-30 score
   partition returned `monitoring_status = pass`.
-- Cloud Run Job entrypoints added for activation score loading and BigQuery score
-  monitoring.
-- Cloud Scheduler command plan added for daily Cloud Run scoring and monitoring
-  jobs.
+- Cloud Run Jobs deployed and exercised on 2026-05-31 for activation score
+  loading and BigQuery score monitoring.
+- Cloud Scheduler schedules deployed and exercised on 2026-05-31 for daily Cloud
+  Run scoring and monitoring jobs.
 - Cloud Run-compatible API container with CI build and `/health` smoke test.
 - Onboarding A/B and referral geo analyses with causal inference and memos.
 - CI for linting, notebooks, tests, data generation, and dbt build.
@@ -71,15 +71,16 @@ Main product-readiness gaps:
 - BigQuery and Cloud Storage now have an exercised demo raw-load path and dbt
   mart build; BigQuery governance, cost controls, and scheduled execution still
   need hardening.
-- Batch scoring now has an exercised BigQuery load path and Cloud Run Job
-  entrypoint; it still needs a first live Cloud Run Job execution.
+- Batch scoring now has an exercised BigQuery load path and a successful live
+  Cloud Run Job execution.
 - Monitoring is local snapshot-based with dashboard surfacing, score-drift
   reporting, realised-label calibration monitoring, a weekly GitHub Actions
-  artifact, an operational runbook, and a Cloud Scheduler command plan; live
-  scheduled execution and alert routing remain future work.
+  artifact, an operational runbook, BigQuery score monitoring, and successful
+  Cloud Scheduler-triggered Cloud Run execution; alert routing remains future
+  work.
 - Cloud Run service deployment is documented and container-gated in CI; Cloud Run
-  jobs for batch scoring and monitoring are implemented; private ingress,
-  production auth, Secret Manager integration, and live scheduled execution
+  jobs for batch scoring and monitoring are implemented and scheduled; private
+  API ingress, production auth, Secret Manager integration, and alert routing
   remain future work.
 
 ## Target Product
@@ -106,10 +107,9 @@ The finished product should have three surfaces:
    - BigQuery load path for `neobank_ml.customer_scores_daily` is exercised.
    - BigQuery score-monitoring query is exercised for volume, duplicate,
      targeting-rate, vulnerable-review, probability-bound, and quantile checks.
-   - Cloud Run Job entrypoints can execute score loading and monitoring.
-   - Cloud Scheduler can trigger Cloud Run Jobs for daily scoring and monitoring.
-   - Live scheduled batch scoring should write or merge one score-date partition
-     per run.
+   - Cloud Run Job entrypoints execute score loading and monitoring in GCP.
+   - Cloud Scheduler triggers Cloud Run Jobs for daily scoring and monitoring.
+   - Live scheduled batch scoring writes one score-date partition per run.
    - Monitoring writes data quality, freshness, model performance, calibration,
      drift, and guardrail reports.
 
@@ -149,8 +149,9 @@ Important distinction:
 - The Streamlit dashboard is already publicly deployed.
 - The API is Cloud Run compatible and container-tested.
 - The raw warehouse landing layer and dbt mart layer are **GCP-exercised** for
-  the demo export. Batch scoring, monitoring jobs, and cloud security hardening
-  are still **GCP-ready**, not yet fully **GCP-deployed**.
+  the demo export. Batch scoring and monitoring jobs are **GCP-deployed and
+  scheduler-exercised** for the demo project. Cloud security hardening is still
+  future work.
 - Do not claim Vertex AI or full GCP deployment unless those resources are
   actually created and exercised.
 
@@ -162,7 +163,7 @@ product path":
 - Upload raw files to Cloud Storage and load BigQuery raw tables.
 - Run dbt against BigQuery while keeping DuckDB as the default local path.
 - Write propensity or activation scores back to BigQuery. The command-rendered
-  load plan is done; the live GCP score load is next.
+  load plan and live GCP score load are done for the demo project.
 - Harden Cloud Run deployment so production guidance is private-by-default.
 - Keep monitoring lightweight, reproducible, and evidence-based.
 
@@ -213,9 +214,9 @@ Near-term hardening:
 
 Future phases:
 
-- Cloud Run jobs for batch scoring and monitoring snapshots.
 - GitHub OIDC to GCP for keyless deployment.
-- Cloud Monitoring alert examples and SLO notes.
+- Cloud Monitoring alert examples and SLO notes for the scheduled Cloud Run
+  scoring and monitoring jobs.
 - Vertex AI only if it adds clear value beyond the current scikit-learn and
   BigQuery path.
 - Terraform only after the manual GCP path is stable and worth codifying.

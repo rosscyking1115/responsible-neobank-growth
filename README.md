@@ -72,10 +72,10 @@ database is present.
   scores in `neobank_ml.customer_scores_daily`.
 - Exercised BigQuery score monitoring with a passing warehouse-side health check
   for volume, uniqueness, targeting, vulnerable-review, and probability bounds.
-- Added Cloud Run Job entrypoints for activation score loading and score
+- Deployed Cloud Run Jobs for activation score loading and BigQuery score
   monitoring.
-- Added a Cloud Scheduler command plan for daily Cloud Run scoring and monitoring
-  jobs.
+- Scheduled the Cloud Run Jobs with Cloud Scheduler at 06:00 and 06:30
+  Europe/London, using a dedicated scheduler service account.
 - Delivered a Streamlit dashboard designed for product and growth review.
 
 ## Why This Exists
@@ -268,6 +268,18 @@ uv run python -m src.cloud.cloud_run_job_deploy_plan `
 
 Omit `--score-date` for a rolling daily schedule; keep it for the reproducible
 portfolio demo run.
+
+Cloud Run and Cloud Scheduler were exercised on 2026-05-31 in
+`europe-west2`:
+
+- `neobank-activation-score-load` completed manually as
+  `neobank-activation-score-load-khjjs`.
+- `neobank-score-monitoring` completed manually as
+  `neobank-score-monitoring-tl447`.
+- Cloud Scheduler triggered `neobank-activation-score-load-6459k`
+  successfully from `neobank-scheduler@neobank-growth-platform-ross.iam.gserviceaccount.com`.
+- Cloud Scheduler triggered `neobank-score-monitoring-2pjlb`
+  successfully from the same scheduler service account.
 
 ## Generate a Monitoring Snapshot
 
