@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from math import exp
 
 from api.activation_model import activation_feature_frame, load_configured_activation_artifact
@@ -20,6 +21,10 @@ BASELINE_MODEL_VERSION = "baseline-rules-2026-05-29"
 MODEL_VERSION = BASELINE_MODEL_VERSION
 CONTRACT_VERSION = "v1"
 DATA_VERSION = "synthetic-local"
+
+
+def active_data_version() -> str:
+    return os.getenv("DATA_VERSION", DATA_VERSION)
 
 
 def _sigmoid(value: float) -> float:

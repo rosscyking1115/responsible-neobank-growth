@@ -38,6 +38,15 @@ def test_health_endpoint_exposes_contract_metadata() -> None:
     assert payload["model_version"].startswith("baseline-rules")
 
 
+def test_health_endpoint_uses_configured_data_version(monkeypatch) -> None:
+    monkeypatch.setenv("DATA_VERSION", "synthetic-portfolio")
+
+    response = client.get("/health")
+
+    assert response.status_code == 200
+    assert response.json()["data_version"] == "synthetic-portfolio"
+
+
 def test_activation_scoring_contract() -> None:
     response = client.post("/score/activation", json={"customer": sample_customer()})
 
