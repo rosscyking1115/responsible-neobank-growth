@@ -42,7 +42,7 @@ except ModuleNotFoundError:
     )
 
 st.set_page_config(
-    page_title="Neobank Product Analytics",
+    page_title="Customer Growth & Pricing Intelligence Platform",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
@@ -159,6 +159,10 @@ def _section_caption(text: str) -> None:
     st.markdown(f"<p class='section-caption'>{text}</p>", unsafe_allow_html=True)
 
 
+def _observation(text: str) -> None:
+    st.caption(f"Observation: {text}")
+
+
 def _render_product_health(data: DashboardData) -> None:
     _section_caption(
         "Executive product readout across activation, engagement, retention, adoption, and value."
@@ -176,6 +180,7 @@ def _render_product_health(data: DashboardData) -> None:
         fig.update_traces(line_color=PRIMARY_BLUE, marker_color=PRIMARY_BLUE)
         _apply_chart_layout(fig, height=330)
         st.plotly_chart(fig, width="stretch")
+        _observation("WAU builds steadily, indicating sustained engagement growth.")
     with right:
         st.subheader("D7 Activation By Region")
         region_frame = data.activation_by_region.sort_values("d7_activation_rate")
@@ -191,6 +196,7 @@ def _render_product_health(data: DashboardData) -> None:
         _apply_chart_layout(fig, height=330)
         fig.update_xaxes(tickformat=".0%")
         st.plotly_chart(fig, width="stretch")
+        _observation("Regional activation gaps point to acquisition mix and localisation levers.")
 
     left, right = st.columns(2)
     with left:
@@ -206,6 +212,7 @@ def _render_product_health(data: DashboardData) -> None:
         _apply_chart_layout(fig, height=320)
         fig.update_yaxes(tickformat=".0%")
         st.plotly_chart(fig, width="stretch")
+        _observation("Retention softens after activation, making habit formation the priority.")
     with right:
         st.subheader("Feature Adoption")
         fig = px.bar(
@@ -222,6 +229,7 @@ def _render_product_health(data: DashboardData) -> None:
         )
         _apply_chart_layout(fig, height=320)
         st.plotly_chart(fig, width="stretch")
+        _observation("Savings-led features drive adoption, with referral loops behind them.")
 
     st.subheader("Value By Income Segment")
     fig = px.bar(
@@ -239,6 +247,7 @@ def _render_product_health(data: DashboardData) -> None:
     )
     _apply_chart_layout(fig, height=330)
     st.plotly_chart(fig, width="stretch")
+    _observation("Higher-income segments carry stronger value and activation.")
 
 
 def _render_experiments(data: DashboardData) -> None:
@@ -264,6 +273,7 @@ def _render_experiments(data: DashboardData) -> None:
         fig.update_layout(showlegend=False)
         fig.update_yaxes(tickformat=".0%")
         st.plotly_chart(fig, width="stretch")
+        _observation("The treatment lifts D7 activation, supporting a monitored rollout.")
 
     with referral:
         st.subheader("Referral Geo Incrementality")
@@ -288,6 +298,7 @@ def _render_experiments(data: DashboardData) -> None:
         )
         _apply_chart_layout(fig, height=340)
         st.plotly_chart(fig, width="stretch")
+        _observation("Referral lift is positive, but scaling needs cheaper incentive economics.")
 
 
 def _render_pricing_scenarios(run: PricingScenarioRun) -> None:
@@ -324,6 +335,7 @@ def _render_pricing_scenarios(run: PricingScenarioRun) -> None:
             width="stretch",
             hide_index=True,
         )
+        _observation("Top scenarios balance positive margin with incremental activated customers.")
     with right:
         st.subheader("Sensitivity Check")
         best_scenario_id = str(summary["best_scenario_id"])
@@ -349,6 +361,7 @@ def _render_pricing_scenarios(run: PricingScenarioRun) -> None:
             )
             _apply_chart_layout(fig, height=285)
             st.plotly_chart(fig, width="stretch")
+            _observation("Sensitivity cases test the best incentive against downside risk.")
 
 
 def _render_pricing(data: DashboardData, scenario_run: PricingScenarioRun) -> None:
@@ -395,6 +408,7 @@ def _render_pricing(data: DashboardData, scenario_run: PricingScenarioRun) -> No
         _apply_chart_layout(fig, height=320)
         fig.update_layout(showlegend=False)
         st.plotly_chart(fig, width="stretch")
+        _observation("Most exposures route to controlled actions, balancing growth and risk.")
 
     with right:
         st.subheader("Margin By Offer")
@@ -415,6 +429,7 @@ def _render_pricing(data: DashboardData, scenario_run: PricingScenarioRun) -> No
         )
         _apply_chart_layout(fig, height=320)
         st.plotly_chart(fig, width="stretch")
+        _observation("Margin concentrates in specific offers; review rates show scaling caution.")
 
     st.subheader("Scenario Runs")
     _render_pricing_scenarios(scenario_run)
@@ -450,6 +465,7 @@ def _render_pricing(data: DashboardData, scenario_run: PricingScenarioRun) -> No
     _apply_chart_layout(fig, height=330)
     fig.update_xaxes(tickformat=".0%")
     st.plotly_chart(fig, width="stretch")
+    _observation("Scale candidates must clear both commercial and customer guardrails.")
 
 
 def _render_monitoring(snapshot: MonitoringSnapshot) -> None:
@@ -497,6 +513,7 @@ def _render_monitoring(snapshot: MonitoringSnapshot) -> None:
         _apply_chart_layout(fig, height=300)
         fig.update_layout(showlegend=False)
         st.plotly_chart(fig, width="stretch")
+        _observation("A healthy release gate clusters checks in pass and keeps failures at zero.")
 
     with right:
         st.subheader("Attention Required")
@@ -507,12 +524,14 @@ def _render_monitoring(snapshot: MonitoringSnapshot) -> None:
                 width="stretch",
                 hide_index=True,
             )
+            _observation("No warnings or failures are prioritised, so the release gate is clear.")
         else:
             st.dataframe(
                 attention[["check", "status", "value", "threshold", "message"]],
                 width="stretch",
                 hide_index=True,
             )
+            _observation("Warnings and failures are surfaced first for focused release review.")
 
     st.subheader("All Checks")
     status_order = {"fail": 0, "warn": 1, "pass": 2}
@@ -524,11 +543,12 @@ def _render_monitoring(snapshot: MonitoringSnapshot) -> None:
         width="stretch",
         hide_index=True,
     )
+    _observation("The full check table keeps the release decision auditable.")
 
 
 def main() -> None:
     _apply_app_style()
-    st.title("Neobank Product Analytics")
+    st.title("Customer Growth & Pricing Intelligence Platform")
 
     db_path = str(DEFAULT_DB_PATH)
 
