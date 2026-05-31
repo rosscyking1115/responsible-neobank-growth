@@ -55,6 +55,8 @@ Already strong:
   activation score rows loaded into `neobank_ml.customer_scores_daily`.
 - BigQuery score monitoring exercised on 2026-05-31: the 2025-06-30 score
   partition returned `monitoring_status = pass`.
+- Cloud Scheduler command plan added for daily Cloud Run scoring and monitoring
+  jobs.
 - Cloud Run-compatible API container with CI build and `/health` smoke test.
 - Onboarding A/B and referral geo analyses with causal inference and memos.
 - CI for linting, notebooks, tests, data generation, and dbt build.
@@ -68,12 +70,11 @@ Main product-readiness gaps:
   mart build; BigQuery governance, cost controls, and scheduled execution still
   need hardening.
 - Batch scoring now has an exercised BigQuery load path; it still needs
-  scheduled execution, scheduled cloud score monitoring, and rollback
-  documentation.
+  deployed Cloud Run Job images and a first live scheduled execution.
 - Monitoring is local snapshot-based with dashboard surfacing, score-drift
   reporting, realised-label calibration monitoring, a weekly GitHub Actions
-  artifact, and an operational runbook; scheduled cloud execution and alert
-  routing remain future work.
+  artifact, an operational runbook, and a Cloud Scheduler command plan; live
+  scheduled execution and alert routing remain future work.
 - Cloud Run service deployment is documented and container-gated in CI; Cloud Run
   jobs for batch scoring and monitoring, private ingress, production auth, and
   Secret Manager integration remain future work.
@@ -102,8 +103,9 @@ The finished product should have three surfaces:
    - BigQuery load path for `neobank_ml.customer_scores_daily` is exercised.
    - BigQuery score-monitoring query is exercised for volume, duplicate,
      targeting-rate, vulnerable-review, probability-bound, and quantile checks.
-   - Scheduled batch scoring should write or merge one score-date partition per
-     run.
+   - Cloud Scheduler can trigger Cloud Run Jobs for daily scoring and monitoring.
+   - Live scheduled batch scoring should write or merge one score-date partition
+     per run.
    - Monitoring writes data quality, freshness, model performance, calibration,
      drift, and guardrail reports.
 
