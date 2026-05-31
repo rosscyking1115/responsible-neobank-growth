@@ -100,12 +100,12 @@ def render_load_command(plan: ScoreLoadPlan, *, location: str = LOCATION_ENV_REF
 def render_verification_command(plan: ScoreLoadPlan) -> str:
     sql = (
         "SELECT "
-        "score_date, "
+        "DATE(score_date) AS score_date, "
         "COUNT(*) AS scored_users, "
         "COUNTIF(decision = 'target') AS targeted_users, "
         "COUNTIF(vulnerable_customer_review) AS vulnerable_review_users "
         f"FROM `{plan.table_ref.replace(':', '.')}` "
-        f"WHERE score_date = DATE '{plan.score_date.isoformat()}' "
+        f"WHERE DATE(score_date) = DATE '{plan.score_date.isoformat()}' "
         "GROUP BY score_date"
     )
     powershell_sql = sql.replace("'", "''")
