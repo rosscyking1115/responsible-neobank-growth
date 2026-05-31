@@ -163,6 +163,15 @@ The API exposes activation, churn, upsell, offer recommendation, and pricing
 scenario contracts. See `docs/API.md` for request examples and guardrail fields.
 
 For the API container and Cloud Run path, see `docs/CLOUD_RUN_DEPLOYMENT.md`.
+To render private-by-default Cloud Run service commands for the API:
+
+```powershell
+uv run python -m src.cloud.cloud_run_api_deploy_plan `
+  --project neobank-growth-platform-ross `
+  --project-number 319492039091 `
+  --region europe-west2 `
+  --invoker-email rosscyking@gmail.com
+```
 
 ## Generate Synthetic Data
 

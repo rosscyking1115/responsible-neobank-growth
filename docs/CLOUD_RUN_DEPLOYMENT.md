@@ -22,7 +22,30 @@ Expected response fields: `status`, `service`, `contract_version`,
 
 ## Cloud Run Service
 
-Example deployment flow:
+The production-style API path uses a dedicated Cloud Build config for
+`Dockerfile.api` and deploys the service private-by-default. Render the reviewed
+command plan with:
+
+```powershell
+uv run python -m src.cloud.cloud_run_api_deploy_plan `
+  --project neobank-growth-platform-ross `
+  --project-number 319492039091 `
+  --region europe-west2 `
+  --invoker-email rosscyking@gmail.com
+```
+
+The plan creates or reuses:
+
+- Artifact Registry repository: `neobank`.
+- Runtime service account: `neobank-api`.
+- Cloud Build image: `europe-west2-docker.pkg.dev/.../neobank-api:latest`.
+- Private Cloud Run service: `neobank-api`.
+- `roles/run.invoker` for the configured reviewer email.
+
+It also renders an authenticated `/health` smoke test using
+`gcloud auth print-identity-token`.
+
+Equivalent deployment flow:
 
 ```bash
 export GCP_PROJECT_ID="<project-id>"
@@ -34,18 +57,24 @@ gcloud artifacts repositories create neobank \
   --location="${GCP_REGION}" \
   --description="Neobank portfolio API images"
 
-gcloud builds submit --tag "${IMAGE}" .
+gcloud builds submit \
+  --config cloudbuild.api.yaml \
+  --substitutions "_IMAGE_URI=${IMAGE}" .
 
 gcloud run deploy neobank-api \
   --image="${IMAGE}" \
   --region="${GCP_REGION}" \
   --platform=managed \
-  --allow-unauthenticated \
-  --set-env-vars="DATA_VERSION=synthetic-portfolio"
+  --service-account="neobank-api@${GCP_PROJECT_ID}.iam.gserviceaccount.com" \
+  --no-allow-unauthenticated \
+  --set-env-vars="DATA_VERSION=synthetic-portfolio,NEOBANK_ENV=gcp"
 ```
 
-For a private production-style service, remove `--allow-unauthenticated` and put
-the API behind IAM, an API gateway, or a controlled frontend.
+For a public portfolio demo API, you can deliberately switch to
+`--allow-unauthenticated`, but the safer default is IAM-protected Cloud Run with
+a small set of explicit invokers. Google Cloud's `gcloud run deploy` supports
+`--[no-]allow-unauthenticated`, and Cloud Run service access is granted with
+`gcloud run services add-iam-policy-binding ... --role=roles/run.invoker`.
 
 ## Scheduled Cloud Run Jobs
 
