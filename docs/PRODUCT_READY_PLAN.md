@@ -60,8 +60,8 @@ Already strong:
 - Cloud Scheduler schedules deployed and exercised on 2026-05-31 for daily Cloud
   Run scoring and monitoring jobs.
 - Cloud Run-compatible API container with CI build and `/health` smoke test.
-- Private-by-default Cloud Run API deployment plan added with an authenticated
-  `/health` smoke test.
+- Private-by-default Cloud Run API service deployed and exercised on 2026-05-31
+  with an authenticated `/health` smoke test.
 - Onboarding A/B and referral geo analyses with causal inference and memos.
 - CI for linting, notebooks, tests, data generation, and dbt build.
 - Model card and public-release notes.
@@ -81,8 +81,8 @@ Main product-readiness gaps:
   Cloud Scheduler-triggered Cloud Run execution; alert routing remains future
   work.
 - Cloud Run API service deployment is documented, command-rendered, private by
-  default, and container-gated in CI; live API deployment, Secret Manager
-  integration, and API alert routing remain future work.
+  default, live-deployed, smoke-tested, and container-gated in CI; Secret Manager
+  integration and API alert routing remain future work.
 
 ## Target Product
 
@@ -148,8 +148,8 @@ production-style GCP portfolio project.
 Important distinction:
 
 - The Streamlit dashboard is already publicly deployed.
-- The API is Cloud Run compatible, container-tested, and has a private
-  deployment command plan.
+- The API is Cloud Run compatible, container-tested, and deployed as a private
+  Cloud Run service in the demo project.
 - The raw warehouse landing layer and dbt mart layer are **GCP-exercised** for
   the demo export. Batch scoring and monitoring jobs are **GCP-deployed and
   scheduler-exercised** for the demo project. Cloud security hardening is still

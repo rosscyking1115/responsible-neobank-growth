@@ -173,6 +173,10 @@ uv run python -m src.cloud.cloud_run_api_deploy_plan `
   --invoker-email rosscyking@gmail.com
 ```
 
+The private Cloud Run API service was deployed and smoke-tested on 2026-05-31:
+`neobank-api-00002-qc4` served `/health` with `status = ok` and
+`data_version = synthetic-portfolio`.
+
 ## Generate Synthetic Data
 
 ```powershell
