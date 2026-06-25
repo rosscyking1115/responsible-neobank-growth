@@ -457,8 +457,8 @@ def _render_pricing(data: DashboardData, scenario_run: PricingScenarioRun) -> No
 
 def _render_monitoring(snapshot: MonitoringSnapshot) -> None:
     _section_caption(
-        "Operational checks show whether the local data product is ready for a "
-        "demo refresh or rollout."
+        "Operational checks show whether the dashboard, scoring workflow, and "
+        "supporting artifacts are ready for a reviewer walkthrough."
     )
     checks = pd.DataFrame(
         [

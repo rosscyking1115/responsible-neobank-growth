@@ -116,17 +116,19 @@ Cloud Scheduler + Cloud Monitoring alerts
 For a five-minute review:
 
 1. Open the [live dashboard](https://neobank-appuct-analytics.streamlit.app/).
-2. Review product health, pricing intelligence, experiments, and monitoring.
-3. Skim the architecture in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
-4. Read the API contract in [docs/API.md](docs/API.md).
-5. Review the model card in
+2. Read the case study in [docs/CASE_STUDY.md](docs/CASE_STUDY.md).
+3. Review product health, pricing intelligence, experiments, and monitoring.
+4. Skim the architecture in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+5. Read the API contract in [docs/API.md](docs/API.md).
+6. Review the model card in
    [docs/model_cards/MODEL_ACTIVATION_DECISIONING.md](docs/model_cards/MODEL_ACTIVATION_DECISIONING.md).
-6. Review the runbook in [docs/OPERATIONS_RUNBOOK.md](docs/OPERATIONS_RUNBOOK.md).
+7. Review the runbook in [docs/OPERATIONS_RUNBOOK.md](docs/OPERATIONS_RUNBOOK.md).
 
 ## Key Documentation
 
 | Document | Purpose |
 | --- | --- |
+| [docs/CASE_STUDY.md](docs/CASE_STUDY.md) | Business-facing case study, decisions supported, evidence, and limitations. |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Local and cloud architecture overview. |
 | [docs/API.md](docs/API.md) | Prediction and pricing scenario API contract. |
 | [docs/CLOUD_RUN_DEPLOYMENT.md](docs/CLOUD_RUN_DEPLOYMENT.md) | Private Cloud Run API and job deployment evidence. |

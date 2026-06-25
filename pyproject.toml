@@ -1,7 +1,7 @@
 [project]
 name = "neobank-product-analytics"
 version = "0.1.0"
-description = "A Monzo-inspired neobank product analytics project covering dbt metrics, experimentation, geo incrementality, and decisioning."
+description = "A synthetic fintech customer growth and pricing intelligence platform covering dbt metrics, experimentation, geo incrementality, and decisioning."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
