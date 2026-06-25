@@ -38,6 +38,7 @@ All data is synthetic. The goal was to build something closer to a small data pr
 
 Repo: https://github.com/rosscyking1115/neobank-product-analytics
 Dashboard: https://neobank-appuct-analytics.streamlit.app/
+Case study: https://github.com/rosscyking1115/neobank-product-analytics/blob/main/docs/CASE_STUDY.md
 ```
 
 Shorter version:
@@ -52,6 +53,7 @@ The goal was to make a portfolio project that behaves like a small data product:
 All data is synthetic.
 Repo: https://github.com/rosscyking1115/neobank-product-analytics
 Dashboard: https://neobank-appuct-analytics.streamlit.app/
+Case study: https://github.com/rosscyking1115/neobank-product-analytics/blob/main/docs/CASE_STUDY.md
 ```
 
 ## CV Bullet
@@ -70,17 +72,18 @@ Built a synthetic fintech growth analytics platform with dbt, DuckDB, Python, St
 
 1. Start with the README and explain that the project is synthetic and
    reproducible.
-2. Open the dashboard and show the four product surfaces: Product health,
+2. Open the case study and frame the business decisions the product supports.
+3. Open the dashboard and show the four product surfaces: Product health,
    Pricing intelligence, Experiments, and Monitoring.
-3. In Product health, explain D7 activation, WAU, retention, feature adoption,
+4. In Product health, explain D7 activation, WAU, retention, feature adoption,
    and CLV proxy.
-4. In Pricing intelligence, show offer economics, guarded recommendations,
+5. In Pricing intelligence, show offer economics, guarded recommendations,
    scenario runs, and sensitivity checks.
-5. In Experiments, explain why onboarding is a ship candidate and referral
+6. In Experiments, explain why onboarding is a ship candidate and referral
    incentives need iteration on unit economics.
-6. In Monitoring, show release-gate checks for marts, pricing, API readiness,
+7. In Monitoring, show release-gate checks for marts, pricing, API readiness,
    batch scores, drift, and calibration.
-7. Close with the technical spine: dbt marts, FastAPI contracts, tests, CI,
+8. Close with the technical spine: dbt marts, FastAPI contracts, tests, CI,
    model card, BigQuery/GCS loads, private Cloud Run API, scheduled Cloud Run
    jobs, and Cloud Monitoring alerts.
 
@@ -104,6 +107,7 @@ Capture these after deploying or running locally:
 ## Final Pre-Post Checklist
 
 - README links are current.
+- Case study link is current.
 - Streamlit deployment URL is live.
 - GitHub repository description and topics are set.
 - CI badge or latest GitHub Actions status is visible.

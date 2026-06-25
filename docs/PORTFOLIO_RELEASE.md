@@ -43,13 +43,15 @@ analysis, and a public-release-ready analytics narrative.
 
 1. Open the dashboard and show the top-line activation, CLV proxy, onboarding
    lift, and referral economics metrics.
-2. Show product health: complete-week WAU, regional D7 activation, week 1+
+2. Use `docs/CASE_STUDY.md` to frame the product decisions supported before
+   moving into technical evidence.
+3. Show product health: complete-week WAU, regional D7 activation, week 1+
    post-activation retention, feature adoption, and CLV by income segment.
-3. Switch to pricing intelligence and show recommendation actions, offer margin,
+4. Switch to pricing intelligence and show recommendation actions, offer margin,
    scenario portfolio, and sensitivity checks.
-4. Switch to experiments and explain why onboarding ships while referral
+5. Switch to experiments and explain why onboarding ships while referral
    incentives need cheaper unit economics.
-5. Point to API docs, Cloud Run deployment evidence, monitoring reports, dbt
+6. Point to API docs, Cloud Run deployment evidence, monitoring reports, dbt
    marts, tests, and CI to show a reproducible analytics layer rather than a
    one-off notebook.
 

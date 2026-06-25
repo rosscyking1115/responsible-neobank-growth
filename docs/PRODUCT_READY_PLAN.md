@@ -175,7 +175,7 @@ Immediate next build session:
 
 1. Cloud configuration and security skeleton
    - Add `.env.example` for `NEOBANK_ENV`, GCP project, region, bucket,
-     BigQuery dataset, and credential path placeholders.
+     BigQuery dataset, and local credential path configuration.
    - Add a typed config helper for local and GCP modes.
    - Document local mode vs GCP mode and the rule that secrets stay outside git.
 
