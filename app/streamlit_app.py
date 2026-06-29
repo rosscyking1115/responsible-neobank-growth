@@ -9,12 +9,14 @@ import streamlit as st
 try:
     from src.monitoring.snapshot import MonitoringSnapshot, build_monitoring_snapshot
     from src.pricing.scenario_runs import PricingScenarioRun, build_pricing_scenario_run
+    from src.reports import build_report, render_html, report_excel_bytes
 except ModuleNotFoundError:
     import sys
 
     sys.path.append(str(Path(__file__).resolve().parents[1]))
     from src.monitoring.snapshot import MonitoringSnapshot, build_monitoring_snapshot
     from src.pricing.scenario_runs import PricingScenarioRun, build_pricing_scenario_run
+    from src.reports import build_report, render_html, report_excel_bytes
 
 try:
     from app.dashboard_data import (
@@ -570,12 +572,43 @@ def _render_release_verdict(data: DashboardData) -> None:
         st.markdown(f"- {reason}")
 
 
+def _render_decision_pack(data: DashboardData) -> None:
+    """Offer the consolidated responsible-growth decision pack as HTML / Excel."""
+    report = build_report(
+        feature_name="personalised_onboarding_pot_prompt",
+        release_decision=onboarding_release_decision(
+            data.experiment_variants, data.customer_outcomes
+        ),
+        customer_outcomes=data.customer_outcomes,
+        onboarding_funnel=data.onboarding_funnel,
+        fair_value=offer_fair_value(data.pricing_recommendations),
+        protection_events=data.protection_events,
+    )
+    with st.expander("Responsible growth decision pack (download)"):
+        for line in report.summary.impact_statements:
+            st.markdown(f"- {line}")
+        left, right = st.columns(2)
+        left.download_button(
+            "Download HTML report",
+            data=render_html(report),
+            file_name="responsible_growth_report.html",
+            mime="text/html",
+        )
+        right.download_button(
+            "Download Excel pack",
+            data=report_excel_bytes(report),
+            file_name="responsible_growth_report.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+
+
 def _render_customer_outcomes(data: DashboardData) -> None:
     _section_caption(
         "Customer outcomes and fairness: do growth decisions improve outcomes evenly, "
         "and is the onboarding change safe to ship?"
     )
     _render_release_verdict(data)
+    _render_decision_pack(data)
 
     if data.customer_outcomes.empty:
         st.info("Customer-outcome marts are not available in this DuckDB build.")
