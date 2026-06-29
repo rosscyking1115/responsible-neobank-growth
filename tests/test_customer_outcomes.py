@@ -19,17 +19,31 @@ def _customer_outcomes() -> pd.DataFrame:
     )
 
 
-def _large_customer_outcomes(n_per_band: int = 40) -> pd.DataFrame:
-    """A frame big enough to clear the default minimum segment size, with a stark
-    100pp activation gap between digital-confidence bands."""
-    return pd.DataFrame(
-        {
-            "digital_confidence_band": ["low"] * n_per_band + ["high"] * n_per_band,
-            "activated_d7": [False] * n_per_band + [True] * n_per_band,
-            "has_support_contact": [False] * (2 * n_per_band),
-            "has_complaint": [False] * (2 * n_per_band),
+def _experiment_segment_outcomes(*, widen: bool, n: int = 60) -> pd.DataFrame:
+    """Variant x income-band activation where the treatment either widens or narrows
+    the gap between bands (n users per cell, above the min_cell threshold)."""
+    if widen:
+        rates = {  # control gap 0pp -> treatment gap 80pp (widens)
+            ("control", "high"): 0.5,
+            ("control", "low"): 0.5,
+            ("treatment", "high"): 0.9,
+            ("treatment", "low"): 0.1,
         }
-    )
+    else:
+        rates = {  # control gap 60pp -> treatment gap 10pp (narrows)
+            ("control", "high"): 0.8,
+            ("control", "low"): 0.2,
+            ("treatment", "high"): 0.85,
+            ("treatment", "low"): 0.75,
+        }
+    rows: list[dict[str, object]] = []
+    for (variant, band), rate in rates.items():
+        activated = int(round(rate * n))
+        for i in range(n):
+            rows.append(
+                {"variant": variant, "income_band": band, "activated_d7": i < activated}
+            )
+    return pd.DataFrame(rows)
 
 
 def _experiment_variants(
@@ -79,13 +93,22 @@ def test_release_decision_downgrades_on_support_burden() -> None:
     assert decision.decision == "limited_rollout"
 
 
-def test_release_decision_blocks_on_large_fairness_gap() -> None:
+def test_release_decision_blocks_when_treatment_widens_gap() -> None:
     decision = onboarding_release_decision(
-        _experiment_variants(), _large_customer_outcomes()
+        _experiment_variants(), _experiment_segment_outcomes(widen=True)
     )
-    # The synthetic outcomes carry a 100pp activation gap -> block dominates.
+    # The treatment widens the segment activation gap -> block dominates.
     assert decision is not None
     assert decision.decision == "block"
+
+
+def test_release_decision_not_blocked_when_treatment_narrows_gap() -> None:
+    # A strong treatment that *reduces* a large baseline disparity must not be blocked.
+    decision = onboarding_release_decision(
+        _experiment_variants(), _experiment_segment_outcomes(widen=False)
+    )
+    assert decision is not None
+    assert decision.decision == "ship"
 
 
 def test_release_decision_handles_missing_experiment() -> None:
