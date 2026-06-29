@@ -18,6 +18,19 @@ PARTIAL_WEEK_DROP_RATIO = 0.70
 DEMO_USERS = 5_000
 DEMO_MONTHS = 6
 
+ONBOARDING_EXPERIMENT = "personalised_onboarding_pot_prompt"
+CUSTOMER_OUTCOME_SEGMENTS = [
+    "digital_confidence_band",
+    "income_band",
+    "vulnerable_customer_proxy",
+]
+CUSTOMER_OUTCOME_FIELDS = ["activated_d7", "has_support_contact", "has_complaint"]
+OUTCOME_LABELS = {
+    "activated_d7": "D7 activation",
+    "has_support_contact": "Support contact",
+    "has_complaint": "Complaint",
+}
+
 
 @dataclass(frozen=True)
 class DashboardData:
@@ -31,6 +44,7 @@ class DashboardData:
     pricing_recommendations: pd.DataFrame
     experiment_variants: pd.DataFrame
     referral_daily: pd.DataFrame
+    customer_outcomes: pd.DataFrame
 
 
 def _fetch_frame(con: duckdb.DuckDBPyConnection, query: str) -> pd.DataFrame:
@@ -88,6 +102,26 @@ def _empty_pricing_recommendations() -> pd.DataFrame:
             "human_review_rate",
             "recommended_action",
             "recommendation_reason_code",
+        ]
+    )
+
+
+def _empty_customer_outcomes() -> pd.DataFrame:
+    return pd.DataFrame(
+        columns=[
+            "user_id",
+            "region",
+            "income_segment",
+            "income_band",
+            "digital_confidence_band",
+            "vulnerable_customer_proxy",
+            "accessibility_need_proxy",
+            "new_to_uk_proxy",
+            "student_proxy",
+            "activated_d7",
+            "support_contact_count",
+            "has_support_contact",
+            "has_complaint",
         ]
     )
 
@@ -348,6 +382,29 @@ def load_dashboard_data(db_path: Path = DEFAULT_DB_PATH) -> DashboardData:
             order by date_day, region
             """,
         )
+        if _table_exists(con, "main_marts", "fct_customer_outcomes"):
+            customer_outcomes = _fetch_frame(
+                con,
+                """
+                select
+                    user_id,
+                    region,
+                    income_segment,
+                    income_band,
+                    digital_confidence_band,
+                    vulnerable_customer_proxy,
+                    accessibility_need_proxy,
+                    new_to_uk_proxy,
+                    student_proxy,
+                    activated_d7,
+                    support_contact_count,
+                    has_support_contact,
+                    has_complaint
+                from main_marts.fct_customer_outcomes
+                """,
+            )
+        else:
+            customer_outcomes = _empty_customer_outcomes()
 
     return DashboardData(
         overview=overview,
@@ -360,6 +417,7 @@ def load_dashboard_data(db_path: Path = DEFAULT_DB_PATH) -> DashboardData:
         pricing_recommendations=pricing_recommendations,
         experiment_variants=experiment_variants,
         referral_daily=referral_daily,
+        customer_outcomes=customer_outcomes,
     )
 
 
@@ -441,6 +499,133 @@ def pricing_economics(pricing_outcomes: pd.DataFrame) -> dict[str, float]:
         "human_review_rate": human_review / exposures if exposures else 0.0,
         "complaint_rate_14d": float(weighted_complaints / exposures) if exposures else 0.0,
     }
+
+
+def customer_outcome_gaps(
+    customer_outcomes: pd.DataFrame,
+    *,
+    segments: list[str] | None = None,
+    outcomes: list[str] | None = None,
+    min_segment_size: int = 30,
+) -> pd.DataFrame:
+    """Disparity (in percentage points) for each outcome across each segment.
+
+    Reuses ``src.wellbeing.metrics.outcome_gap`` so the dashboard and the analysis
+    library share one definition of a fairness gap.
+    """
+    from src.wellbeing.metrics import outcome_gap
+
+    columns = [
+        "segment",
+        "outcome",
+        "outcome_label",
+        "higher_rate_level",
+        "lower_rate_level",
+        "higher_rate",
+        "lower_rate",
+        "gap_pp",
+    ]
+    segments = segments or CUSTOMER_OUTCOME_SEGMENTS
+    outcomes = outcomes or CUSTOMER_OUTCOME_FIELDS
+    if customer_outcomes.empty:
+        return pd.DataFrame(columns=columns)
+
+    rows: list[dict[str, object]] = []
+    for segment in segments:
+        if segment not in customer_outcomes.columns:
+            continue
+        for outcome in outcomes:
+            if outcome not in customer_outcomes.columns:
+                continue
+            gap = outcome_gap(
+                customer_outcomes, segment, outcome, min_segment_size=min_segment_size
+            )
+            if gap is None:
+                continue
+            rows.append(
+                {
+                    "segment": segment,
+                    "outcome": outcome,
+                    "outcome_label": OUTCOME_LABELS.get(outcome, outcome),
+                    "higher_rate_level": gap.best_level,
+                    "lower_rate_level": gap.worst_level,
+                    "higher_rate": gap.best_rate,
+                    "lower_rate": gap.worst_rate,
+                    "gap_pp": gap.gap * 100,
+                }
+            )
+    return (
+        pd.DataFrame(rows, columns=columns)
+        .sort_values("gap_pp", ascending=False)
+        .reset_index(drop=True)
+    )
+
+
+def _two_proportion_evidence_strength(rates: pd.DataFrame) -> float:
+    """One-sided confidence that treatment activation exceeds control.
+
+    Uses a numpy/stdlib two-proportion z-test (no scipy) so it runs inside the
+    slim Streamlit Cloud dependency set. Returns 0..1 (``1 - one_sided_p_value``).
+    """
+    import math
+
+    control = rates.loc["control"]
+    treatment = rates.loc["treatment"]
+    n_c = int(control["users"])
+    n_t = int(treatment["users"])
+    if n_c == 0 or n_t == 0:
+        return 0.0
+    p_c = float(control["d7_activation_rate"])
+    p_t = float(treatment["d7_activation_rate"])
+    p_pool = (p_c * n_c + p_t * n_t) / (n_c + n_t)
+    se = math.sqrt(p_pool * (1.0 - p_pool) * (1.0 / n_c + 1.0 / n_t))
+    if se == 0:
+        return 0.0
+    z = (p_t - p_c) / se
+    one_sided_p = 0.5 * math.erfc(z / math.sqrt(2))
+    return max(0.0, min(1.0, 1.0 - one_sided_p))
+
+
+def onboarding_release_decision(
+    experiment_variants: pd.DataFrame,
+    customer_outcomes: pd.DataFrame | None = None,
+):
+    """Combine the onboarding A/B readout and fairness gaps into a release decision.
+
+    Returns a ``ReleaseDecision`` (or ``None`` if the experiment data is missing),
+    wiring the release-gate engine to live dashboard signals.
+    """
+    from src.release_decisions import ReleaseSignals, decide
+
+    if experiment_variants.empty:
+        return None
+    rates = experiment_variants.set_index("variant")
+    if "control" not in rates.index or "treatment" not in rates.index:
+        return None
+
+    lift = onboarding_lift_pp(experiment_variants) or 0.0
+    support_delta = float(
+        rates.loc["treatment", "support_contact_rate"]
+        - rates.loc["control", "support_contact_rate"]
+    )
+    complaint_delta = float(
+        rates.loc["treatment", "complaint_rate"] - rates.loc["control", "complaint_rate"]
+    )
+    fairness_gap = 0.0
+    if customer_outcomes is not None and not customer_outcomes.empty:
+        activation_gaps = customer_outcome_gaps(customer_outcomes, outcomes=["activated_d7"])
+        if not activation_gaps.empty:
+            fairness_gap = float(activation_gaps["gap_pp"].max()) / 100.0
+
+    signals = ReleaseSignals(
+        feature_name=ONBOARDING_EXPERIMENT,
+        business_uplift=lift / 100.0,
+        evidence_strength=_two_proportion_evidence_strength(rates),
+        complaint_rate_delta=complaint_delta,
+        support_burden_delta=support_delta,
+        fairness_gap=fairness_gap,
+    )
+    return decide(signals)
 
 
 def pricing_margin_by_offer(pricing_recommendations: pd.DataFrame) -> pd.DataFrame:
