@@ -24,6 +24,20 @@ models:
           - accepted_values:
               arguments:
                 values: [low, medium, high]
+  - name: fct_onboarding_funnel
+    description: >
+      One row per user with onboarding/KYC funnel outcomes joined to wellbeing and
+      inclusion segment bands, for digital-exclusion and assisted-onboarding analysis.
+    columns:
+      - name: user_id
+        tests: [not_null, unique]
+      - name: completed_onboarding
+        tests: [not_null]
+      - name: digital_confidence_band
+        tests:
+          - accepted_values:
+              arguments:
+                values: [low, medium, high]
   - name: fct_retention_cohorts
     description: Weekly transaction-active retention table for activated users by signup cohort.
     columns:

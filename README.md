@@ -82,9 +82,11 @@ Optional GCP path:
 - **FastAPI service** — `/health`, `/score/{activation,churn,upsell}`,
   `/recommend/offer`, and `/simulate/pricing`. Every response returns a decision,
   reason codes, and explicit guardrail flags.
-- **Streamlit dashboard** — product health, **customer outcomes & fairness**, pricing
-  intelligence, experiments, and monitoring views over the dbt marts. The customer
-  outcomes tab shows segment fairness gaps and a live release-gate verdict.
+- **Streamlit dashboard** — product health, **customer outcomes & fairness**, **digital
+  inclusion**, pricing intelligence, experiments, and monitoring views over the dbt
+  marts. The customer outcomes tab shows segment fairness gaps and a live release-gate
+  verdict; the digital inclusion tab shows the onboarding funnel and abandonment by
+  segment.
 - **Monitoring & operations** — a monitoring snapshot, model and calibration reports,
   release checks, and an operations runbook.
 - **Cloud path (GCP)** — repeatable plan generators and Cloud Run job entrypoints for
@@ -101,7 +103,10 @@ Optional GCP path:
 - **Fair-value pricing governance** — scores each offer's fair value from observed
   customer-outcome guardrails and downgrades commercially attractive but unfair offers
   to hold or human review. See [docs/FAIR_VALUE_PRICING.md](docs/FAIR_VALUE_PRICING.md).
-- **Quality** — 156 `pytest` tests, `ruff` lint, a GitHub Actions CI pipeline (lint →
+- **Digital inclusion & onboarding funnel** — synthetic KYC funnel plus analysis of
+  who drops out, which segments are underserved, and who needs an assisted journey.
+  See [docs/DIGITAL_INCLUSION.md](docs/DIGITAL_INCLUSION.md).
+- **Quality** — 164 `pytest` tests, `ruff` lint, a GitHub Actions CI pipeline (lint →
   tests → dbt build → container build → API smoke test), and a scheduled monitoring
   workflow.
 
@@ -202,8 +207,6 @@ release-gate verdict on the onboarding A/B).
 
 Still **planned, not yet built**:
 
-- **Digital inclusion analysis** — who fails onboarding, abandons KYC, or needs
-  assisted journeys.
 - **Customer-protection / scam-intervention simulation** — supportive friction and
   education, explicitly *not* a fraud engine.
 
