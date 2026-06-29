@@ -54,7 +54,7 @@ except ModuleNotFoundError:
     )
 
 st.set_page_config(
-    page_title="Customer Growth & Pricing Intelligence Platform",
+    page_title="Responsible Neobank Growth Platform",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
@@ -851,7 +851,7 @@ def _render_monitoring(snapshot: MonitoringSnapshot) -> None:
 
 def main() -> None:
     _apply_app_style()
-    st.title("Customer Growth & Pricing Intelligence Platform")
+    st.title("Responsible Neobank Growth Platform")
 
     db_path = str(DEFAULT_DB_PATH)
 

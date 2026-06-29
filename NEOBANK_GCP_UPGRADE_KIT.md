@@ -1,6 +1,6 @@
 # Neobank GCP Upgrade Brief
 
-This file records the cloud upgrade brief for `neobank-product-analytics`. It is
+This file records the cloud upgrade brief for `responsible-neobank-growth`. It is
 kept as project context and implementation evidence for the GCP productisation
 path.
 
@@ -316,7 +316,7 @@ Deliverables:
 Adapt to the current repo rather than forcing this exact layout.
 
 ```text
-neobank-product-analytics/
+responsible-neobank-growth/
   api/
     main.py
     schemas.py

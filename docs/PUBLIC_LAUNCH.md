@@ -36,9 +36,9 @@ What it covers:
 
 All data is synthetic. The goal was to build something closer to a small data product than a notebook: reproducible warehouse, tested code, dashboard, API boundary, scheduled scoring, monitoring, and business-facing decision outputs.
 
-Repo: https://github.com/rosscyking1115/neobank-product-analytics
+Repo: https://github.com/rosscyking1115/responsible-neobank-growth
 Dashboard: https://neobank-appuct-analytics.streamlit.app/
-Case study: https://github.com/rosscyking1115/neobank-product-analytics/blob/main/docs/CASE_STUDY.md
+Case study: https://github.com/rosscyking1115/responsible-neobank-growth/blob/main/docs/CASE_STUDY.md
 ```
 
 Shorter version:
@@ -51,9 +51,9 @@ It covers activation and retention analytics, CUPED experimentation, geo-lift an
 The goal was to make a portfolio project that behaves like a small data product: reproducible marts, tested code, API contracts, batch scoring, cloud deployment evidence, model monitoring, pricing sensitivity outputs, and clear product decisions.
 
 All data is synthetic.
-Repo: https://github.com/rosscyking1115/neobank-product-analytics
+Repo: https://github.com/rosscyking1115/responsible-neobank-growth
 Dashboard: https://neobank-appuct-analytics.streamlit.app/
-Case study: https://github.com/rosscyking1115/neobank-product-analytics/blob/main/docs/CASE_STUDY.md
+Case study: https://github.com/rosscyking1115/responsible-neobank-growth/blob/main/docs/CASE_STUDY.md
 ```
 
 ## CV Bullet
