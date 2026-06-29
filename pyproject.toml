@@ -15,6 +15,7 @@ dependencies = [
     "linearmodels>=6.0",
     "marimo>=0.13.0",
     "numpy>=2.2.0",
+    "openpyxl>=3.1",
     "optuna>=4.3.0",
     "pandas>=2.2.0",
     "plotly>=6.0.0",
