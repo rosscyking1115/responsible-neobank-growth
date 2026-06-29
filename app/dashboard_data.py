@@ -47,6 +47,7 @@ class DashboardData:
     customer_outcomes: pd.DataFrame
     onboarding_funnel: pd.DataFrame
     protection_events: pd.DataFrame
+    experiment_segment_outcomes: pd.DataFrame
 
 
 def _fetch_frame(con: duckdb.DuckDBPyConnection, query: str) -> pd.DataFrame:
@@ -167,6 +168,18 @@ def _empty_protection_events() -> pd.DataFrame:
             "support_contact_about_scam",
             "investment_context",
             "vulnerable_customer",
+        ]
+    )
+
+
+def _empty_experiment_segment_outcomes() -> pd.DataFrame:
+    return pd.DataFrame(
+        columns=[
+            "variant",
+            "activated_d7",
+            "income_band",
+            "digital_confidence_band",
+            "vulnerable_customer_proxy",
         ]
     )
 
@@ -499,6 +512,26 @@ def load_dashboard_data(db_path: Path = DEFAULT_DB_PATH) -> DashboardData:
             )
         else:
             protection_events = _empty_protection_events()
+        if _table_exists(con, "main_marts", "fct_experiment_user_metrics") and _table_exists(
+            con, "main_marts", "fct_customer_outcomes"
+        ):
+            experiment_segment_outcomes = _fetch_frame(
+                con,
+                """
+                select
+                    experiment.variant,
+                    experiment.activated_d7,
+                    outcomes.income_band,
+                    outcomes.digital_confidence_band,
+                    outcomes.vulnerable_customer_proxy
+                from main_marts.fct_experiment_user_metrics as experiment
+                inner join main_marts.fct_customer_outcomes as outcomes
+                    on experiment.user_id = outcomes.user_id
+                where experiment.experiment_name = 'personalised_onboarding_pot_prompt'
+                """,
+            )
+        else:
+            experiment_segment_outcomes = _empty_experiment_segment_outcomes()
 
     return DashboardData(
         overview=overview,
@@ -514,6 +547,7 @@ def load_dashboard_data(db_path: Path = DEFAULT_DB_PATH) -> DashboardData:
         customer_outcomes=customer_outcomes,
         onboarding_funnel=onboarding_funnel,
         protection_events=protection_events,
+        experiment_segment_outcomes=experiment_segment_outcomes,
     )
 
 
@@ -737,14 +771,58 @@ def _two_proportion_evidence_strength(rates: pd.DataFrame) -> float:
     return max(0.0, min(1.0, 1.0 - one_sided_p))
 
 
+def treatment_fairness_gap(
+    experiment_segment_outcomes: pd.DataFrame,
+    *,
+    segments: list[str] | None = None,
+    min_cell: int = 50,
+) -> float:
+    """How much the treatment *widens* the activation gap between segment levels.
+
+    For each segment dimension, compares the within-variant activation spread
+    (max level - min level) in treatment vs control. A positive value means the
+    treatment increased the disparity; a treatment that narrows it returns 0. This is
+    the fairness signal a release decision should use -- the treatment's *effect* on
+    fairness, not the pre-existing population disparity it inherited.
+    """
+    segments = segments or CUSTOMER_OUTCOME_SEGMENTS
+    frame = experiment_segment_outcomes
+    if frame.empty or "variant" not in frame.columns or "activated_d7" not in frame.columns:
+        return 0.0
+
+    working = frame.copy()
+    working["activated_d7"] = working["activated_d7"].astype(float)
+    worst_widening = 0.0
+    for segment in segments:
+        if segment not in working.columns:
+            continue
+        grouped = (
+            working.groupby(["variant", segment])["activated_d7"]
+            .agg(rate="mean", size="size")
+            .reset_index()
+        )
+        grouped = grouped[grouped["size"] >= min_cell]
+        variant_gap: dict[str, float] = {}
+        for variant in ("control", "treatment"):
+            levels = grouped[grouped["variant"] == variant]
+            if levels[segment].nunique() < 2:
+                break
+            variant_gap[variant] = float(levels["rate"].max() - levels["rate"].min())
+        if {"control", "treatment"} <= variant_gap.keys():
+            worst_widening = max(worst_widening, variant_gap["treatment"] - variant_gap["control"])
+    return max(0.0, worst_widening)
+
+
 def onboarding_release_decision(
     experiment_variants: pd.DataFrame,
-    customer_outcomes: pd.DataFrame | None = None,
+    experiment_segment_outcomes: pd.DataFrame | None = None,
 ):
-    """Combine the onboarding A/B readout and fairness gaps into a release decision.
+    """Combine the onboarding A/B readout and fairness signal into a release decision.
 
-    Returns a ``ReleaseDecision`` (or ``None`` if the experiment data is missing),
-    wiring the release-gate engine to live dashboard signals.
+    The fairness input is the treatment's *effect* on the segment activation gap
+    (see ``treatment_fairness_gap``), so a beneficial change is not blocked for a
+    baseline disparity it did not create. Returns a ``ReleaseDecision`` (or ``None``
+    if the experiment data is missing).
     """
     from src.release_decisions import ReleaseSignals, decide
 
@@ -762,11 +840,11 @@ def onboarding_release_decision(
     complaint_delta = float(
         rates.loc["treatment", "complaint_rate"] - rates.loc["control", "complaint_rate"]
     )
-    fairness_gap = 0.0
-    if customer_outcomes is not None and not customer_outcomes.empty:
-        activation_gaps = customer_outcome_gaps(customer_outcomes, outcomes=["activated_d7"])
-        if not activation_gaps.empty:
-            fairness_gap = float(activation_gaps["gap_pp"].max()) / 100.0
+    fairness_gap = (
+        treatment_fairness_gap(experiment_segment_outcomes)
+        if experiment_segment_outcomes is not None
+        else 0.0
+    )
 
     signals = ReleaseSignals(
         feature_name=ONBOARDING_EXPERIMENT,
