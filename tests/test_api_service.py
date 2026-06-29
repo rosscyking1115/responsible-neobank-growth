@@ -5,6 +5,8 @@ from fastapi.testclient import TestClient
 
 from api.main import app
 from api.pricing_mart import PricingMartSummary
+from api.schemas import CustomerFeatures
+from api.scoring import score_customer
 
 client = TestClient(app)
 
@@ -84,6 +86,45 @@ def test_activation_scoring_uses_configured_artifact(monkeypatch) -> None:
     assert payload["probability"] == 0.21
     assert payload["threshold"] == 0.3
     assert payload["decision"] == "target"
+
+
+def test_baseline_activation_targets_low_propensity_customers() -> None:
+    """Baseline activation targets users *unlikely* to activate (they need help),
+    matching the calibrated-artifact path and the batch scorer."""
+    high_propensity = CustomerFeatures(
+        customer_id="cust_high",
+        region="London",
+        signup_channel="organic_search",
+        device_os="ios",
+        income_segment="affluent",
+        age=35,
+        push_opt_in=True,
+        days_since_signup=0,
+        weekly_sessions=10,
+        monthly_card_spend_gbp=2000.0,
+        adopted_savings_pot=True,
+    )
+    low_propensity = CustomerFeatures(
+        customer_id="cust_low",
+        region="London",
+        signup_channel="paid_social",
+        device_os="android",
+        income_segment="low",
+        age=22,
+        push_opt_in=False,
+        days_since_signup=5,
+        weekly_sessions=0,
+        monthly_card_spend_gbp=0.0,
+        adopted_savings_pot=False,
+    )
+
+    high = score_customer(high_propensity, "activation")
+    low = score_customer(low_propensity, "activation")
+
+    assert high.probability > high.threshold
+    assert high.decision == "monitor"
+    assert low.probability <= low.threshold
+    assert low.decision == "target"
 
 
 def test_vulnerable_customer_is_not_directly_targeted() -> None:
@@ -171,3 +212,8 @@ def test_pricing_scenario_uses_pricing_mart_when_available(monkeypatch) -> None:
     assert "pricing_mart_response" in payload["reason_codes"]
     assert "price_variant_incentive" in payload["reason_codes"]
     assert any(flag["name"] == "pricing_mart_available" for flag in payload["guardrails"])
+    # Projected margin is expressed over incremental activations only (net margin is
+    # already net of incentive), not the whole eligible base.
+    assert payload["expected_monthly_margin_gbp"] == round(
+        payload["incremental_activated_customers"] * 1.4, 2
+    )
