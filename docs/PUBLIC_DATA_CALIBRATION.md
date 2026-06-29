@@ -34,20 +34,21 @@ tuned.
 uv run python -m src.calibration.calibrate --db neobank.duckdb
 ```
 
-Example output (current generators, default 5k-user demo):
+Example output (default 5k-user demo):
 
 ```text
 | Metric                                    | Observed | Benchmark | Within? |
-| Adults born outside the UK                |    6.4%  |   16.0%   |   NO    |
-| Disabled adults (any long-term impairment)|    5.5%  |   20.0%   |   NO    |
-| Adults lacking foundation digital skills  |    0.4%  |    7.0%   |   NO    |
+| Adults born outside the UK                |   14.6%  |   16.0%   |   yes   |
+| Disabled adults (any long-term impairment)|   16.7%  |   20.0%   |   yes   |
+| Adults lacking foundation digital skills  |    6.5%  |    7.0%   |   yes   |
 ```
 
-The "NO" rows are the point: they show the synthetic population currently
-**under-represents** these groups relative to the public anchors. The calibration
-report is a diagnostic — the natural follow-up is to tune the wellbeing generator's
-probabilities (in [`data_generator/wellbeing.py`](../data_generator/wellbeing.py))
-toward the verified anchors, then re-run until the metrics fall within tolerance.
+The wellbeing generator in
+[`data_generator/wellbeing.py`](../data_generator/wellbeing.py) has been **tuned to
+these anchors** (base rates for new-to-UK, accessibility need, and the digital-
+confidence intercept/spread), so the measured shares now fall within tolerance. The
+report stays in the toolkit as a regression check: if a generator change or an updated
+anchor pushes a metric out of tolerance, it shows up here as a `NO`.
 
 ## Boundary
 
