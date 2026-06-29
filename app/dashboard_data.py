@@ -642,3 +642,39 @@ def pricing_margin_by_offer(pricing_recommendations: pd.DataFrame) -> pd.DataFra
         )
         .sort_values("total_net_margin_30d_gbp", ascending=False)
     )
+
+
+def offer_fair_value(pricing_recommendations: pd.DataFrame) -> pd.DataFrame:
+    """Offer-level fair-value score and fairness-aware governance action.
+
+    Aggregates the recommendation mart to one exposure-weighted row per offer, then
+    applies ``src.pricing_governance`` so commercially attractive but unfair offers
+    are downgraded.
+    """
+    from src.pricing_governance import assess_offers
+
+    if pricing_recommendations.empty:
+        return assess_offers(pd.DataFrame())
+
+    def _weighted(group: pd.DataFrame, column: str) -> float:
+        weight = float(group["exposures"].sum())
+        if weight == 0:
+            return 0.0
+        return float((group[column] * group["exposures"]).sum() / weight)
+
+    offer_rows: list[dict[str, object]] = []
+    for offer_id, group in pricing_recommendations.groupby("offer_id"):
+        dominant = group.sort_values("exposures", ascending=False).iloc[0]["recommended_action"]
+        offer_rows.append(
+            {
+                "offer_id": offer_id,
+                "exposures": int(group["exposures"].sum()),
+                "complaint_rate_14d": _weighted(group, "complaint_rate_14d"),
+                "support_contact_rate_14d": _weighted(group, "support_contact_rate_14d"),
+                "human_review_rate": _weighted(group, "human_review_rate"),
+                "recommended_action": dominant,
+            }
+        )
+    assessed = assess_offers(pd.DataFrame(offer_rows))
+    exposures = pd.DataFrame(offer_rows)[["offer_id", "exposures"]]
+    return assessed.merge(exposures, on="offer_id", how="left")
