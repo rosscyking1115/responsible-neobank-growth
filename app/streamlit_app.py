@@ -24,6 +24,8 @@ try:
         ensure_demo_database,
         load_dashboard_data,
         offer_fair_value,
+        onboarding_abandonment_by_segment,
+        onboarding_funnel_steps,
         onboarding_lift_pp,
         onboarding_release_decision,
         pricing_economics,
@@ -39,6 +41,8 @@ except ModuleNotFoundError:
         ensure_demo_database,
         load_dashboard_data,
         offer_fair_value,
+        onboarding_abandonment_by_segment,
+        onboarding_funnel_steps,
         onboarding_lift_pp,
         onboarding_release_decision,
         pricing_economics,
@@ -629,6 +633,87 @@ def _render_customer_outcomes(data: DashboardData) -> None:
     )
 
 
+def _render_digital_inclusion(data: DashboardData) -> None:
+    _section_caption(
+        "Digital inclusion: who drops out of onboarding, which segments are "
+        "underserved, and who should be offered an assisted journey."
+    )
+    if data.onboarding_funnel.empty:
+        st.info("Onboarding-funnel marts are not available in this DuckDB build.")
+        return
+
+    funnel = onboarding_funnel_steps(data.onboarding_funnel)
+    completion = float(
+        data.onboarding_funnel["completed_onboarding"].astype(float).mean()
+    )
+    assisted = int(data.onboarding_funnel["needs_assisted_onboarding"].astype(bool).sum())
+    cols = st.columns(3)
+    cols[0].metric("Onboarding completion", _pct(completion))
+    cols[1].metric("Customers", f"{len(data.onboarding_funnel):,}")
+    cols[2].metric("Assisted-onboarding need", f"{assisted:,}")
+
+    left, right = st.columns([1, 1.1])
+    with left:
+        st.subheader("Onboarding Funnel")
+        fig = px.funnel(
+            funnel,
+            x="reached",
+            y="label",
+            labels={"reached": "Customers", "label": "Step"},
+        )
+        fig.update_traces(marker_color=PRIMARY_BLUE)
+        _apply_chart_layout(fig, height=340)
+        st.plotly_chart(fig, width="stretch")
+
+    with right:
+        st.subheader("Abandonment By Digital Confidence")
+        abandonment = onboarding_abandonment_by_segment(
+            data.onboarding_funnel, "digital_confidence_band", min_segment_size=30
+        )
+        if abandonment.empty:
+            st.info("Not enough customers per band to summarise.")
+        else:
+            fig = px.bar(
+                abandonment,
+                x="level",
+                y="abandonment_rate",
+                color="level",
+                color_discrete_map={
+                    "low": "#EF4444",
+                    "medium": "#F2B544",
+                    "high": "#00A88F",
+                },
+                labels={
+                    "level": "Digital confidence",
+                    "abandonment_rate": "Onboarding abandonment",
+                },
+                hover_data=["customers", "assisted_need_rate"],
+            )
+            _apply_chart_layout(fig, height=340)
+            fig.update_layout(showlegend=False)
+            fig.update_yaxes(tickformat=".0%")
+            st.plotly_chart(fig, width="stretch")
+
+    from src.inclusion import assisted_onboarding_segments
+
+    flags: list = []
+    for segment in ["digital_confidence_band", "income_band"]:
+        if segment in data.onboarding_funnel.columns:
+            flags.extend(
+                assisted_onboarding_segments(data.onboarding_funnel, segment)
+            )
+    if flags:
+        lines = ", ".join(
+            f"{flag.segment}={flag.level} ({flag.abandonment_rate:.0%} abandon)"
+            for flag in flags
+        )
+        st.warning(f"Assisted-onboarding candidates: {lines}")
+    st.caption(
+        "Inclusion proxies are synthetic and are used only to target supportive "
+        "interventions, never to deny or restrict access."
+    )
+
+
 def _render_monitoring(snapshot: MonitoringSnapshot) -> None:
     _section_caption(
         "Operational checks show whether the dashboard, scoring workflow, and "
@@ -721,6 +806,7 @@ def main() -> None:
     (
         product_tab,
         outcomes_tab,
+        inclusion_tab,
         pricing_tab,
         experiment_tab,
         monitoring_tab,
@@ -728,6 +814,7 @@ def main() -> None:
         [
             "Product health",
             "Customer outcomes",
+            "Digital inclusion",
             "Pricing intelligence",
             "Experiments",
             "Monitoring",
@@ -737,6 +824,8 @@ def main() -> None:
         _render_product_health(data)
     with outcomes_tab:
         _render_customer_outcomes(data)
+    with inclusion_tab:
+        _render_digital_inclusion(data)
     with pricing_tab:
         _render_pricing(data, pricing_scenario_run)
     with experiment_tab:

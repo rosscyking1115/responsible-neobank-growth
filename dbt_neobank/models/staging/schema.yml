@@ -20,6 +20,7 @@ sources:
       - name: pricing_outcomes
       - name: experiment_ground_truth
       - name: wellbeing_proxies
+      - name: onboarding_events
 
 models:
   - name: stg_users
@@ -147,3 +148,17 @@ models:
           - accepted_values:
               arguments:
                 values: [low, medium, high]
+  - name: stg_onboarding_events
+    description: Synthetic per-customer onboarding / KYC funnel outcomes.
+    columns:
+      - name: user_id
+        tests: [not_null, unique]
+      - name: furthest_step
+        tests:
+          - accepted_values:
+              arguments:
+                values:
+                  - signup_started
+                  - identity_check_started
+                  - identity_check_passed
+                  - card_activated
