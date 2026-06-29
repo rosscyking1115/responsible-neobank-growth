@@ -110,10 +110,19 @@ def score_customer(customer: CustomerFeatures, score_type: ScoreType) -> ScoreRe
         threshold = 0.50
         reason_codes = ["value_potential", "product_fit", "engagement_depth"]
 
+    # Activation targets customers who are *unlikely* to activate, because they are the
+    # ones who need onboarding help. This matches the calibrated-artifact path
+    # (score_activation_with_artifact) and the batch scorer. Churn and upsell instead
+    # target customers above their threshold.
+    if score_type == "activation":
+        meets_target_condition = probability <= threshold
+    else:
+        meets_target_condition = probability >= threshold
+
     guardrails = customer_guardrails(customer)
     if any(flag.severity == "block" and not flag.passed for flag in guardrails):
         decision = "do_not_target"
-    elif probability >= threshold and not customer.vulnerable_customer_flag:
+    elif meets_target_condition and not customer.vulnerable_customer_flag:
         decision = "target"
     else:
         decision = "monitor"
@@ -291,10 +300,12 @@ def simulate_pricing_scenario_from_mart(
     projected_rate = min(request.baseline_activation_rate + projected_lift, 0.95)
     incremental_customers = round(request.eligible_customers * projected_lift)
     incremental_cost = incremental_customers * request.proposed_incentive_gbp
-    expected_margin = (
-        request.eligible_customers * mart_summary.avg_net_margin_30d_gbp
-        - incremental_cost
-    )
+    # avg_net_margin_30d_gbp is already net of incentive cost, so express projected
+    # margin over the incremental activations only -- consistent with the fallback
+    # path. (Previously this spread observed margin across the whole eligible base and
+    # then subtracted incremental incentive cost again, double-counting the incentive
+    # and making the positive-unit-economics guardrail pass almost unconditionally.)
+    expected_margin = incremental_customers * mart_summary.avg_net_margin_30d_gbp
 
     guardrails = [
         GuardrailFlag(

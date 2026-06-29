@@ -56,7 +56,9 @@ def _patch_batch_model(monkeypatch) -> None:
 
 def _patch_parquet_writer(monkeypatch) -> None:
     def fake_to_parquet(self: pd.DataFrame, path: Path, *, index: bool) -> None:
-        Path(path).write_text(self.to_json(orient="records"), encoding="utf-8")
+        Path(path).write_text(
+            self.to_json(orient="records", date_format="iso"), encoding="utf-8"
+        )
 
     monkeypatch.setattr(pd.DataFrame, "to_parquet", fake_to_parquet)
 
