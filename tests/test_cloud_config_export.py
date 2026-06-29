@@ -62,7 +62,8 @@ def test_cloud_export_writes_parquet_files_and_manifest(tmp_path: Path) -> None:
     assert "pricing_exposures" in table_names
     assert "wellbeing_proxies" in table_names
     assert "onboarding_events" in table_names
-    assert len(payload["tables"]) == 15
+    assert "protection_events" in table_names
+    assert len(payload["tables"]) == 16
     assert all((tmp_path / table["file"]).exists() for table in payload["tables"])
     assert all(table["row_count"] > 0 for table in payload["tables"])
     assert all(table["size_bytes"] > 0 for table in payload["tables"])

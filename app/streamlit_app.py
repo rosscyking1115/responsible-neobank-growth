@@ -30,6 +30,7 @@ try:
         onboarding_release_decision,
         pricing_economics,
         pricing_margin_by_offer,
+        protection_intervention_summary,
         referral_economics,
         referral_grouped_daily,
     )
@@ -47,6 +48,7 @@ except ModuleNotFoundError:
         onboarding_release_decision,
         pricing_economics,
         pricing_margin_by_offer,
+        protection_intervention_summary,
         referral_economics,
         referral_grouped_daily,
     )
@@ -92,6 +94,20 @@ GOVERNANCE_COLORS = {
     "monitor": "#0B66C3",
     "hold_fair_value": "#F2B544",
     "human_review": "#7C6FE8",
+}
+PROTECTION_COLORS = {
+    "no_action": "#6B7280",
+    "education_prompt": "#0B66C3",
+    "soft_friction": "#F2B544",
+    "cooling_off_period": "#EC7211",
+    "human_review_recommendation": "#7C6FE8",
+}
+PROTECTION_LABELS = {
+    "no_action": "No action",
+    "education_prompt": "Education prompt",
+    "soft_friction": "Soft friction",
+    "cooling_off_period": "Cooling-off period",
+    "human_review_recommendation": "Human review",
 }
 
 
@@ -714,6 +730,51 @@ def _render_digital_inclusion(data: DashboardData) -> None:
     )
 
 
+def _render_customer_protection(data: DashboardData) -> None:
+    _section_caption(
+        "Customer protection: risk-triggered support and education on transfers. Every "
+        "response is supportive (education, soft friction, cooling-off, human review) - "
+        "this is not a fraud engine and never blocks a payment."
+    )
+    if data.protection_events.empty:
+        st.info("Customer-protection event marts are not available in this DuckDB build.")
+        return
+
+    summary = protection_intervention_summary(data.protection_events)
+    total = len(data.protection_events)
+    intervened = int(summary.loc[summary["action"] != "no_action", "events"].sum())
+    cols = st.columns(3)
+    cols[0].metric("Transfer events", f"{total:,}")
+    cols[1].metric("Supportive interventions", f"{intervened:,}")
+    cols[2].metric("Intervention rate", _pct(intervened / total if total else 0.0))
+
+    summary = summary.assign(label=summary["action"].map(PROTECTION_LABELS))
+    fig = px.bar(
+        summary,
+        x="events",
+        y="label",
+        orientation="h",
+        color="action",
+        color_discrete_map=PROTECTION_COLORS,
+        labels={"events": "Events", "label": "Intervention", "action": "Intervention"},
+        category_orders={"label": [PROTECTION_LABELS[a] for a in summary["action"]]},
+    )
+    _apply_chart_layout(fig, height=320)
+    fig.update_layout(showlegend=False)
+    st.plotly_chart(fig, width="stretch")
+    st.dataframe(
+        summary[["label", "events", "share"]].rename(
+            columns={"label": "Intervention", "events": "Events", "share": "Share"}
+        ),
+        width="stretch",
+        hide_index=True,
+    )
+    st.caption(
+        "A responsible-intervention simulation on synthetic data. It models support "
+        "and education, not automated fraud blocking."
+    )
+
+
 def _render_monitoring(snapshot: MonitoringSnapshot) -> None:
     _section_caption(
         "Operational checks show whether the dashboard, scoring workflow, and "
@@ -807,6 +868,7 @@ def main() -> None:
         product_tab,
         outcomes_tab,
         inclusion_tab,
+        protection_tab,
         pricing_tab,
         experiment_tab,
         monitoring_tab,
@@ -815,6 +877,7 @@ def main() -> None:
             "Product health",
             "Customer outcomes",
             "Digital inclusion",
+            "Customer protection",
             "Pricing intelligence",
             "Experiments",
             "Monitoring",
@@ -826,6 +889,8 @@ def main() -> None:
         _render_customer_outcomes(data)
     with inclusion_tab:
         _render_digital_inclusion(data)
+    with protection_tab:
+        _render_customer_protection(data)
     with pricing_tab:
         _render_pricing(data, pricing_scenario_run)
     with experiment_tab:

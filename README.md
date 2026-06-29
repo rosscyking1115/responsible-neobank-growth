@@ -83,10 +83,10 @@ Optional GCP path:
   `/recommend/offer`, and `/simulate/pricing`. Every response returns a decision,
   reason codes, and explicit guardrail flags.
 - **Streamlit dashboard** — product health, **customer outcomes & fairness**, **digital
-  inclusion**, pricing intelligence, experiments, and monitoring views over the dbt
-  marts. The customer outcomes tab shows segment fairness gaps and a live release-gate
-  verdict; the digital inclusion tab shows the onboarding funnel and abandonment by
-  segment.
+  inclusion**, **customer protection**, pricing intelligence, experiments, and
+  monitoring views over the dbt marts. The customer outcomes tab shows segment fairness
+  gaps and a live release-gate verdict; digital inclusion shows the onboarding funnel
+  and abandonment by segment; customer protection shows scam-intervention outcomes.
 - **Monitoring & operations** — a monitoring snapshot, model and calibration reports,
   release checks, and an operations runbook.
 - **Cloud path (GCP)** — repeatable plan generators and Cloud Run job entrypoints for
@@ -106,7 +106,11 @@ Optional GCP path:
 - **Digital inclusion & onboarding funnel** — synthetic KYC funnel plus analysis of
   who drops out, which segments are underserved, and who needs an assisted journey.
   See [docs/DIGITAL_INCLUSION.md](docs/DIGITAL_INCLUSION.md).
-- **Quality** — 164 `pytest` tests, `ruff` lint, a GitHub Actions CI pipeline (lint →
+- **Customer-protection / scam-intervention simulation** — risk-triggered *supportive*
+  responses (education, soft friction, cooling-off, human review) on transfers;
+  explicitly not a fraud engine. See
+  [docs/CUSTOMER_PROTECTION_SIMULATION.md](docs/CUSTOMER_PROTECTION_SIMULATION.md).
+- **Quality** — 175 `pytest` tests, `ruff` lint, a GitHub Actions CI pipeline (lint →
   tests → dbt build → container build → API smoke test), and a scheduled monitoring
   workflow.
 
@@ -192,23 +196,18 @@ policies plus a budget and storage-lifecycle policy for cost control. See
 [docs/CLOUD_RUN_DEPLOYMENT.md](docs/CLOUD_RUN_DEPLOYMENT.md) and
 [docs/GCP_WAREHOUSE.md](docs/GCP_WAREHOUSE.md) for the recorded evidence.
 
-## Roadmap — Responsible Growth pivot
+## Responsible Growth pivot
 
-The current platform already connects growth with customer-outcome guardrails. The
-planned next step deepens it into a **Responsible Neobank Growth & Financial
-Wellbeing Decision Platform**.
+The platform has been deepened into a **Responsible Neobank Growth & Financial
+Wellbeing Decision Platform** — connecting commercial growth with customer-outcome,
+fairness, inclusion, and protection guardrails. All six pivot modules are built:
 
-✅ **Done:** the financial wellbeing layer
-([docs/FINANCIAL_WELLBEING_PROXIES.md](docs/FINANCIAL_WELLBEING_PROXIES.md)), the
-responsible release-gate engine
-([docs/RELEASE_DECISION_FRAMEWORK.md](docs/RELEASE_DECISION_FRAMEWORK.md)), and the
-**Customer Outcomes & Fairness dashboard page** (segment fairness gaps + a live
-release-gate verdict on the onboarding A/B).
-
-Still **planned, not yet built**:
-
-- **Customer-protection / scam-intervention simulation** — supportive friction and
-  education, explicitly *not* a fraud engine.
+1. ✅ **Financial wellbeing layer** — [docs/FINANCIAL_WELLBEING_PROXIES.md](docs/FINANCIAL_WELLBEING_PROXIES.md)
+2. ✅ **Responsible release-gate engine** — [docs/RELEASE_DECISION_FRAMEWORK.md](docs/RELEASE_DECISION_FRAMEWORK.md)
+3. ✅ **Customer Outcomes & Fairness page** — segment fairness gaps + live release-gate verdict
+4. ✅ **Fair-value pricing governance** — [docs/FAIR_VALUE_PRICING.md](docs/FAIR_VALUE_PRICING.md)
+5. ✅ **Digital inclusion & onboarding funnel** — [docs/DIGITAL_INCLUSION.md](docs/DIGITAL_INCLUSION.md)
+6. ✅ **Customer-protection / scam-intervention simulation** — [docs/CUSTOMER_PROTECTION_SIMULATION.md](docs/CUSTOMER_PROTECTION_SIMULATION.md)
 
 ## Safety & ethics
 
