@@ -111,6 +111,30 @@
       "partition_field": null,
       "cluster_fields": ["metric"],
       "write_disposition": "WRITE_TRUNCATE"
+    },
+    {
+      "name": "wellbeing_proxies",
+      "file": "wellbeing_proxies.parquet",
+      "grain": "one row per synthetic customer wellbeing proxy",
+      "partition_field": null,
+      "cluster_fields": ["income_band"],
+      "write_disposition": "WRITE_TRUNCATE"
+    },
+    {
+      "name": "onboarding_events",
+      "file": "onboarding_events.parquet",
+      "grain": "one row per user onboarding funnel outcome",
+      "partition_field": null,
+      "cluster_fields": ["furthest_step"],
+      "write_disposition": "WRITE_TRUNCATE"
+    },
+    {
+      "name": "protection_events",
+      "file": "protection_events.parquet",
+      "grain": "one row per customer-protection transfer event",
+      "partition_field": "event_date",
+      "cluster_fields": ["user_id"],
+      "write_disposition": "WRITE_TRUNCATE"
     }
   ]
 }

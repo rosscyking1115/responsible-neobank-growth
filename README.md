@@ -196,6 +196,11 @@ policies plus a budget and storage-lifecycle policy for cost control. See
 [docs/CLOUD_RUN_DEPLOYMENT.md](docs/CLOUD_RUN_DEPLOYMENT.md) and
 [docs/GCP_WAREHOUSE.md](docs/GCP_WAREHOUSE.md) for the recorded evidence.
 
+> The recorded BigQuery figures (13 raw tables, 107 dbt checks) reflect the cloud run
+> *before* the responsible-growth pivot. The load manifest now covers all 16 raw
+> tables; the new wellbeing, inclusion, and protection tables and marts are exercised
+> locally and would be reloaded on the next GCP run.
+
 ## Responsible Growth pivot
 
 The platform has been deepened into a **Responsible Neobank Growth & Financial
