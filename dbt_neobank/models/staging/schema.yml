@@ -19,6 +19,7 @@ sources:
       - name: pricing_exposures
       - name: pricing_outcomes
       - name: experiment_ground_truth
+      - name: wellbeing_proxies
 
 models:
   - name: stg_users
@@ -136,3 +137,13 @@ models:
         tests: [not_null, unique]
       - name: net_margin_30d_gbp
         tests: [not_null]
+  - name: stg_wellbeing_proxies
+    description: Synthetic per-customer financial-wellbeing proxies (simulation only).
+    columns:
+      - name: user_id
+        tests: [not_null, unique]
+      - name: income_band
+        tests:
+          - accepted_values:
+              arguments:
+                values: [low, medium, high]
