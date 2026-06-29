@@ -23,6 +23,7 @@ try:
         customer_outcome_gaps,
         ensure_demo_database,
         load_dashboard_data,
+        offer_fair_value,
         onboarding_lift_pp,
         onboarding_release_decision,
         pricing_economics,
@@ -37,6 +38,7 @@ except ModuleNotFoundError:
         customer_outcome_gaps,
         ensure_demo_database,
         load_dashboard_data,
+        offer_fair_value,
         onboarding_lift_pp,
         onboarding_release_decision,
         pricing_economics,
@@ -80,6 +82,12 @@ DECISION_LABELS = {
     "experiment_only": "EXPERIMENT ONLY",
     "needs_human_review": "NEEDS HUMAN REVIEW",
     "block": "BLOCK",
+}
+GOVERNANCE_COLORS = {
+    "scale": "#00A88F",
+    "monitor": "#0B66C3",
+    "hold_fair_value": "#F2B544",
+    "human_review": "#7C6FE8",
 }
 
 
@@ -471,6 +479,52 @@ def _render_pricing(data: DashboardData, scenario_run: PricingScenarioRun) -> No
     _apply_chart_layout(fig, height=330)
     fig.update_xaxes(tickformat=".0%")
     st.plotly_chart(fig, width="stretch")
+
+    st.subheader("Fair-Value Governance")
+    _section_caption(
+        "Fairness lens on the commercial recommendation: an attractive offer is "
+        "downgraded when its complaint, support, or human-review load points to poor "
+        "customer value."
+    )
+    fair_value = offer_fair_value(data.pricing_recommendations)
+    if fair_value.empty:
+        st.info("No offers available for fair-value governance.")
+        return
+    downgrades = int(fair_value["downgraded"].sum())
+    if downgrades:
+        st.warning(
+            f"{downgrades} offer(s) downgraded from scale on fair-value grounds."
+        )
+    fig = px.bar(
+        fair_value,
+        x="fair_value_score",
+        y="offer_id",
+        orientation="h",
+        color="governance_action",
+        color_discrete_map=GOVERNANCE_COLORS,
+        labels={
+            "fair_value_score": "Fair-value score",
+            "offer_id": "Offer",
+            "governance_action": "Governance action",
+        },
+        hover_data=["recommended_action", "reason", "exposures"],
+    )
+    _apply_chart_layout(fig, height=320)
+    fig.update_xaxes(range=[0, 1])
+    st.plotly_chart(fig, width="stretch")
+    st.dataframe(
+        fair_value[
+            [
+                "offer_id",
+                "fair_value_score",
+                "recommended_action",
+                "governance_action",
+                "reason",
+            ]
+        ],
+        width="stretch",
+        hide_index=True,
+    )
 
 
 def _render_release_verdict(data: DashboardData) -> None:

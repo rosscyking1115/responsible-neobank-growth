@@ -98,7 +98,10 @@ Optional GCP path:
   into an explainable `ship / limited_rollout / experiment_only / needs_human_review /
   block` decision, where harm signals always dominate commercial uplift. See
   [docs/RELEASE_DECISION_FRAMEWORK.md](docs/RELEASE_DECISION_FRAMEWORK.md).
-- **Quality** — 146 `pytest` tests, `ruff` lint, a GitHub Actions CI pipeline (lint →
+- **Fair-value pricing governance** — scores each offer's fair value from observed
+  customer-outcome guardrails and downgrades commercially attractive but unfair offers
+  to hold or human review. See [docs/FAIR_VALUE_PRICING.md](docs/FAIR_VALUE_PRICING.md).
+- **Quality** — 156 `pytest` tests, `ruff` lint, a GitHub Actions CI pipeline (lint →
   tests → dbt build → container build → API smoke test), and a scheduled monitoring
   workflow.
 
@@ -199,8 +202,6 @@ release-gate verdict on the onboarding A/B).
 
 Still **planned, not yet built**:
 
-- **Fair-value pricing governance** — incentive fairness, margin stress, and
-  vulnerable-exposure checks.
 - **Digital inclusion analysis** — who fails onboarding, abandons KYC, or needs
   assisted journeys.
 - **Customer-protection / scam-intervention simulation** — supportive friction and
