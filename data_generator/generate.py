@@ -14,6 +14,7 @@ from data_generator.experiments import assign_onboarding_experiment, experiment_
 from data_generator.features import generate_feature_usage
 from data_generator.onboarding import generate_onboarding_events
 from data_generator.pricing import generate_pricing
+from data_generator.protection import generate_protection_events
 from data_generator.referrals import generate_referrals
 from data_generator.sessions import generate_sessions
 from data_generator.support import generate_support_contacts
@@ -35,6 +36,7 @@ def build_dataset(config: GeneratorConfig) -> dict[str, pl.DataFrame]:
     ground_truth = experiment_ground_truth(config)
     wellbeing_proxies = generate_wellbeing_proxies(users, config)
     onboarding_events = generate_onboarding_events(users, wellbeing_proxies, config)
+    protection_events = generate_protection_events(users, config)
 
     return {
         "users": users,
@@ -52,6 +54,7 @@ def build_dataset(config: GeneratorConfig) -> dict[str, pl.DataFrame]:
         "experiment_ground_truth": ground_truth,
         "wellbeing_proxies": wellbeing_proxies,
         "onboarding_events": onboarding_events,
+        "protection_events": protection_events,
     }
 
 

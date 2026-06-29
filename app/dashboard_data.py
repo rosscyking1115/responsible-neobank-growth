@@ -46,6 +46,7 @@ class DashboardData:
     referral_daily: pd.DataFrame
     customer_outcomes: pd.DataFrame
     onboarding_funnel: pd.DataFrame
+    protection_events: pd.DataFrame
 
 
 def _fetch_frame(con: duckdb.DuckDBPyConnection, query: str) -> pd.DataFrame:
@@ -145,6 +146,27 @@ def _empty_onboarding_funnel() -> pd.DataFrame:
             "furthest_step",
             "abandoned_step",
             "needs_assisted_onboarding",
+        ]
+    )
+
+
+def _empty_protection_events() -> pd.DataFrame:
+    return pd.DataFrame(
+        columns=[
+            "protection_event_id",
+            "user_id",
+            "event_date",
+            "amount_gbp",
+            "new_payee",
+            "first_large_transfer",
+            "unusual_time",
+            "recent_device_change",
+            "viewed_scam_warning",
+            "ignored_warning",
+            "confirmed_transfer",
+            "support_contact_about_scam",
+            "investment_context",
+            "vulnerable_customer",
         ]
     )
 
@@ -453,6 +475,30 @@ def load_dashboard_data(db_path: Path = DEFAULT_DB_PATH) -> DashboardData:
             )
         else:
             onboarding_funnel = _empty_onboarding_funnel()
+        if _table_exists(con, "main_marts", "fct_protection_events"):
+            protection_events = _fetch_frame(
+                con,
+                """
+                select
+                    protection_event_id,
+                    user_id,
+                    event_date,
+                    amount_gbp,
+                    new_payee,
+                    first_large_transfer,
+                    unusual_time,
+                    recent_device_change,
+                    viewed_scam_warning,
+                    ignored_warning,
+                    confirmed_transfer,
+                    support_contact_about_scam,
+                    investment_context,
+                    vulnerable_customer
+                from main_marts.fct_protection_events
+                """,
+            )
+        else:
+            protection_events = _empty_protection_events()
 
     return DashboardData(
         overview=overview,
@@ -467,6 +513,7 @@ def load_dashboard_data(db_path: Path = DEFAULT_DB_PATH) -> DashboardData:
         referral_daily=referral_daily,
         customer_outcomes=customer_outcomes,
         onboarding_funnel=onboarding_funnel,
+        protection_events=protection_events,
     )
 
 
@@ -631,6 +678,38 @@ def onboarding_abandonment_by_segment(
     return abandonment_by_segment(
         onboarding_funnel, segment, min_segment_size=min_segment_size
     )
+
+
+PROTECTION_ACTION_ORDER = [
+    "human_review_recommendation",
+    "cooling_off_period",
+    "soft_friction",
+    "education_prompt",
+    "no_action",
+]
+
+
+def protection_intervention_summary(protection_events: pd.DataFrame) -> pd.DataFrame:
+    """Count scam-intervention outcomes by supportive action.
+
+    Applies the ``src.protection`` rules engine to each event and returns counts and
+    shares per action, ordered most to least protective.
+    """
+    from src.protection import assess_events
+
+    columns = ["action", "events", "share"]
+    if protection_events.empty:
+        return pd.DataFrame(columns=columns)
+
+    assessed = assess_events(protection_events)
+    total = len(assessed)
+    counts = assessed["action"].value_counts()
+    rows: list[dict[str, object]] = []
+    for action in PROTECTION_ACTION_ORDER:
+        events = int(counts.get(action, 0))
+        if events > 0:
+            rows.append({"action": action, "events": events, "share": events / total})
+    return pd.DataFrame(rows, columns=columns)
 
 
 def _two_proportion_evidence_strength(rates: pd.DataFrame) -> float:
