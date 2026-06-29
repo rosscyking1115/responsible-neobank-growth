@@ -69,6 +69,9 @@ A strong uplift never overrides a block-level harm signal.
   underserved, who needs an assisted journey ([docs](docs/DIGITAL_INCLUSION.md)).
 - **Customer-protection / scam-intervention simulation** — risk-triggered *supportive*
   responses that never block a payment ([docs](docs/CUSTOMER_PROTECTION_SIMULATION.md)).
+- **Responsible growth decision pack** — consolidates every engine's output into one
+  stakeholder report with a business-impact summary, exportable from the dashboard as
+  HTML or Excel ([docs](docs/RESPONSIBLE_GROWTH_REPORT.md)).
 
 ## What decisions it supports
 
@@ -200,6 +203,7 @@ container build → authenticated `/health` smoke test.
 | [docs/FAIR_VALUE_PRICING.md](docs/FAIR_VALUE_PRICING.md) | Fair-value scoring and pricing governance. |
 | [docs/DIGITAL_INCLUSION.md](docs/DIGITAL_INCLUSION.md) | Onboarding funnel and digital-exclusion analysis. |
 | [docs/CUSTOMER_PROTECTION_SIMULATION.md](docs/CUSTOMER_PROTECTION_SIMULATION.md) | Scam-intervention simulation. |
+| [docs/RESPONSIBLE_GROWTH_REPORT.md](docs/RESPONSIBLE_GROWTH_REPORT.md) | Consolidated stakeholder decision pack (HTML / Excel). |
 | [docs/MONITORING.md](docs/MONITORING.md) | Data, model, score, and GCP monitoring checks. |
 | [docs/OPERATIONS_RUNBOOK.md](docs/OPERATIONS_RUNBOOK.md) | Rollback triggers, triage, and GCP operations. |
 
