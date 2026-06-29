@@ -38,6 +38,15 @@ models:
           - accepted_values:
               arguments:
                 values: [low, medium, high]
+  - name: fct_protection_events
+    description: >
+      Cleaned transfer-level scam-intervention risk events. Supportive interventions
+      are derived by the Python rules engine in src/protection.
+    columns:
+      - name: protection_event_id
+        tests: [not_null, unique]
+      - name: user_id
+        tests: [not_null]
   - name: fct_retention_cohorts
     description: Weekly transaction-active retention table for activated users by signup cohort.
     columns:

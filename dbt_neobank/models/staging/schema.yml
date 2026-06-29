@@ -21,6 +21,7 @@ sources:
       - name: experiment_ground_truth
       - name: wellbeing_proxies
       - name: onboarding_events
+      - name: protection_events
 
 models:
   - name: stg_users
@@ -162,3 +163,10 @@ models:
                   - identity_check_started
                   - identity_check_passed
                   - card_activated
+  - name: stg_protection_events
+    description: Synthetic transfer-level scam-intervention risk events (simulation only).
+    columns:
+      - name: protection_event_id
+        tests: [not_null, unique]
+      - name: user_id
+        tests: [not_null]

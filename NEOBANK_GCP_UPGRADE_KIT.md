@@ -21,7 +21,9 @@ Implemented for the public portfolio version:
 
 - Public Streamlit dashboard.
 - GCS raw landing path and BigQuery raw dataset for the synthetic demo export.
-- dbt mart build exercised against BigQuery with 107 passing checks.
+- dbt mart build exercised against BigQuery with 107 passing checks (pre-pivot run;
+  the responsible-growth raw tables and marts were added later and are not yet
+  reloaded to BigQuery).
 - Activation scores loaded to `neobank_ml.customer_scores_daily`.
 - BigQuery score monitoring written to `neobank_monitoring.score_monitoring_daily`.
 - Private Cloud Run FastAPI service with authenticated health smoke test.

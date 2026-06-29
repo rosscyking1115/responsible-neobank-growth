@@ -48,9 +48,11 @@ Already strong:
   BigQuery dbt target.
 - Small demo raw landing path exercised against GCS and BigQuery on 2026-05-30:
   13 parquet files uploaded, 13 raw tables loaded, and all manifest row counts
-  verified in BigQuery.
+  verified in BigQuery. (The data model has since grown to 16 raw tables with the
+  responsible-growth modules; those are not yet reloaded to BigQuery.)
 - dbt graph exercised against BigQuery on 2026-05-30: staging views,
-  intermediate tables, mart tables, and 107 dbt tests passed.
+  intermediate tables, mart tables, and 107 dbt tests passed. (Local `dbt build`
+  now runs 133 checks including the new wellbeing, inclusion, and protection marts.)
 - Batch scoring exercised against GCS and BigQuery on 2026-05-31: 5,000
   activation score rows loaded into `neobank_ml.customer_scores_daily`.
 - BigQuery score monitoring exercised on 2026-05-31: the 2025-06-30 score
