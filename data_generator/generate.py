@@ -19,6 +19,7 @@ from data_generator.support import generate_support_contacts
 from data_generator.transactions import generate_transactions
 from data_generator.users import generate_users
 from data_generator.utils import ensure_output_dir, write_parquet
+from data_generator.wellbeing import generate_wellbeing_proxies
 
 
 def build_dataset(config: GeneratorConfig) -> dict[str, pl.DataFrame]:
@@ -31,6 +32,7 @@ def build_dataset(config: GeneratorConfig) -> dict[str, pl.DataFrame]:
     referrals, region_daily_signups = generate_referrals(users, activation, config)
     offer_catalog, pricing_exposures, pricing_outcomes = generate_pricing(users, activation, config)
     ground_truth = experiment_ground_truth(config)
+    wellbeing_proxies = generate_wellbeing_proxies(users, config)
 
     return {
         "users": users,
@@ -46,6 +48,7 @@ def build_dataset(config: GeneratorConfig) -> dict[str, pl.DataFrame]:
         "pricing_exposures": pricing_exposures,
         "pricing_outcomes": pricing_outcomes,
         "experiment_ground_truth": ground_truth,
+        "wellbeing_proxies": wellbeing_proxies,
     }
 
 
