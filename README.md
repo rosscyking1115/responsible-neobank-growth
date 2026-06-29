@@ -72,6 +72,9 @@ A strong uplift never overrides a block-level harm signal.
 - **Responsible growth decision pack** — consolidates every engine's output into one
   stakeholder report with a business-impact summary, exportable from the dashboard as
   HTML or Excel ([docs](docs/RESPONSIBLE_GROWTH_REPORT.md)).
+- **Public-data calibration** — anchors the synthetic wellbeing/inclusion distributions
+  to approximate UK public benchmarks and reports the gaps
+  ([docs](docs/PUBLIC_DATA_CALIBRATION.md)).
 
 ## What decisions it supports
 
@@ -204,6 +207,7 @@ container build → authenticated `/health` smoke test.
 | [docs/DIGITAL_INCLUSION.md](docs/DIGITAL_INCLUSION.md) | Onboarding funnel and digital-exclusion analysis. |
 | [docs/CUSTOMER_PROTECTION_SIMULATION.md](docs/CUSTOMER_PROTECTION_SIMULATION.md) | Scam-intervention simulation. |
 | [docs/RESPONSIBLE_GROWTH_REPORT.md](docs/RESPONSIBLE_GROWTH_REPORT.md) | Consolidated stakeholder decision pack (HTML / Excel). |
+| [docs/PUBLIC_DATA_CALIBRATION.md](docs/PUBLIC_DATA_CALIBRATION.md) | Calibrating synthetic distributions to public benchmarks. |
 | [docs/MONITORING.md](docs/MONITORING.md) | Data, model, score, and GCP monitoring checks. |
 | [docs/OPERATIONS_RUNBOOK.md](docs/OPERATIONS_RUNBOOK.md) | Rollback triggers, triage, and GCP operations. |
 
