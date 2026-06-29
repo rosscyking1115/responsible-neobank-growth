@@ -173,6 +173,28 @@ def cached_pricing_scenario_run(db_path: str) -> PricingScenarioRun:
     return build_pricing_scenario_run(db_path=prepared_db_path)
 
 
+@st.cache_data(show_spinner=False)
+def cached_decision_pack(db_path: str) -> tuple[list[str], str, bytes]:
+    """Build the responsible-growth decision pack once per dataset.
+
+    Returns (impact statements, HTML report, Excel bytes). Cached because assembling
+    the report -- especially serialising the Excel workbook -- is the most expensive
+    per-render work on the Customer outcomes tab.
+    """
+    data = cached_dashboard_data(db_path)
+    report = build_report(
+        feature_name="personalised_onboarding_pot_prompt",
+        release_decision=onboarding_release_decision(
+            data.experiment_variants, data.customer_outcomes
+        ),
+        customer_outcomes=data.customer_outcomes,
+        onboarding_funnel=data.onboarding_funnel,
+        fair_value=offer_fair_value(data.pricing_recommendations),
+        protection_events=data.protection_events,
+    )
+    return report.summary.impact_statements, render_html(report), report_excel_bytes(report)
+
+
 def _pct(value: float) -> str:
     return f"{value * 100:.1f}%"
 
@@ -572,31 +594,22 @@ def _render_release_verdict(data: DashboardData) -> None:
         st.markdown(f"- {reason}")
 
 
-def _render_decision_pack(data: DashboardData) -> None:
+def _render_decision_pack() -> None:
     """Offer the consolidated responsible-growth decision pack as HTML / Excel."""
-    report = build_report(
-        feature_name="personalised_onboarding_pot_prompt",
-        release_decision=onboarding_release_decision(
-            data.experiment_variants, data.customer_outcomes
-        ),
-        customer_outcomes=data.customer_outcomes,
-        onboarding_funnel=data.onboarding_funnel,
-        fair_value=offer_fair_value(data.pricing_recommendations),
-        protection_events=data.protection_events,
-    )
+    impact_statements, html_report, excel_bytes = cached_decision_pack(str(DEFAULT_DB_PATH))
     with st.expander("Responsible growth decision pack (download)"):
-        for line in report.summary.impact_statements:
+        for line in impact_statements:
             st.markdown(f"- {line}")
         left, right = st.columns(2)
         left.download_button(
             "Download HTML report",
-            data=render_html(report),
+            data=html_report,
             file_name="responsible_growth_report.html",
             mime="text/html",
         )
         right.download_button(
             "Download Excel pack",
-            data=report_excel_bytes(report),
+            data=excel_bytes,
             file_name="responsible_growth_report.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         )
@@ -608,7 +621,7 @@ def _render_customer_outcomes(data: DashboardData) -> None:
         "and is the onboarding change safe to ship?"
     )
     _render_release_verdict(data)
-    _render_decision_pack(data)
+    _render_decision_pack()
 
     if data.customer_outcomes.empty:
         st.info("Customer-outcome marts are not available in this DuckDB build.")
@@ -897,6 +910,9 @@ def main() -> None:
         st.stop()
 
     _metric_grid(data)
+    # Dynamic tabs (on_change="rerun"): only the open tab's content renders, so the
+    # other six tabs -- including the decision-pack build -- don't recompute on every
+    # rerun. tab.open is True only for the selected tab.
     (
         product_tab,
         outcomes_tab,
@@ -914,22 +930,30 @@ def main() -> None:
             "Pricing intelligence",
             "Experiments",
             "Monitoring",
-        ]
+        ],
+        on_change="rerun",
     )
-    with product_tab:
-        _render_product_health(data)
-    with outcomes_tab:
-        _render_customer_outcomes(data)
-    with inclusion_tab:
-        _render_digital_inclusion(data)
-    with protection_tab:
-        _render_customer_protection(data)
-    with pricing_tab:
-        _render_pricing(data, pricing_scenario_run)
-    with experiment_tab:
-        _render_experiments(data)
-    with monitoring_tab:
-        _render_monitoring(monitoring_snapshot)
+    if product_tab.open:
+        with product_tab:
+            _render_product_health(data)
+    if outcomes_tab.open:
+        with outcomes_tab:
+            _render_customer_outcomes(data)
+    if inclusion_tab.open:
+        with inclusion_tab:
+            _render_digital_inclusion(data)
+    if protection_tab.open:
+        with protection_tab:
+            _render_customer_protection(data)
+    if pricing_tab.open:
+        with pricing_tab:
+            _render_pricing(data, pricing_scenario_run)
+    if experiment_tab.open:
+        with experiment_tab:
+            _render_experiments(data)
+    if monitoring_tab.open:
+        with monitoring_tab:
+            _render_monitoring(monitoring_snapshot)
 
 
 if __name__ == "__main__":
