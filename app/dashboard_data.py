@@ -45,6 +45,7 @@ class DashboardData:
     experiment_variants: pd.DataFrame
     referral_daily: pd.DataFrame
     customer_outcomes: pd.DataFrame
+    onboarding_funnel: pd.DataFrame
 
 
 def _fetch_frame(con: duckdb.DuckDBPyConnection, query: str) -> pd.DataFrame:
@@ -122,6 +123,28 @@ def _empty_customer_outcomes() -> pd.DataFrame:
             "support_contact_count",
             "has_support_contact",
             "has_complaint",
+        ]
+    )
+
+
+def _empty_onboarding_funnel() -> pd.DataFrame:
+    return pd.DataFrame(
+        columns=[
+            "user_id",
+            "region",
+            "income_segment",
+            "income_band",
+            "digital_confidence_band",
+            "accessibility_need_proxy",
+            "new_to_uk_proxy",
+            "vulnerable_customer_proxy",
+            "identity_check_started",
+            "identity_check_passed",
+            "card_activated",
+            "completed_onboarding",
+            "furthest_step",
+            "abandoned_step",
+            "needs_assisted_onboarding",
         ]
     )
 
@@ -405,6 +428,31 @@ def load_dashboard_data(db_path: Path = DEFAULT_DB_PATH) -> DashboardData:
             )
         else:
             customer_outcomes = _empty_customer_outcomes()
+        if _table_exists(con, "main_marts", "fct_onboarding_funnel"):
+            onboarding_funnel = _fetch_frame(
+                con,
+                """
+                select
+                    user_id,
+                    region,
+                    income_segment,
+                    income_band,
+                    digital_confidence_band,
+                    accessibility_need_proxy,
+                    new_to_uk_proxy,
+                    vulnerable_customer_proxy,
+                    identity_check_started,
+                    identity_check_passed,
+                    card_activated,
+                    completed_onboarding,
+                    furthest_step,
+                    abandoned_step,
+                    needs_assisted_onboarding
+                from main_marts.fct_onboarding_funnel
+                """,
+            )
+        else:
+            onboarding_funnel = _empty_onboarding_funnel()
 
     return DashboardData(
         overview=overview,
@@ -418,6 +466,7 @@ def load_dashboard_data(db_path: Path = DEFAULT_DB_PATH) -> DashboardData:
         experiment_variants=experiment_variants,
         referral_daily=referral_daily,
         customer_outcomes=customer_outcomes,
+        onboarding_funnel=onboarding_funnel,
     )
 
 
@@ -558,6 +607,29 @@ def customer_outcome_gaps(
         pd.DataFrame(rows, columns=columns)
         .sort_values("gap_pp", ascending=False)
         .reset_index(drop=True)
+    )
+
+
+def onboarding_funnel_steps(onboarding_funnel: pd.DataFrame) -> pd.DataFrame:
+    """Step-by-step onboarding funnel conversion for the dashboard."""
+    from src.inclusion import funnel_conversion
+
+    return funnel_conversion(onboarding_funnel)
+
+
+def onboarding_abandonment_by_segment(
+    onboarding_funnel: pd.DataFrame,
+    segment: str,
+    *,
+    min_segment_size: int = 30,
+) -> pd.DataFrame:
+    """Onboarding completion / abandonment / assisted-need rates by segment level."""
+    from src.inclusion import abandonment_by_segment
+
+    if onboarding_funnel.empty or segment not in onboarding_funnel.columns:
+        return abandonment_by_segment(_empty_onboarding_funnel(), segment)
+    return abandonment_by_segment(
+        onboarding_funnel, segment, min_segment_size=min_segment_size
     )
 
 

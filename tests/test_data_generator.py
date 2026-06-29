@@ -26,9 +26,11 @@ def test_generator_writes_expected_parquet_files(tmp_path) -> None:
         "pricing_outcomes",
         "experiment_ground_truth",
         "wellbeing_proxies",
+        "onboarding_events",
     }
     assert {path.stem for path in tmp_path.glob("*.parquet")} == expected
     assert frames["wellbeing_proxies"].height == 500
+    assert frames["onboarding_events"].height == 500
     assert frames["users"].height == 500
     assert frames["experiment_assignments"].height == 500
     assert frames["activation_ground_truth"].height == 500

@@ -24,7 +24,7 @@ def test_load_export_manifest_reads_cloud_export(tmp_path: Path) -> None:
     assert manifest.schema_version
     assert manifest.profile == "demo"
     assert manifest.source_format == "parquet"
-    assert len(manifest.tables) == 14
+    assert len(manifest.tables) == 15
     assert {table.file for table in manifest.tables} >= {"users.parquet", "transactions.parquet"}
 
 
@@ -52,7 +52,7 @@ def test_render_upload_plan_summarises_export_and_lists_commands(tmp_path: Path)
     plan = render_upload_plan(manifest, tmp_path)
 
     assert "Cloud Storage Raw Upload Plan" in plan
-    assert "Tables: 14" in plan
+    assert "Tables: 15" in plan
     assert "`NEOBANK_GCS_RAW_BUCKET`" in plan
     assert "gcloud storage cp" in plan
     assert "gs://${NEOBANK_GCS_RAW_BUCKET}/${NEOBANK_GCS_RAW_PREFIX}/users.parquet" in plan
