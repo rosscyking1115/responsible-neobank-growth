@@ -81,13 +81,15 @@ def generate_wellbeing_proxies(users: pl.DataFrame, config: GeneratorConfig) -> 
     missed_payment_proxy = (rng.random(n) < (overdraft_risk_proxy * 0.35)).astype(bool)
 
     # Digital confidence falls with age and is a little higher on iOS; lower for the
-    # most strained segments.
+    # most strained segments. Intercept/slope/noise are calibrated so the share in the
+    # low band (score < 0.40) is close to the public "lacking foundation digital
+    # skills" anchor -- see src/calibration and docs/PUBLIC_DATA_CALIBRATION.md.
     digital_confidence_score = _clip01(
-        0.92
-        - (age - 25.0) / 90.0
+        0.86
+        - (age - 25.0) / 72.0
         + np.where(device_os == "ios", 0.04, -0.02)
-        - 0.10 * bill_pressure_score
-        + noise(0.06)
+        - 0.14 * bill_pressure_score
+        + noise(0.08)
     )
 
     support_contact_frequency = np.maximum(
@@ -100,11 +102,13 @@ def generate_wellbeing_proxies(users: pl.DataFrame, config: GeneratorConfig) -> 
         rng.random(n) < (0.02 + 0.06 * vulnerable_flag + 0.04 * bill_pressure_score)
     ).astype(bool)
 
+    # Base rates are calibrated to approximate UK public anchors (disability
+    # prevalence, share born outside the UK) -- see src/calibration.
     accessibility_need_proxy = (
-        rng.random(n) < (0.05 + np.where(age >= 65, 0.18, 0.0))
+        rng.random(n) < (0.17 + np.where(age >= 65, 0.15, 0.0))
     ).astype(bool)
     new_to_uk_proxy = (
-        rng.random(n) < (0.06 + np.where(signup_channel == "campus", 0.05, 0.0))
+        rng.random(n) < (0.15 + np.where(signup_channel == "campus", 0.05, 0.0))
     ).astype(bool)
     student_proxy = (income_segment == "student") | (rng.random(n) < 0.02)
 
