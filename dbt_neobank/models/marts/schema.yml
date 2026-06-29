@@ -10,6 +10,20 @@ models:
       - name: activated_d7
         description: True when the user made their first card transaction within 7 days of signup.
         tests: [not_null]
+  - name: fct_customer_outcomes
+    description: >
+      One row per user joining wellbeing/inclusion segment bands to customer
+      outcomes (activation, support contact, complaint) for fairness-gap analysis.
+    columns:
+      - name: user_id
+        tests: [not_null, unique]
+      - name: activated_d7
+        tests: [not_null]
+      - name: digital_confidence_band
+        tests:
+          - accepted_values:
+              arguments:
+                values: [low, medium, high]
   - name: fct_retention_cohorts
     description: Weekly transaction-active retention table for activated users by signup cohort.
     columns:
