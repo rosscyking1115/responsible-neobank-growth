@@ -185,7 +185,7 @@ def cached_decision_pack(db_path: str) -> tuple[list[str], str, bytes]:
     report = build_report(
         feature_name="personalised_onboarding_pot_prompt",
         release_decision=onboarding_release_decision(
-            data.experiment_variants, data.customer_outcomes
+            data.experiment_variants, data.experiment_segment_outcomes
         ),
         customer_outcomes=data.customer_outcomes,
         onboarding_funnel=data.onboarding_funnel,
@@ -572,7 +572,9 @@ def _render_pricing(data: DashboardData, scenario_run: PricingScenarioRun) -> No
 
 
 def _render_release_verdict(data: DashboardData) -> None:
-    decision = onboarding_release_decision(data.experiment_variants, data.customer_outcomes)
+    decision = onboarding_release_decision(
+        data.experiment_variants, data.experiment_segment_outcomes
+    )
     if decision is None:
         return
     color = DECISION_COLORS.get(decision.decision, PRIMARY_BLUE)

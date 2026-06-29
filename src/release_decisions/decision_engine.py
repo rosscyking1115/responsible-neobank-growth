@@ -43,7 +43,10 @@ class ReleaseSignals:
     # Customer-outcome guardrails (deltas vs control; higher = worse).
     complaint_rate_delta: float = 0.0
     support_burden_delta: float = 0.0
-    fairness_gap: float = 0.0  # worst-vs-best segment outcome gap, 0..1
+    # Disparity the change INTRODUCES across segments (0..1). Use the treatment's
+    # effect on the gap (how much it widens it), not the pre-existing baseline gap --
+    # otherwise a beneficial change is blocked for inequality it did not cause.
+    fairness_gap: float = 0.0
     vulnerable_customer_impact: float = 0.0  # signed; negative = harm
     fair_value_score: float = 1.0  # 0..1, higher = fairer
     # Model / data operations.
