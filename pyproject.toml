@@ -1,7 +1,7 @@
 [project]
-name = "neobank-product-analytics"
+name = "responsible-neobank-growth"
 version = "0.1.0"
-description = "A synthetic fintech customer growth and pricing intelligence platform covering dbt metrics, experimentation, geo incrementality, and decisioning."
+description = "A synthetic fintech decision-support platform combining product analytics, experimentation, model decisioning, pricing governance, and customer-outcome guardrails for responsible neobank growth."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [

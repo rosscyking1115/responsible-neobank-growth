@@ -1,148 +1,124 @@
-# Neobank Growth & Customer-Outcome Decision Platform
+# Responsible Neobank Growth Platform
 
-[![CI](https://github.com/rosscyking1115/neobank-product-analytics/actions/workflows/ci.yml/badge.svg)](https://github.com/rosscyking1115/neobank-product-analytics/actions/workflows/ci.yml)
-[![Monitoring Snapshot](https://github.com/rosscyking1115/neobank-product-analytics/actions/workflows/monitoring-snapshot.yml/badge.svg)](https://github.com/rosscyking1115/neobank-product-analytics/actions/workflows/monitoring-snapshot.yml)
-
-> A synthetic fintech decision-support platform that combines product analytics,
-> experimentation, activation modelling, and pricing intelligence with
-> customer-outcome guardrails — so a neobank can decide whether to **ship, iterate,
-> or hold** a growth action while still protecting vulnerable customers.
+[![CI](https://github.com/rosscyking1115/responsible-neobank-growth/actions/workflows/ci.yml/badge.svg)](https://github.com/rosscyking1115/responsible-neobank-growth/actions/workflows/ci.yml)
+[![Monitoring Snapshot](https://github.com/rosscyking1115/responsible-neobank-growth/actions/workflows/monitoring-snapshot.yml/badge.svg)](https://github.com/rosscyking1115/responsible-neobank-growth/actions/workflows/monitoring-snapshot.yml)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue.svg)](pyproject.toml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 [Live Streamlit Dashboard](https://neobank-appuct-analytics.streamlit.app/)
 
-![Neobank product analytics dashboard](docs/assets/streamlit-product-health.png)
+![Responsible Neobank Growth Platform dashboard](docs/assets/streamlit-product-health.png)
 
-All data is synthetic. No real customer data, internal bank data, or proprietary
-business metrics are used. See [Safety & Ethics](#safety--ethics).
+A synthetic fintech **decision-support platform** that combines product analytics,
+experimentation, model decisioning, and pricing intelligence with customer-outcome,
+fairness, inclusion, and protection guardrails — so a neobank can decide whether to
+**ship, iterate, or hold** a growth action while still protecting its customers.
+
+> All data is synthetic. No real customer data, internal bank data, or proprietary
+> business metrics are used. See [Safety & ethics](#safety--ethics).
 
 ---
 
 ## Why this project exists
 
-In most analytics demos, growth is the only goal: increase activation, conversion,
-retention, or margin. In financial services that framing is dangerous. A bad
-e-commerce discount wastes money; a bad fintech growth decision can push a
-vulnerable customer toward a worse financial outcome.
-
-This project asks a sharper question than "does this action grow a metric?":
+In most analytics demos, growth is the only goal. In financial services that framing
+is dangerous: a bad e-commerce discount wastes money, but a bad fintech growth
+decision can push a vulnerable customer toward a worse financial outcome. This
+platform asks a sharper question than "does this action move a metric?":
 
 > Can we grow activation, retention, referrals, and pricing conversion **while still
 > delivering good customer outcomes** — and is the evidence strong enough to act?
 
-Every analysis therefore ends in a **decision with guardrails** (e.g. `ship` /
-`iterate` / `hold`, or `target` / `monitor` / `do_not_target`), not just a chart.
+Every analysis therefore ends in a **decision with guardrails**, and one principle is
+enforced throughout the code: **customer-outcome concerns dominate commercial appeal.**
+A strong uplift never overrides a block-level harm signal.
+
+## Key features
+
+**Core analytics, experimentation & decisioning**
+
+- **Synthetic data generation** — deterministic, seeded `polars` generators for users,
+  transactions, sessions, feature adoption, support, referrals, pricing, and
+  experiment assignments with embedded ground truth.
+- **dbt metrics layer** — staging plus product, pricing, experiment, geo, and finance
+  marts (DuckDB locally; BigQuery as an optional target).
+- **Activation decisioning model** — logistic pipeline with isotonic calibration on a
+  forward time window, threshold economics, a published
+  [model card](docs/model_cards/MODEL_ACTIVATION_DECISIONING.md), an artifact
+  registry, and batch scoring.
+- **Experimentation & causal inference** — Welch difference-in-means, CUPED, SRM,
+  heterogeneous effects, confidence-interval guardrails, difference-in-differences
+  with clustered standard errors, parallel trends, placebo-in-space, and synthetic
+  control.
+- **FastAPI service** — scoring, offer-recommendation, and pricing-scenario contracts,
+  each returning a decision, reason codes, and guardrail flags.
+
+**Responsible-growth modules**
+
+- **Financial wellbeing layer** — synthetic wellbeing/vulnerability proxies with
+  *executable* permitted/prohibited-use guardrails and fairness-gap metrics
+  ([docs](docs/FINANCIAL_WELLBEING_PROXIES.md)).
+- **Customer Outcomes & Fairness** — segment fairness gaps plus a live release-gate
+  verdict on the onboarding A/B (dashboard tab).
+- **Responsible release-gate engine** — maps evidence + guardrails to
+  `ship / limited_rollout / experiment_only / needs_human_review / block`
+  ([docs](docs/RELEASE_DECISION_FRAMEWORK.md)).
+- **Fair-value pricing governance** — scores each offer's fair value and downgrades
+  commercially attractive but unfair offers ([docs](docs/FAIR_VALUE_PRICING.md)).
+- **Digital inclusion & onboarding funnel** — who drops out, which segments are
+  underserved, who needs an assisted journey ([docs](docs/DIGITAL_INCLUSION.md)).
+- **Customer-protection / scam-intervention simulation** — risk-triggered *supportive*
+  responses that never block a payment ([docs](docs/CUSTOMER_PROTECTION_SIMULATION.md)).
 
 ## What decisions it supports
 
-| Question a growth/product team asks | What the platform provides |
+| Question a growth / product / governance team asks | What the platform provides |
 | --- | --- |
-| Should we ship this onboarding treatment? | D7 activation A/B readout with CUPED, SRM, and customer-outcome guardrails. |
-| Which users need onboarding **help** (not upsell)? | Calibrated activation model that targets *low-propensity* users, with a vulnerable-customer review path. |
+| Should we ship this onboarding treatment? | D7 activation A/B readout (CUPED, SRM) plus a release-gate verdict. |
+| Which users need onboarding **help** (not upsell)? | Calibrated activation model targeting *low-propensity* users, with a vulnerable-customer review path. |
 | Are referral incentives genuinely incremental? | Geo difference-in-differences with parallel-trends, placebo, and synthetic-control checks. |
-| Which pricing/incentive offers are attractive *after* guardrails? | Offer economics + recommendation mart + scenario runs with margin, complaint, support, and vulnerable-share guardrails. |
-| Is the data/model still safe to operate? | Monitoring snapshot, calibration report, drift checks, and release gates. |
-
-## How it works (end to end)
-
-```text
-Synthetic event generator  (users, transactions, sessions, features, support,
-        |                    referrals, pricing offers, experiment assignments)
-        v
-DuckDB / Parquet  ──►  dbt metrics layer  ──►  Streamlit dashboard
-        |                (staging + product / pricing / experiment / geo marts)
-        |
-        ├──►  Modelling + experiments  ──►  model card, decision memos, monitoring
-        |
-        └──►  FastAPI service  ──►  scoring, offer, and pricing-scenario contracts
-                                     (each response carries guardrail flags)
-
-Optional GCP path:
-   Cloud Storage  ──►  BigQuery (raw + marts)  ──►  Cloud Run jobs + private API
-                                                     ──►  Cloud Scheduler + Monitoring
-```
-
-## What's built today
-
-- **Synthetic data generation** — deterministic, seeded `polars` generator covering
-  users, transactions, sessions, feature adoption, support contacts, referrals,
-  pricing offers, and experiment assignments with embedded ground truth.
-- **dbt metrics layer** — staging models plus product, pricing, experiment, geo, and
-  finance marts (DuckDB locally; BigQuery as an optional target).
-- **Activation decisioning model** — logistic pipeline with **isotonic calibration on
-  a forward time window**, threshold economics, segment checks, a published
-  [model card](docs/model_cards/MODEL_ACTIVATION_DECISIONING.md), an artifact registry,
-  and batch scoring.
-- **Experimentation & causal inference** — Welch difference-in-means, **CUPED**
-  variance reduction, **SRM** checks, heterogeneous effects, confidence-interval-based
-  guardrails, **difference-in-differences with clustered standard errors**, parallel
-  trends, placebo-in-space, and synthetic control.
-- **Pricing intelligence** — observed offer economics, a recommendation mart, and
-  scenario + sensitivity runs that score margin against fair-value, vulnerable-share,
-  complaint, and human-review guardrails.
-- **FastAPI service** — `/health`, `/score/{activation,churn,upsell}`,
-  `/recommend/offer`, and `/simulate/pricing`. Every response returns a decision,
-  reason codes, and explicit guardrail flags.
-- **Streamlit dashboard** — product health, **customer outcomes & fairness**, **digital
-  inclusion**, **customer protection**, pricing intelligence, experiments, and
-  monitoring views over the dbt marts. The customer outcomes tab shows segment fairness
-  gaps and a live release-gate verdict; digital inclusion shows the onboarding funnel
-  and abandonment by segment; customer protection shows scam-intervention outcomes.
-- **Monitoring & operations** — a monitoring snapshot, model and calibration reports,
-  release checks, and an operations runbook.
-- **Cloud path (GCP)** — repeatable plan generators and Cloud Run job entrypoints for
-  GCS landing, BigQuery load/verify/monitoring, private API and job deployment,
-  scheduling, and cost controls.
-- **Financial wellbeing layer** — synthetic, clearly-bounded per-customer wellbeing
-  and vulnerability proxies with **executable use-boundary guardrails** (permitted vs
-  prohibited uses) and segment outcome / fairness-gap metrics. See
-  [docs/FINANCIAL_WELLBEING_PROXIES.md](docs/FINANCIAL_WELLBEING_PROXIES.md).
-- **Responsible release-gate engine** — turns evidence + customer-outcome guardrails
-  into an explainable `ship / limited_rollout / experiment_only / needs_human_review /
-  block` decision, where harm signals always dominate commercial uplift. See
-  [docs/RELEASE_DECISION_FRAMEWORK.md](docs/RELEASE_DECISION_FRAMEWORK.md).
-- **Fair-value pricing governance** — scores each offer's fair value from observed
-  customer-outcome guardrails and downgrades commercially attractive but unfair offers
-  to hold or human review. See [docs/FAIR_VALUE_PRICING.md](docs/FAIR_VALUE_PRICING.md).
-- **Digital inclusion & onboarding funnel** — synthetic KYC funnel plus analysis of
-  who drops out, which segments are underserved, and who needs an assisted journey.
-  See [docs/DIGITAL_INCLUSION.md](docs/DIGITAL_INCLUSION.md).
-- **Customer-protection / scam-intervention simulation** — risk-triggered *supportive*
-  responses (education, soft friction, cooling-off, human review) on transfers;
-  explicitly not a fraud engine. See
-  [docs/CUSTOMER_PROTECTION_SIMULATION.md](docs/CUSTOMER_PROTECTION_SIMULATION.md).
-- **Quality** — 175 `pytest` tests, `ruff` lint, a GitHub Actions CI pipeline (lint →
-  tests → dbt build → container build → API smoke test), and a scheduled monitoring
-  workflow.
-
-## Customer-outcome guardrails
-
-Guardrails are first-class outputs, not an afterthought. They are already wired into
-the code:
-
-- **Scoring** — an age block, a vulnerable-customer review flag, and an activation
-  model that targets users who need *help* rather than upselling them.
-- **Experiments** — guardrails are evaluated on the **confidence interval**, not just
-  the point estimate, across complaint, support-contact, and app-stability metrics.
-- **Pricing** — recommendations are gated on positive incremental unit economics,
-  vulnerable-customer share, 14-day complaint rate, and human-review load.
-- **Monitoring** — the snapshot fails the build on missing marts or an elevated
-  complaint rate and warns on weak activation, margin, or review load.
+| Is this pricing offer attractive **and fair**? | Offer economics, scenario runs, and a fair-value governance verdict. |
+| Are vulnerable or digitally excluded customers worse off? | Segment fairness gaps and onboarding-abandonment analysis. |
+| Should this transfer trigger support? | Supportive scam-intervention simulation (education → soft friction → cooling-off → human review). |
 
 ## Technology stack
 
 | Layer | Tools |
 | --- | --- |
-| Data generation | Python, `polars`, Faker-style synthetic events, Parquet |
+| Language / runtime | Python 3.12+, managed with `uv` |
+| Data generation | `polars`, Faker-style synthetic events, Parquet |
 | Analytics engineering | dbt, DuckDB, BigQuery |
-| Experimentation | CUPED, SRM, CI-based guardrails, DiD, synthetic control |
-| Modelling | scikit-learn, isotonic calibration, model card, batch scoring |
+| Experimentation | CUPED, SRM, CI-based guardrails, DiD, synthetic control (`scipy`, `statsmodels`, `linearmodels`) |
+| Modelling | `scikit-learn`, isotonic calibration, model card, batch scoring |
 | Application | Streamlit dashboard, FastAPI prediction service |
 | Cloud | Cloud Storage, BigQuery, Cloud Run, Cloud Scheduler, Cloud Monitoring |
-| Quality | pytest, ruff, GitHub Actions, monitoring snapshot workflow |
+| Quality | `pytest`, `ruff`, GitHub Actions, monitoring snapshot workflow |
 
-## Quickstart (no cloud required)
+## Project architecture
 
-The full local path builds a synthetic dataset, dbt marts, tests, and the dashboard.
+```text
+Synthetic event generator  (users, transactions, sessions, features, support,
+        |                    referrals, pricing, wellbeing, onboarding, protection)
+        v
+DuckDB / Parquet  ──►  dbt metrics layer  ──►  Streamlit dashboard
+        |                                        (7 decision tabs)
+        ├──►  modelling + experiments  ──►  model card, memos, monitoring
+        ├──►  responsible-growth engines (release gates, fair value, inclusion,
+        |                                  protection) ──►  decisions with guardrails
+        └──►  FastAPI service  ──►  scoring, offer, and pricing contracts
+
+Optional GCP path:
+   Cloud Storage ─► BigQuery (raw + marts) ─► Cloud Run jobs + private API
+                                              ─► Cloud Scheduler + Monitoring
+```
+
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full local and cloud
+architecture.
+
+## Getting started
+
+**Prerequisites:** Python 3.12+ and [`uv`](https://docs.astral.sh/uv/). No cloud
+account is required — the entire platform runs locally.
 
 ```powershell
 uv sync --group dev
@@ -152,85 +128,119 @@ uv run pytest
 uv run streamlit run app/streamlit_app.py
 ```
 
-For a portfolio-size dataset:
-
-```powershell
-uv run python -m data_generator.generate --users 50000 --months 12 --output-dir raw/portfolio_full
-uv run dbt build --project-dir dbt_neobank --profiles-dir dbt_neobank --vars "{raw_path: raw/portfolio_full}"
-```
-
 Run the API locally:
 
 ```powershell
 uv run uvicorn api.main:app --reload   # then open http://127.0.0.1:8000/docs
 ```
 
-## Five-minute review guide
+For a portfolio-size dataset, generate with `--users 50000 --months 12` and pass
+`--vars "{raw_path: raw/portfolio_full}"` to `dbt build`.
 
-1. Open the [live dashboard](https://neobank-appuct-analytics.streamlit.app/).
-2. Read the [case study](docs/CASE_STUDY.md) — decisions supported, evidence, limits.
-3. Skim the [architecture](docs/ARCHITECTURE.md) and [API contract](docs/API.md).
-4. Review the [model card](docs/model_cards/MODEL_ACTIVATION_DECISIONING.md) and
-   [operations runbook](docs/OPERATIONS_RUNBOOK.md).
+## Project structure
+
+```text
+api/                    FastAPI prediction & pricing service
+app/                    Streamlit dashboard (7 decision tabs)
+data_generator/         Seeded synthetic event & proxy generators
+dbt_neobank/            dbt metrics layer (staging + marts)
+src/
+  experiments/          CUPED, SRM, DiD, synthetic control, guardrails
+  modelling/            Activation model: train, calibrate, score, explain
+  monitoring/           Monitoring snapshot, model & calibration reports
+  pricing/              Pricing scenario runs
+  pricing_governance/   Fair-value scoring & governance
+  wellbeing/            Wellbeing proxy guardrails & fairness metrics
+  inclusion/            Onboarding funnel & digital-exclusion analysis
+  release_decisions/    Responsible release-gate engine
+  protection/           Scam-intervention simulation
+  cloud/                GCP load / verify / deploy plan generators + jobs
+docs/                   Architecture, case study, module docs, model card
+tests/                  pytest suite
+```
+
+## Development workflow
+
+- Work happens on feature branches (`feat/...`, `chore/...`) and merges to `main` via
+  pull request; the responsible-growth modules were delivered as a stacked PR chain.
+- Every PR runs the CI pipeline below; `main` is the protected default branch.
+- Synthetic data, DuckDB files, dbt `target/`, and `artifacts/` are git-ignored — only
+  source is tracked, so the repo stays reproducible from the generators.
+
+## Coding standards
+
+- `ruff` (line length 100; `E`, `F`, `I`, `UP`, `B`, `SIM` rule sets) — `uv run ruff check .`
+- Type hints throughout; typed Pydantic contracts at the API boundary and frozen
+  dataclasses for engine inputs/outputs.
+- Guardrail boundaries are executable, not doc-only: prohibited uses of wellbeing
+  proxies and non-supportive protection actions raise/are rejected in code.
+
+## Testing
+
+```powershell
+uv run pytest            # full suite
+uv run ruff check .      # lint
+uv run dbt build --project-dir dbt_neobank --profiles-dir dbt_neobank   # marts + dbt tests
+```
+
+The suite covers the data generators, statistical methods, the decision engines, the
+dbt-backed dashboard helpers, and the cloud plan generators. The GitHub Actions CI
+pipeline runs lint → notebook check → tests → synthetic data → `dbt build` → API
+container build → authenticated `/health` smoke test.
 
 ## Documentation
 
 | Document | Purpose |
 | --- | --- |
-| [docs/CASE_STUDY.md](docs/CASE_STUDY.md) | Business-facing case study, decisions, evidence, and limitations. |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Local and cloud architecture overview. |
+| [docs/CASE_STUDY.md](docs/CASE_STUDY.md) | Business-facing case study, decisions, evidence, limitations. |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Local and cloud architecture. |
 | [docs/API.md](docs/API.md) | Prediction and pricing-scenario API contract. |
-| [docs/PRICING_SCENARIOS.md](docs/PRICING_SCENARIOS.md) | Pricing recommendation and scenario framework. |
+| [docs/RELEASE_DECISION_FRAMEWORK.md](docs/RELEASE_DECISION_FRAMEWORK.md) | Release-gate decisions and resolution order. |
+| [docs/FINANCIAL_WELLBEING_PROXIES.md](docs/FINANCIAL_WELLBEING_PROXIES.md) | Wellbeing data dictionary and use boundaries. |
+| [docs/FAIR_VALUE_PRICING.md](docs/FAIR_VALUE_PRICING.md) | Fair-value scoring and pricing governance. |
+| [docs/DIGITAL_INCLUSION.md](docs/DIGITAL_INCLUSION.md) | Onboarding funnel and digital-exclusion analysis. |
+| [docs/CUSTOMER_PROTECTION_SIMULATION.md](docs/CUSTOMER_PROTECTION_SIMULATION.md) | Scam-intervention simulation. |
 | [docs/MONITORING.md](docs/MONITORING.md) | Data, model, score, and GCP monitoring checks. |
 | [docs/OPERATIONS_RUNBOOK.md](docs/OPERATIONS_RUNBOOK.md) | Rollback triggers, triage, and GCP operations. |
-| [docs/CLOUD_RUN_DEPLOYMENT.md](docs/CLOUD_RUN_DEPLOYMENT.md) | Private Cloud Run API and job deployment. |
-| [docs/GCP_WAREHOUSE.md](docs/GCP_WAREHOUSE.md) | Cloud Storage and BigQuery warehouse path. |
 
 ## Cloud path
 
 The GCP path has been exercised beyond local development: a Cloud Storage landing
 zone loaded into BigQuery, a dbt graph run against BigQuery, an activation score
-extract and monitoring result written to BigQuery, a private Cloud Run API and
-Cloud Run scoring/monitoring jobs, Cloud Scheduler runs, and Cloud Monitoring alert
-policies plus a budget and storage-lifecycle policy for cost control. See
+extract and monitoring result written to BigQuery, a private Cloud Run API and Cloud
+Run scoring/monitoring jobs, Cloud Scheduler runs, and Cloud Monitoring alert policies
+plus a budget and storage-lifecycle policy for cost control. See
 [docs/CLOUD_RUN_DEPLOYMENT.md](docs/CLOUD_RUN_DEPLOYMENT.md) and
-[docs/GCP_WAREHOUSE.md](docs/GCP_WAREHOUSE.md) for the recorded evidence.
+[docs/GCP_WAREHOUSE.md](docs/GCP_WAREHOUSE.md).
 
 > The recorded BigQuery figures (13 raw tables, 107 dbt checks) reflect the cloud run
 > *before* the responsible-growth pivot. The load manifest now covers all 16 raw
 > tables; the new wellbeing, inclusion, and protection tables and marts are exercised
 > locally and would be reloaded on the next GCP run.
 
-## Responsible Growth pivot
-
-The platform has been deepened into a **Responsible Neobank Growth & Financial
-Wellbeing Decision Platform** — connecting commercial growth with customer-outcome,
-fairness, inclusion, and protection guardrails. All six pivot modules are built:
-
-1. ✅ **Financial wellbeing layer** — [docs/FINANCIAL_WELLBEING_PROXIES.md](docs/FINANCIAL_WELLBEING_PROXIES.md)
-2. ✅ **Responsible release-gate engine** — [docs/RELEASE_DECISION_FRAMEWORK.md](docs/RELEASE_DECISION_FRAMEWORK.md)
-3. ✅ **Customer Outcomes & Fairness page** — segment fairness gaps + live release-gate verdict
-4. ✅ **Fair-value pricing governance** — [docs/FAIR_VALUE_PRICING.md](docs/FAIR_VALUE_PRICING.md)
-5. ✅ **Digital inclusion & onboarding funnel** — [docs/DIGITAL_INCLUSION.md](docs/DIGITAL_INCLUSION.md)
-6. ✅ **Customer-protection / scam-intervention simulation** — [docs/CUSTOMER_PROTECTION_SIMULATION.md](docs/CUSTOMER_PROTECTION_SIMULATION.md)
-
 ## Safety & ethics
 
 This project uses **synthetic data** and is **not** a production banking, fraud,
-credit, eligibility, or financial-advice system. Vulnerability and wellbeing fields
-are synthetic proxies for evaluating product decisions and must not be used to deny
-services, set prices unfairly, determine creditworthiness, or make punitive
-decisions. It does not represent any real financial institution.
+credit, eligibility, or financial-advice system. Vulnerability, wellbeing, and
+inclusion fields are synthetic proxies for evaluating product decisions and must not
+be used to deny services, set prices unfairly, determine creditworthiness, or make
+punitive decisions. The customer-protection module is a supportive-intervention
+simulation, not a fraud engine. It does not represent any real financial institution.
 
 ## What would be hardened for production
 
 A regulated deployment would add stronger API protection (API Gateway / IAP / JWT,
 rate limits, structured logging); formal data governance (row/column controls,
-retention, lineage, cost controls); keyless OIDC CI/CD with image scanning, SBOMs,
-and IaC; a model registry / feature store with shadow deployments and
-online/offline parity; and formal privacy, Consumer Duty, model-risk, and approval
-controls before any live customer decisioning.
+retention, lineage, cost controls); keyless OIDC CI/CD with image scanning, SBOMs, and
+IaC; a model registry / feature store with shadow deployments and online/offline
+parity; access controls (RBAC) over sensitive wellbeing data; and formal privacy,
+Consumer Duty, model-risk, and approval controls before any live customer decisioning.
+
+## Contributing
+
+This is a synthetic portfolio project. Issues and suggestions are welcome — please run
+`uv run ruff check .` and `uv run pytest` before opening a pull request.
 
 ## License
 
-See [LICENSE](LICENSE).
+Released under the [MIT License](LICENSE).
