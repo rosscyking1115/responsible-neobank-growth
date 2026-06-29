@@ -11,21 +11,24 @@ from src.cloud.gcp_load_plan import load_manifest, render_bq_load_command, rende
 def test_default_manifest_covers_all_raw_generator_outputs() -> None:
     manifest = load_manifest()
 
-    assert len(manifest.tables) == 13
+    assert len(manifest.tables) == 16
     assert {table.file for table in manifest.tables} == {
         "activation_ground_truth.parquet",
         "experiment_assignments.parquet",
         "experiment_ground_truth.parquet",
         "feature_events.parquet",
+        "onboarding_events.parquet",
         "pricing_exposures.parquet",
         "pricing_offer_catalog.parquet",
         "pricing_outcomes.parquet",
+        "protection_events.parquet",
         "referrals.parquet",
         "region_daily_signups.parquet",
         "sessions.parquet",
         "support_contacts.parquet",
         "transactions.parquet",
         "users.parquet",
+        "wellbeing_proxies.parquet",
     }
 
 
