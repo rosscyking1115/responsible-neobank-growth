@@ -102,6 +102,15 @@ The demo raw landing path was exercised on 2026-05-30 against project
 - The BigQuery score monitoring query returned `monitoring_status = pass` on
   2026-05-31 for the 2025-06-30 score partition.
 
+> **Note (since the responsible-growth pivot).** The figures above record the
+> warehouse as exercised on 2026-05-30/31, before the responsible-growth modules
+> were added. The data model has since grown to **16 raw tables** — the load
+> manifest now also covers `wellbeing_proxies`, `onboarding_events`, and
+> `protection_events`, with their `fct_customer_outcomes`, `fct_onboarding_funnel`,
+> and `fct_protection_events` marts. These new tables are exercised locally
+> (`dbt build`, 133 checks) but have **not** yet been reloaded to BigQuery; the
+> counts above will increase on the next GCP run.
+
 This proves the raw GCS-to-BigQuery warehouse path and dbt mart build are
 working for a small synthetic demo export. Batch scoring has also been exercised
 through Cloud Storage and BigQuery. Scheduled scoring jobs, monitoring jobs, and

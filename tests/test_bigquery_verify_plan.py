@@ -50,7 +50,7 @@ def test_render_raw_row_count_sql_covers_raw_manifest_tables() -> None:
         {"users": 5_000},
     )
 
-    assert sql.count("SELECT ") == 13
+    assert sql.count("SELECT ") == 16
     assert "SELECT 'users' AS table_name" in sql
     assert "SELECT 'transactions' AS table_name" in sql
     assert "ORDER BY table_name" in sql
