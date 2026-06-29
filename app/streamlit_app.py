@@ -20,9 +20,11 @@ try:
     from app.dashboard_data import (
         DEFAULT_DB_PATH,
         DashboardData,
+        customer_outcome_gaps,
         ensure_demo_database,
         load_dashboard_data,
         onboarding_lift_pp,
+        onboarding_release_decision,
         pricing_economics,
         pricing_margin_by_offer,
         referral_economics,
@@ -32,9 +34,11 @@ except ModuleNotFoundError:
     from dashboard_data import (  # type: ignore[no-redef]
         DEFAULT_DB_PATH,
         DashboardData,
+        customer_outcome_gaps,
         ensure_demo_database,
         load_dashboard_data,
         onboarding_lift_pp,
+        onboarding_release_decision,
         pricing_economics,
         pricing_margin_by_offer,
         referral_economics,
@@ -63,6 +67,20 @@ PRICING_ACTION_COLORS = {
 }
 PRIMARY_BLUE = "#0B66C3"
 STATUS_COLORS = {"pass": "#00A88F", "warn": "#F2B544", "fail": "#EF4444"}
+DECISION_COLORS = {
+    "ship": "#00A88F",
+    "limited_rollout": "#0B66C3",
+    "experiment_only": "#F2B544",
+    "needs_human_review": "#7C6FE8",
+    "block": "#EF4444",
+}
+DECISION_LABELS = {
+    "ship": "SHIP",
+    "limited_rollout": "LIMITED ROLLOUT",
+    "experiment_only": "EXPERIMENT ONLY",
+    "needs_human_review": "NEEDS HUMAN REVIEW",
+    "block": "BLOCK",
+}
 
 
 def _apply_app_style() -> None:
@@ -455,6 +473,108 @@ def _render_pricing(data: DashboardData, scenario_run: PricingScenarioRun) -> No
     st.plotly_chart(fig, width="stretch")
 
 
+def _render_release_verdict(data: DashboardData) -> None:
+    decision = onboarding_release_decision(data.experiment_variants, data.customer_outcomes)
+    if decision is None:
+        return
+    color = DECISION_COLORS.get(decision.decision, PRIMARY_BLUE)
+    label = DECISION_LABELS.get(decision.decision, decision.decision.upper())
+    st.markdown(
+        f"""
+        <div style="border-left: 6px solid {color}; background: #F8FAFC;
+                    padding: 0.9rem 1.1rem; border-radius: 6px; margin-bottom: 1rem;">
+            <div style="font-size: 0.85rem; color: #5f6b85;">
+                Responsible release recommendation · {decision.feature_name}</div>
+            <div style="font-size: 1.5rem; font-weight: 700; color: {color};">{label}</div>
+            <div style="font-size: 0.9rem; color: #5f6b85;">
+                Evidence tier: {decision.evidence_tier}</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    for reason in decision.reasons:
+        st.markdown(f"- {reason}")
+
+
+def _render_customer_outcomes(data: DashboardData) -> None:
+    _section_caption(
+        "Customer outcomes and fairness: do growth decisions improve outcomes evenly, "
+        "and is the onboarding change safe to ship?"
+    )
+    _render_release_verdict(data)
+
+    if data.customer_outcomes.empty:
+        st.info("Customer-outcome marts are not available in this DuckDB build.")
+        return
+
+    gaps = customer_outcome_gaps(data.customer_outcomes)
+    left, right = st.columns([1.1, 1])
+    with left:
+        st.subheader("Outcome Gaps By Segment")
+        if gaps.empty:
+            st.info("No segment had enough customers to estimate a stable gap.")
+        else:
+            display = gaps.assign(
+                label=gaps["segment"] + " · " + gaps["outcome_label"]
+            )
+            fig = px.bar(
+                display,
+                x="gap_pp",
+                y="label",
+                orientation="h",
+                color="outcome_label",
+                color_discrete_map={
+                    "D7 activation": PRIMARY_BLUE,
+                    "Support contact": "#F2B544",
+                    "Complaint": "#EF4444",
+                },
+                labels={
+                    "gap_pp": "Disparity (pp)",
+                    "label": "Segment · outcome",
+                    "outcome_label": "Outcome",
+                },
+            )
+            _apply_chart_layout(fig, height=340)
+            st.plotly_chart(fig, width="stretch")
+
+    with right:
+        st.subheader("D7 Activation By Digital Confidence")
+        from src.wellbeing.metrics import segment_outcome_rates
+
+        rates = segment_outcome_rates(
+            data.customer_outcomes,
+            "digital_confidence_band",
+            ["activated_d7", "has_support_contact"],
+            min_segment_size=30,
+        )
+        if rates.empty:
+            st.info("Not enough customers per band to summarise.")
+        else:
+            fig = px.bar(
+                rates,
+                x="level",
+                y="activated_d7",
+                color="level",
+                color_discrete_map={
+                    "low": "#EF4444",
+                    "medium": "#F2B544",
+                    "high": "#00A88F",
+                },
+                labels={"level": "Digital confidence", "activated_d7": "D7 activation"},
+                hover_data=["customers", "has_support_contact"],
+            )
+            _apply_chart_layout(fig, height=340)
+            fig.update_layout(showlegend=False)
+            fig.update_yaxes(tickformat=".0%")
+            st.plotly_chart(fig, width="stretch")
+
+    st.caption(
+        "Wellbeing and vulnerability fields are synthetic proxies for evaluating "
+        "product decisions. They must not be used for credit, pricing-penalty, or "
+        "service-denial decisions."
+    )
+
+
 def _render_monitoring(snapshot: MonitoringSnapshot) -> None:
     _section_caption(
         "Operational checks show whether the dashboard, scoring workflow, and "
@@ -544,11 +664,25 @@ def main() -> None:
         st.stop()
 
     _metric_grid(data)
-    product_tab, pricing_tab, experiment_tab, monitoring_tab = st.tabs(
-        ["Product health", "Pricing intelligence", "Experiments", "Monitoring"]
+    (
+        product_tab,
+        outcomes_tab,
+        pricing_tab,
+        experiment_tab,
+        monitoring_tab,
+    ) = st.tabs(
+        [
+            "Product health",
+            "Customer outcomes",
+            "Pricing intelligence",
+            "Experiments",
+            "Monitoring",
+        ]
     )
     with product_tab:
         _render_product_health(data)
+    with outcomes_tab:
+        _render_customer_outcomes(data)
     with pricing_tab:
         _render_pricing(data, pricing_scenario_run)
     with experiment_tab:
