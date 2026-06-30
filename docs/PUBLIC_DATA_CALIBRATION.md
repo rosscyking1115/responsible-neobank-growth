@@ -1,16 +1,14 @@
 # Public-Data Calibration
 
 Synthetic data is only credible if its distributions are plausible. This module
-**anchors the synthetic wellbeing / inclusion population to approximate UK public
+**anchors the synthetic wellbeing / inclusion population to real UK public
 benchmarks**, measures the generated data against them, and reports the gaps — so a
-reviewer can see how realistic the simulation is and where the generators should be
-tuned.
+reviewer can see how realistic the simulation is.
 
-> **The benchmark targets are approximate, illustrative anchors** drawn from
-> well-known UK public sources. They are seeded to make the project defensible and to
-> demonstrate the calibration workflow — they are **not authoritative figures**.
-> Verify and update each value against the cited source (and its latest release)
-> before relying on it.
+> The benchmark targets are taken from named UK public sources (ONS, DWP, Lloyds) —
+> see [REAL_DATA_PROVENANCE.md](REAL_DATA_PROVENANCE.md) for the full citations,
+> figures, and construct notes. They are point-in-time and construct-sensitive;
+> refresh them against the latest release of each source.
 
 ## Where it lives
 
@@ -22,11 +20,11 @@ tuned.
 
 ## Anchors
 
-| Metric | Synthetic proxy | Source (verify) |
-| --- | --- | --- |
-| Adults born outside the UK | `new_to_uk_proxy` | ONS Census 2021 |
-| Disabled adults (any long-term impairment) | `accessibility_need_proxy` | DWP Family Resources Survey |
-| Adults lacking foundation digital skills | low `digital_confidence_band` | Lloyds Consumer Digital Index / ONS |
+| Metric | Synthetic proxy | Benchmark | Source (year) |
+| --- | --- | ---: | --- |
+| Adults born outside the UK | `new_to_uk_proxy` | 16.8% | ONS Census 2021 |
+| Disabled adults (any long-term impairment) | `accessibility_need_proxy` | 24% | DWP Family Resources Survey 2022/23 |
+| Adults with low digital capability | low `digital_confidence_band` | 18% | Lloyds Consumer Digital Index 2023 |
 
 ## Run it
 
@@ -38,17 +36,17 @@ Example output (default 5k-user demo):
 
 ```text
 | Metric                                    | Observed | Benchmark | Within? |
-| Adults born outside the UK                |   14.6%  |   16.0%   |   yes   |
-| Disabled adults (any long-term impairment)|   16.7%  |   20.0%   |   yes   |
-| Adults lacking foundation digital skills  |    6.5%  |    7.0%   |   yes   |
+| Adults born outside the UK                |   15.7%  |   16.8%   |   yes   |
+| Disabled adults (any long-term impairment)|   21.3%  |   24.0%   |   yes   |
+| Adults with low digital capability        |   16.1%  |   18.0%   |   yes   |
 ```
 
 The wellbeing generator in
 [`data_generator/wellbeing.py`](../data_generator/wellbeing.py) has been **tuned to
-these anchors** (base rates for new-to-UK, accessibility need, and the digital-
-confidence intercept/spread), so the measured shares now fall within tolerance. The
-report stays in the toolkit as a regression check: if a generator change or an updated
-anchor pushes a metric out of tolerance, it shows up here as a `NO`.
+these anchors** (base rates for new-to-UK and accessibility need, and the digital-
+confidence intercept/spread), so the measured shares fall within tolerance. The report
+stays in the toolkit as a regression check: if a generator change or an updated anchor
+pushes a metric out of tolerance, it shows up here as a `NO`.
 
 ## Boundary
 
