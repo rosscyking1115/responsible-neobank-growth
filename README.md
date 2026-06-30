@@ -73,8 +73,11 @@ A strong uplift never overrides a block-level harm signal.
   stakeholder report with a business-impact summary, exportable from the dashboard as
   HTML or Excel ([docs](docs/RESPONSIBLE_GROWTH_REPORT.md)).
 - **Public-data calibration** — anchors the synthetic wellbeing/inclusion distributions
-  to approximate UK public benchmarks and reports the gaps
+  to verified UK public benchmarks (ONS, DWP, Lloyds) and reports the gaps
   ([docs](docs/PUBLIC_DATA_CALIBRATION.md)).
+- **Real-data adapter** — runs the same fairness/outcome analysis on the real UCI Bank
+  Marketing dataset, proving the pipeline works on real inputs
+  ([docs](docs/REAL_DATA_ADAPTER.md)).
 
 ## What decisions it supports
 
@@ -209,6 +212,7 @@ container build → authenticated `/health` smoke test.
 | [docs/RESPONSIBLE_GROWTH_REPORT.md](docs/RESPONSIBLE_GROWTH_REPORT.md) | Consolidated stakeholder decision pack (HTML / Excel). |
 | [docs/PUBLIC_DATA_CALIBRATION.md](docs/PUBLIC_DATA_CALIBRATION.md) | Calibrating synthetic distributions to public benchmarks. |
 | [docs/REAL_DATA_PROVENANCE.md](docs/REAL_DATA_PROVENANCE.md) | Verified public sources behind the calibration anchors + real-dataset options. |
+| [docs/REAL_DATA_ADAPTER.md](docs/REAL_DATA_ADAPTER.md) | Running the fairness analysis on the real UCI Bank Marketing dataset. |
 | [docs/MONITORING.md](docs/MONITORING.md) | Data, model, score, and GCP monitoring checks. |
 | [docs/OPERATIONS_RUNBOOK.md](docs/OPERATIONS_RUNBOOK.md) | Rollback triggers, triage, and GCP operations. |
 
