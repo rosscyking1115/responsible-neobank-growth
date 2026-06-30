@@ -7,6 +7,7 @@ import plotly.express as px
 import streamlit as st
 
 try:
+    from src.access import ROLES, accessible_segments, can_view_sensitive
     from src.monitoring.snapshot import MonitoringSnapshot, build_monitoring_snapshot
     from src.pricing.scenario_runs import PricingScenarioRun, build_pricing_scenario_run
     from src.reports import build_report, render_html, report_excel_bytes
@@ -14,12 +15,14 @@ except ModuleNotFoundError:
     import sys
 
     sys.path.append(str(Path(__file__).resolve().parents[1]))
+    from src.access import ROLES, accessible_segments, can_view_sensitive
     from src.monitoring.snapshot import MonitoringSnapshot, build_monitoring_snapshot
     from src.pricing.scenario_runs import PricingScenarioRun, build_pricing_scenario_run
     from src.reports import build_report, render_html, report_excel_bytes
 
 try:
     from app.dashboard_data import (
+        CUSTOMER_OUTCOME_SEGMENTS,
         DEFAULT_DB_PATH,
         DashboardData,
         customer_outcome_gaps,
@@ -38,6 +41,7 @@ try:
     )
 except ModuleNotFoundError:
     from dashboard_data import (  # type: ignore[no-redef]
+        CUSTOMER_OUTCOME_SEGMENTS,
         DEFAULT_DB_PATH,
         DashboardData,
         customer_outcome_gaps,
@@ -629,7 +633,22 @@ def _render_customer_outcomes(data: DashboardData) -> None:
         st.info("Customer-outcome marts are not available in this DuckDB build.")
         return
 
-    gaps = customer_outcome_gaps(data.customer_outcomes)
+    role = st.selectbox(
+        "View as role",
+        ROLES,
+        index=0,
+        help=(
+            "Data minimisation: individual-level vulnerability fields are visible only "
+            "to governance roles (consumer_duty_reviewer, admin)."
+        ),
+    )
+    segments = accessible_segments(role, list(CUSTOMER_OUTCOME_SEGMENTS))
+    gaps = customer_outcome_gaps(data.customer_outcomes, segments=segments)
+    if not can_view_sensitive(role):
+        st.caption(
+            f"Individual-level vulnerability segments are hidden for the '{role}' role "
+            "(data minimisation); aggregate gaps are shown for non-sensitive segments only."
+        )
     left, right = st.columns([1.1, 1])
     with left:
         st.subheader("Outcome Gaps By Segment")
