@@ -80,8 +80,8 @@ def render_markdown(results: list[CalibrationResult]) -> str:
     lines = [
         "# Public-Data Calibration",
         "",
-        "> Benchmark targets are **approximate, illustrative anchors** from public "
-        "sources and must be verified against the cited source before real-world use.",
+        "> Benchmark targets are point-in-time figures from named UK public sources "
+        "(see docs/REAL_DATA_PROVENANCE.md); refresh against the latest release.",
         "",
         "| Metric | Observed | Benchmark | Tolerance | Within? | Source |",
         "| --- | ---: | ---: | ---: | :---: | --- |",

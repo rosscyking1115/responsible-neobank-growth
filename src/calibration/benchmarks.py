@@ -1,10 +1,10 @@
 """Public benchmark anchors for calibrating the synthetic population.
 
-IMPORTANT: the ``target`` values below are *approximate, illustrative anchors* drawn
-from well-known UK public sources. They are intended to make the synthetic data
-defensible and to show where the generators diverge from reality -- they are NOT
-authoritative figures. Verify and update each value against the cited source (and its
-latest release) before relying on it.
+The ``target`` values below are taken from named UK public sources (see ``source`` /
+``url`` and docs/REAL_DATA_PROVENANCE.md). They anchor the synthetic distributions to
+reality. They remain *point-in-time* figures and are construct-sensitive (the synthetic
+proxy and the published measure are related but not identical) -- refresh them against
+the latest release of each source before relying on them.
 """
 
 from __future__ import annotations
@@ -23,33 +23,39 @@ class Benchmark:
     note: str
 
 
-# Approximate anchors -- verify against source before real-world use.
+# Sourced anchors -- see docs/REAL_DATA_PROVENANCE.md. Refresh against latest release.
 PUBLIC_BENCHMARKS: list[Benchmark] = [
     Benchmark(
         metric="new_to_uk_share",
         label="Adults born outside the UK",
-        target=0.16,
+        target=0.168,
         tolerance=0.05,
         source="ONS Census 2021 (England & Wales)",
-        url="https://www.ons.gov.uk",
-        note="Proxy for new-to-UK customers; verify the latest ONS figure and geography.",
+        url=(
+            "https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/"
+            "internationalmigration/bulletins/internationalmigrationenglandandwales/census2021"
+        ),
+        note="16.8% of England & Wales residents were born outside the UK (Census 2021).",
     ),
     Benchmark(
         metric="accessibility_need_share",
         label="Disabled adults (any long-term impairment)",
-        target=0.20,
+        target=0.24,
         tolerance=0.07,
-        source="DWP Family Resources Survey",
-        url="https://www.gov.uk",
-        note="Proxy for accessibility needs; highly definition-sensitive, verify.",
+        source="DWP Family Resources Survey 2022/23",
+        url="https://www.gov.uk/government/statistics/family-resources-survey-financial-year-2022-to-2023",
+        note="24% of the UK population (16.1m) reported a disability; definition-sensitive.",
     ),
     Benchmark(
         metric="low_digital_confidence_share",
-        label="Adults lacking foundation digital skills",
-        target=0.07,
-        tolerance=0.04,
-        source="Lloyds Consumer Digital Index / ONS",
-        url="https://www.lloydsbank.com",
-        note="Proxy for low digital confidence; verify the latest published figure.",
+        label="Adults with low digital capability",
+        target=0.18,
+        tolerance=0.06,
+        source="Lloyds Consumer Digital Index 2023",
+        url="https://www.lloydsbank.com/consumer-digital-index.html",
+        note=(
+            "~20% lack foundation digital skills (80% have them); the narrower 'confidence' "
+            "proxy is anchored slightly below the skills figure. Construct-sensitive."
+        ),
     ),
 ]
