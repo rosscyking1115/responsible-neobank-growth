@@ -78,6 +78,9 @@ A strong uplift never overrides a block-level harm signal.
 - **Real-data adapter** — runs the same fairness/outcome analysis on the real UCI Bank
   Marketing dataset, proving the pipeline works on real inputs
   ([docs](docs/REAL_DATA_ADAPTER.md)).
+- **Access control & data minimisation** — a lightweight RBAC layer that restricts
+  individual-level vulnerability data to governance roles, with a role selector in the
+  dashboard ([docs](docs/ACCESS_CONTROL.md)).
 
 ## What decisions it supports
 
@@ -213,6 +216,7 @@ container build → authenticated `/health` smoke test.
 | [docs/PUBLIC_DATA_CALIBRATION.md](docs/PUBLIC_DATA_CALIBRATION.md) | Calibrating synthetic distributions to public benchmarks. |
 | [docs/REAL_DATA_PROVENANCE.md](docs/REAL_DATA_PROVENANCE.md) | Verified public sources behind the calibration anchors + real-dataset options. |
 | [docs/REAL_DATA_ADAPTER.md](docs/REAL_DATA_ADAPTER.md) | Running the fairness analysis on the real UCI Bank Marketing dataset. |
+| [docs/ACCESS_CONTROL.md](docs/ACCESS_CONTROL.md) | RBAC / data-minimisation over sensitive wellbeing fields. |
 | [docs/MONITORING.md](docs/MONITORING.md) | Data, model, score, and GCP monitoring checks. |
 | [docs/OPERATIONS_RUNBOOK.md](docs/OPERATIONS_RUNBOOK.md) | Rollback triggers, triage, and GCP operations. |
 
@@ -246,8 +250,11 @@ A regulated deployment would add stronger API protection (API Gateway / IAP / JW
 rate limits, structured logging); formal data governance (row/column controls,
 retention, lineage, cost controls); keyless OIDC CI/CD with image scanning, SBOMs, and
 IaC; a model registry / feature store with shadow deployments and online/offline
-parity; access controls (RBAC) over sensitive wellbeing data; and formal privacy,
-Consumer Duty, model-risk, and approval controls before any live customer decisioning.
+parity; and formal privacy, Consumer Duty, model-risk, and approval controls before any
+live customer decisioning. (A lightweight access-control / data-minimisation layer over
+sensitive wellbeing data is already demonstrated — see
+[docs/ACCESS_CONTROL.md](docs/ACCESS_CONTROL.md); production would enforce it with real
+identity, row/column-level security, and audit logging.)
 
 ## Contributing
 
