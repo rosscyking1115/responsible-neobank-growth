@@ -13,12 +13,13 @@ from src.calibration import (
 
 
 def _frame(n: int = 100) -> pd.DataFrame:
-    # 16% new-to-UK, 20% accessibility need, 7% low digital confidence.
+    # ~17% new-to-UK, 24% accessibility need, 18% low digital confidence (within the
+    # verified benchmark tolerances).
     return pd.DataFrame(
         {
-            "new_to_uk_proxy": [True] * 16 + [False] * 84,
-            "accessibility_need_proxy": [True] * 20 + [False] * 80,
-            "digital_confidence_band": ["low"] * 7 + ["medium"] * 43 + ["high"] * 50,
+            "new_to_uk_proxy": [True] * 17 + [False] * 83,
+            "accessibility_need_proxy": [True] * 24 + [False] * 76,
+            "digital_confidence_band": ["low"] * 18 + ["medium"] * 42 + ["high"] * 40,
         }
     )
 
@@ -33,9 +34,9 @@ def test_benchmarks_are_well_formed() -> None:
 
 def test_measure_synthetic_computes_shares() -> None:
     observed = measure_synthetic(_frame())
-    assert observed["new_to_uk_share"] == pytest.approx(0.16)
-    assert observed["accessibility_need_share"] == pytest.approx(0.20)
-    assert observed["low_digital_confidence_share"] == pytest.approx(0.07)
+    assert observed["new_to_uk_share"] == pytest.approx(0.17)
+    assert observed["accessibility_need_share"] == pytest.approx(0.24)
+    assert observed["low_digital_confidence_share"] == pytest.approx(0.18)
 
 
 def test_calibrate_flags_within_tolerance() -> None:
@@ -67,7 +68,7 @@ def test_calibrate_respects_custom_benchmarks() -> None:
     ]
     result = calibrate(_frame(), custom)[0]
     assert result.target == 0.50
-    assert not result.within  # observed 7% vs 50%
+    assert not result.within  # observed 18% vs 50%
 
 
 def test_measure_synthetic_handles_empty_and_missing_columns() -> None:
@@ -81,5 +82,5 @@ def test_measure_synthetic_handles_empty_and_missing_columns() -> None:
 def test_render_markdown_includes_disclaimer_and_rows() -> None:
     md = render_markdown(calibrate(_frame()))
     assert "Public-Data Calibration" in md
-    assert "verified against the cited source" in md
+    assert "named UK public sources" in md
     assert "Adults born outside the UK" in md
