@@ -93,6 +93,20 @@ A strong uplift never overrides a block-level harm signal.
 | Are vulnerable or digitally excluded customers worse off? | Segment fairness gaps and onboarding-abandonment analysis. |
 | Should this transfer trigger support? | Supportive scam-intervention simulation (education → soft friction → cooling-off → human review). |
 
+## Dashboard views
+
+The **Customer Outcomes** tab turns the analysis into a decision: a release-gate verdict
+with its reasons, role-based access to sensitive segments (data minimisation), and
+segment fairness gaps.
+
+![Customer Outcomes tab — release-gate verdict, role-based access, and fairness gaps](docs/assets/streamlit-customer-outcomes.png)
+
+The **Digital Inclusion** tab shows who drops out of onboarding and which segments are
+underserved — here, onboarding abandonment rises sharply for lower digital-confidence
+customers.
+
+![Digital Inclusion tab — onboarding funnel and abandonment by digital confidence](docs/assets/streamlit-digital-inclusion.png)
+
 ## Technology stack
 
 | Layer | Tools |
