@@ -9,13 +9,15 @@
 
 ![Responsible Neobank Growth Platform dashboard](docs/assets/streamlit-product-health.png)
 
-A synthetic fintech **decision-support platform** that combines product analytics,
-experimentation, model decisioning, and pricing intelligence with customer-outcome,
-fairness, inclusion, and protection guardrails — so a neobank can decide whether to
-**ship, iterate, or hold** a growth action while still protecting its customers.
+**A fintech data-science portfolio project** demonstrating responsible-growth analytics
+under **UK Consumer Duty**. On synthetic neobank data it shows the methodology a product
+data scientist would apply to a growth decision — experimentation rigour, activation and
+geo-lift modelling, fairness metrics, and a foreseeable-harm gate that decides whether a
+change should **ship, iterate, or hold**.
 
-> All data is synthetic. No real customer data, internal bank data, or proprietary
-> business metrics are used. See [Safety & ethics](#safety--ethics).
+> This is a portfolio / audition piece, **not a product** and not for sale. All data is
+> synthetic — no real customer data, internal bank data, or proprietary business metrics
+> are used. See [Safety & ethics](#safety--ethics).
 
 ---
 
@@ -30,8 +32,29 @@ platform asks a sharper question than "does this action move a metric?":
 > delivering good customer outcomes** — and is the evidence strong enough to act?
 
 Every analysis therefore ends in a **decision with guardrails**, and one principle is
-enforced throughout the code: **customer-outcome concerns dominate commercial appeal.**
-A strong uplift never overrides a block-level harm signal.
+enforced throughout: **customer-outcome concerns dominate commercial appeal.** A strong
+uplift never overrides a block-level harm signal.
+
+## What this demonstrates (data-science focus)
+
+The centrepiece is the **responsible-growth methodology**, not the plumbing:
+
+- **Experimentation rigour** — CUPED variance reduction, sample-ratio-mismatch checks,
+  confidence-interval guardrails, heterogeneous treatment effects, and a two-proportion
+  evidence-strength signal that feeds the decision gate.
+- **Activation & geo-lift modelling** — a calibrated (isotonic) D7-activation model with
+  threshold economics and a model card; referral incrementality via difference-in-
+  differences with clustered standard errors, parallel-trends, placebo-in-space, and
+  synthetic control.
+- **Fairness metrics** — segment outcome gaps, and a **treatment-induced** fairness signal
+  (the change's *effect* on disparity, not pre-existing baseline inequality).
+- **Foreseeable-harm gate** — evidence and customer-outcome guardrails resolve to
+  `ship / limited_rollout / experiment_only / needs_human_review / block`, where a harm
+  signal always overrides commercial uplift.
+
+Engineering breadth — dbt marts, a FastAPI service, RBAC / data-minimisation over sensitive
+fields, CI, and an optional GCP path — is included to show the analysis is **reproducible
+and operable**, not as a product to sell.
 
 ## Key features
 
@@ -260,7 +283,9 @@ simulation, not a fraud engine. It does not represent any real financial institu
 
 ## What would be hardened for production
 
-A regulated deployment would add stronger API protection (API Gateway / IAP / JWT,
+This stays a portfolio project — the list below is included to show awareness of the gap
+between a demonstration and a regulated deployment, not as a plan to ship one. A regulated
+deployment would add stronger API protection (API Gateway / IAP / JWT,
 rate limits, structured logging); formal data governance (row/column controls,
 retention, lineage, cost controls); keyless OIDC CI/CD with image scanning, SBOMs, and
 IaC; a model registry / feature store with shadow deployments and online/offline
