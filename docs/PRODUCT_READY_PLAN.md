@@ -1,6 +1,14 @@
-# Product-Ready Upgrade Plan
+# Engineering-Hardening Notes (frozen reference)
 
-Target public title: **Customer Growth & Pricing Intelligence Platform**
+> **Frozen — portfolio project, not a product.** This document predates the
+> responsible-growth reframing and reflects an earlier "industrial data product"
+> framing that is **no longer the direction**. It is retained only as an
+> engineering-hardening reference (warehouse path, prediction APIs, batch scoring,
+> monitoring, deployment). There is **no commercial plan, pricing, or go-to-market** —
+> the repo is a fintech data-science portfolio / audition piece. See the
+> [README](../README.md) for the current positioning.
+
+_Superseded title (historical): "Customer Growth & Pricing Intelligence Platform"._
 
 Original research date: 2026-05-29
 
