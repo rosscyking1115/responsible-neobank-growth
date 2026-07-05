@@ -56,6 +56,10 @@ Engineering breadth — dbt marts, a FastAPI service, RBAC / data-minimisation o
 fields, CI, and an optional GCP path — is included to show the analysis is **reproducible
 and operable**, not as a product to sell.
 
+**See it end-to-end:** [a single worked decision](docs/WORKED_DECISION_ONBOARDING_AB.md) —
+the personalised-onboarding A/B walked from SRM check → activation uplift → guardrails →
+fairness (heterogeneous effects) → a `limited_rollout` verdict.
+
 ## Key features
 
 **Core analytics, experimentation & decisioning**
@@ -241,6 +245,7 @@ container build → authenticated `/health` smoke test.
 
 | Document | Purpose |
 | --- | --- |
+| [docs/WORKED_DECISION_ONBOARDING_AB.md](docs/WORKED_DECISION_ONBOARDING_AB.md) | **One decision end-to-end** — the onboarding A/B walked to a verdict (DS-focused). |
 | [docs/CASE_STUDY.md](docs/CASE_STUDY.md) | Business-facing case study, decisions, evidence, limitations. |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Local and cloud architecture. |
 | [docs/API.md](docs/API.md) | Prediction and pricing-scenario API contract. |
