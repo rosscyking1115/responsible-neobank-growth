@@ -6,7 +6,7 @@ the synthetic dataset (commands at the bottom).
 
 ---
 
-## Recommendation (TL;DR)
+## Recommendation (in brief)
 
 **`LIMITED ROLLOUT`.** The personalised onboarding prompt lifts D7 activation by a clear,
 significant **+4.5pp** and — importantly under Consumer Duty — it **narrows** the
