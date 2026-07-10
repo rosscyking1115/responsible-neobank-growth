@@ -48,7 +48,7 @@ I built a synthetic fintech Customer Growth & Pricing Intelligence Platform usin
 
 It covers activation and retention analytics, CUPED experimentation, geo-lift analysis, activation modelling, pricing scenario simulation, monitoring reports, and a PM-facing dashboard.
 
-The goal was to make a portfolio project that behaves like a small data product: reproducible marts, tested code, API contracts, batch scoring, cloud deployment evidence, model monitoring, pricing sensitivity outputs, and clear product decisions.
+The goal was to build something that behaves like a small data product: reproducible marts, tested code, API contracts, batch scoring, cloud deployment evidence, model monitoring, pricing sensitivity outputs, and clear product decisions.
 
 All data is synthetic.
 Repo: https://github.com/rosscyking1115/responsible-neobank-growth
