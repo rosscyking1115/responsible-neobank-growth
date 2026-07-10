@@ -9,13 +9,13 @@
 
 ![Responsible Neobank Growth Platform dashboard](docs/assets/streamlit-product-health.png)
 
-**A fintech data-science portfolio project** demonstrating responsible-growth analytics
+**A fintech data-science project** applying responsible-growth analytics
 under **UK Consumer Duty**. On synthetic neobank data it shows the methodology a product
 data scientist would apply to a growth decision — experimentation rigour, activation and
 geo-lift modelling, fairness metrics, and a foreseeable-harm gate that decides whether a
 change should **ship, iterate, or hold**.
 
-> This is a portfolio / audition piece, **not a product** and not for sale. All data is
+> A reference project, **not a product** and not for sale. All data is
 > synthetic — no real customer data, internal bank data, or proprietary business metrics
 > are used. See [Safety & ethics](#safety--ethics).
 
@@ -35,7 +35,7 @@ Every analysis therefore ends in a **decision with guardrails**, and one princip
 enforced throughout: **customer-outcome concerns dominate commercial appeal.** A strong
 uplift never overrides a block-level harm signal.
 
-## What this demonstrates (data-science focus)
+## What it covers (data-science focus)
 
 The centrepiece is the **responsible-growth methodology**, not the plumbing:
 
@@ -288,8 +288,8 @@ simulation, not a fraud engine. It does not represent any real financial institu
 
 ## What would be hardened for production
 
-This stays a portfolio project — the list below is included to show awareness of the gap
-between a demonstration and a regulated deployment, not as a plan to ship one. A regulated
+This stays a reference project — the list below maps the gap between a demonstration and a
+regulated deployment, not a plan to ship one. A regulated
 deployment would add stronger API protection (API Gateway / IAP / JWT,
 rate limits, structured logging); formal data governance (row/column controls,
 retention, lineage, cost controls); keyless OIDC CI/CD with image scanning, SBOMs, and
@@ -302,7 +302,7 @@ identity, row/column-level security, and audit logging.)
 
 ## Contributing
 
-This is a synthetic portfolio project. Issues and suggestions are welcome — please run
+This is a synthetic reference project. Issues and suggestions are welcome — please run
 `uv run ruff check .` and `uv run pytest` before opening a pull request.
 
 ## License
