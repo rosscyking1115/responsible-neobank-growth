@@ -4,7 +4,7 @@
 [![Monitoring Snapshot](https://github.com/rosscyking1115/responsible-neobank-growth/actions/workflows/monitoring-snapshot.yml/badge.svg)](https://github.com/rosscyking1115/responsible-neobank-growth/actions/workflows/monitoring-snapshot.yml)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue.svg)](pyproject.toml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Live dashboard](https://img.shields.io/badge/demo-Streamlit-ff4b4b)](https://neobank-product-analytics.streamlit.app/)
+[![Live dashboard](https://img.shields.io/badge/demo-Streamlit-ff4b4b)](https://neobank-appuct-analytics.streamlit.app/)
 
 ![Responsible Neobank Growth Platform dashboard](docs/assets/streamlit-product-health.png)
 
