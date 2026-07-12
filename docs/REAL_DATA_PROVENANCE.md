@@ -37,17 +37,21 @@ calibration anchors:
 > `vulnerable_customer_proxy` models a narrower, more acute subset, so it is **not**
 > calibrated to 49% — the FCA figure is cited for context only.
 
-## Real dataset for an optional adapter
+## Real datasets for the cross-check adapters
 
-**UCI Bank Marketing** (Moro, Cortez & Rita, 2014) — real data from a Portuguese
-bank's phone campaigns; 41,188 records; target = term-deposit subscription (yes/no),
-with age / job / marital / education for demographic slicing. It ships in
-`fairlearn.datasets.fetch_bank_marketing`, i.e. it is an established fairness-research
-dataset — a strong fit to demonstrate the activation/decisioning and fairness path on
-real inputs.
+Two real public datasets re-run the platform's *own* analysis code, each targeting a
+different chapter. See [REAL_DATA_ADAPTER.md](REAL_DATA_ADAPTER.md),
+[REAL_DATA_CRITEO.md](REAL_DATA_CRITEO.md), and [CREDIBILITY.md](CREDIBILITY.md).
 
-- Source: <https://archive.ics.uci.edu/dataset/222/bank+marketing> (CC BY 4.0; cite Moro et al. 2014).
-- Lower-fit alternatives: Kaggle credit-card-fraud (ULB) — real but anonymised, no
+| Dataset | Chapter | Records | Licence / cite | Fit |
+| --- | --- | ---: | --- | --- |
+| **UCI Bank Marketing** (Moro, Cortez & Rita, 2014) | Fairness / outcomes | 41,188 | CC BY 4.0; Moro et al. 2014 | Real conversion (term-deposit) + demographics for fairness slicing. Also ships in `fairlearn.datasets`. Strong fit. |
+| **Criteo Uplift** (Diemert et al., 2018) | Experimentation | ~13M | Criteo AI Lab; Diemert et al. 2018 | Real *randomised* treatment/control + conversion → exercises Welch/CUPED/SRM on real data. Ad-tech, and **no known ground-truth lift** — validates estimator behaviour, not recovery. |
+
+- UCI: <https://archive.ics.uci.edu/dataset/222/bank+marketing> (the adapter can fetch it on
+  demand — no manual download).
+- Criteo: <https://ailab.criteo.com/criteo-uplift-prediction-dataset/>.
+- Lower-fit alternatives considered: Kaggle credit-card-fraud (ULB) — real but anonymised, no
   demographics; Lending Club (lending, not neobank growth); Telco churn (wrong sector).
 
 ## What this does and does not claim

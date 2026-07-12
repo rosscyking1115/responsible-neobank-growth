@@ -14,8 +14,11 @@ the same fairness machinery the synthetic dashboard uses.
 
 from __future__ import annotations
 
+import io
+import zipfile
 from dataclasses import dataclass
 from pathlib import Path
+from urllib.request import urlopen
 
 import pandas as pd
 
@@ -23,6 +26,12 @@ from src.wellbeing.metrics import outcome_gap
 
 # Demographic segments available in the dataset, used for fairness slicing.
 SEGMENTS = ["age_band", "education", "marital", "job"]
+
+# Official UCI download (CC BY 4.0; cite Moro, Cortez & Rita 2014). The archive nests
+# ``bank-additional.zip`` -> ``bank-additional/bank-additional-full.csv`` inside the
+# outer zip, so a fetch has to descend one level.
+UCI_ZIP_URL = "https://archive.ics.uci.edu/static/public/222/bank+marketing.zip"
+_FULL_CSV_NAME = "bank-additional-full.csv"
 
 _AGE_BINS = [0, 25, 35, 45, 55, 65, 200]
 _AGE_LABELS = ["under_25", "25_34", "35_44", "45_54", "55_64", "65_plus"]
@@ -63,6 +72,41 @@ def load_bank_marketing(path: Path) -> pd.DataFrame:
     """Load and prepare the UCI Bank Marketing CSV (semicolon-separated)."""
     raw = pd.read_csv(path, sep=";", quotechar='"')
     return prepare(raw)
+
+
+def _extract_full_csv_text(zip_bytes: bytes) -> str:
+    """Pull ``bank-additional-full.csv`` text out of the (nested) UCI zip archive.
+
+    Factored out from the network fetch so the archive-descent logic is testable
+    offline against a synthetic nested zip. Raises ``KeyError`` if the expected file
+    is not found at either nesting level.
+    """
+    with zipfile.ZipFile(io.BytesIO(zip_bytes)) as outer:
+        for name in outer.namelist():
+            if name.endswith(_FULL_CSV_NAME):
+                return outer.read(name).decode("utf-8")
+            if name.endswith(".zip"):
+                with zipfile.ZipFile(io.BytesIO(outer.read(name))) as inner:
+                    for inner_name in inner.namelist():
+                        if inner_name.endswith(_FULL_CSV_NAME):
+                            return inner.read(inner_name).decode("utf-8")
+    raise KeyError(f"{_FULL_CSV_NAME} not found in the UCI archive")
+
+
+def fetch_bank_marketing(cache_path: Path | None = None) -> pd.DataFrame:
+    """Download the real UCI dataset on demand and return the prepared frame.
+
+    One-command reproducibility with no manual download and no extra dependency: the
+    CSV is cached to ``cache_path`` (default ``raw/real/bank-additional-full.csv``) so
+    the network is hit only once. Not used by the test suite — tests stay offline.
+    """
+    cache_path = cache_path or Path("raw/real") / _FULL_CSV_NAME
+    if not cache_path.exists():
+        with urlopen(UCI_ZIP_URL) as response:  # noqa: S310 - fixed, trusted UCI URL
+            csv_text = _extract_full_csv_text(response.read())
+        cache_path.parent.mkdir(parents=True, exist_ok=True)
+        cache_path.write_text(csv_text, encoding="utf-8")
+    return load_bank_marketing(cache_path)
 
 
 def conversion_summary(frame: pd.DataFrame) -> ConversionSummary:
@@ -153,13 +197,14 @@ def main() -> None:
     parser.add_argument(
         "--csv",
         type=Path,
-        required=True,
-        help="Path to bank-additional-full.csv / bank-full.csv (semicolon-separated).",
+        default=None,
+        help="Path to bank-additional-full.csv (semicolon-separated). "
+        "Omit to download the real dataset from UCI on demand.",
     )
     parser.add_argument("--output", type=Path, default=None)
     args = parser.parse_args()
 
-    frame = load_bank_marketing(args.csv)
+    frame = load_bank_marketing(args.csv) if args.csv else fetch_bank_marketing()
     report = render_markdown(frame)
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)

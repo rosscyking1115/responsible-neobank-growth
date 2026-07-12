@@ -41,7 +41,9 @@ The engine evaluates two things independently and then combines them:
 > **Fairness gap is the treatment's *effect* on disparity, not the baseline gap.**
 > The dashboard feeds the engine how much the change *widens* the segment activation
 > gap (`treatment_fairness_gap`), so a beneficial change that narrows a pre-existing
-> disparity is not blocked for inequality it did not cause.
+> disparity is not blocked for inequality it did not cause. This is also a
+> **non-circularity** guarantee — the gate reacts to an effect the analysis measures, not a
+> disparity the generator baked in. See [CREDIBILITY.md](CREDIBILITY.md).
 
 Resolution order (highest precedence first):
 

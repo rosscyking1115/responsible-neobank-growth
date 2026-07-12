@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import io
+import zipfile
+
 import pandas as pd
 import pytest
 
@@ -10,6 +13,7 @@ from src.adapters import (
     prepare,
     render_markdown,
 )
+from src.adapters.uci_bank_marketing import _extract_full_csv_text
 
 
 def _raw_uci_frame() -> pd.DataFrame:
@@ -81,3 +85,29 @@ def test_render_markdown_reports_conversion_and_gaps() -> None:
 
 def test_fairness_gaps_empty_frame() -> None:
     assert fairness_gaps(pd.DataFrame()).empty
+
+
+def _nested_uci_zip(csv_text: str) -> bytes:
+    """Build a zip that mirrors the real UCI archive (a zip nested inside a zip)."""
+    inner_buf = io.BytesIO()
+    with zipfile.ZipFile(inner_buf, "w") as inner:
+        inner.writestr("bank-additional/bank-additional-full.csv", csv_text)
+    outer_buf = io.BytesIO()
+    with zipfile.ZipFile(outer_buf, "w") as outer:
+        outer.writestr("bank-additional.zip", inner_buf.getvalue())
+        outer.writestr("bank.zip", b"other")
+    return outer_buf.getvalue()
+
+
+def test_extract_full_csv_descends_nested_zip() -> None:
+    csv_text = 'age;job;y\n30;"admin.";"yes"\n'
+    extracted = _extract_full_csv_text(_nested_uci_zip(csv_text))
+    assert extracted == csv_text
+
+
+def test_extract_full_csv_missing_file_raises() -> None:
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as z:
+        z.writestr("unrelated.txt", "nope")
+    with pytest.raises(KeyError):
+        _extract_full_csv_text(buf.getvalue())

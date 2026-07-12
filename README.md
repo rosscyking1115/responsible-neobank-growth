@@ -19,6 +19,15 @@ change should **ship, iterate, or hold**.
 > synthetic — no real customer data, internal bank data, or proprietary business metrics
 > are used. See [Safety & ethics](#safety--ethics).
 
+> **How to read the numbers in this repo.** Every figure is one of two kinds:
+> 🟢 *ground-truth-validated* (the method is judged against a known embedded answer — CUPED
+> variance reduction, SRM, synthetic-control recovering the true incrementality) or
+> 🟡 *synthetic — illustrative of method, not real-world performance* (activation rates,
+> £CLV, fairness-gap magnitudes). The same analysis code is also re-run on **real** public
+> data (UCI Bank Marketing, Criteo Uplift) as a cross-check. See
+> **[docs/CREDIBILITY.md](docs/CREDIBILITY.md)** for the split, the non-circularity
+> guarantee, and why the core stays synthetic.
+
 ---
 
 ## Why this project exists
@@ -102,9 +111,11 @@ fairness (heterogeneous effects) → a `limited_rollout` verdict.
 - **Public-data calibration** — anchors the synthetic wellbeing/inclusion distributions
   to verified UK public benchmarks (ONS, DWP, Lloyds) and reports the gaps
   ([docs](docs/PUBLIC_DATA_CALIBRATION.md)).
-- **Real-data adapter** — runs the same fairness/outcome analysis on the real UCI Bank
-  Marketing dataset, proving the pipeline works on real inputs
-  ([docs](docs/REAL_DATA_ADAPTER.md)).
+- **Real-data cross-checks** — the *same* analysis code re-run on real public data: the
+  fairness/outcome analysis on the UCI Bank Marketing dataset
+  ([docs](docs/REAL_DATA_ADAPTER.md)), and the A/B estimators (Welch, CUPED, SRM) on the
+  real randomised Criteo Uplift experiment ([docs](docs/REAL_DATA_CRITEO.md)) — so the
+  pipeline is shown working on inputs the author did not generate.
 - **Access control & data minimisation** — a lightweight RBAC layer that restricts
   individual-level vulnerability data to governance roles, with a role selector in the
   dashboard ([docs](docs/ACCESS_CONTROL.md)).
@@ -187,7 +198,7 @@ Run the API locally:
 uv run uvicorn api.main:app --reload   # then open http://127.0.0.1:8000/docs
 ```
 
-For a portfolio-size dataset, generate with `--users 50000 --months 12` and pass
+For a full-size dataset, generate with `--users 50000 --months 12` and pass
 `--vars "{raw_path: raw/portfolio_full}"` to `dbt build`.
 
 ## Project structure
@@ -245,6 +256,7 @@ container build → authenticated `/health` smoke test.
 
 | Document | Purpose |
 | --- | --- |
+| [docs/CREDIBILITY.md](docs/CREDIBILITY.md) | **How to read the numbers** — method-validation vs illustrative-magnitude, and the non-circularity guarantee. |
 | [docs/WORKED_DECISION_ONBOARDING_AB.md](docs/WORKED_DECISION_ONBOARDING_AB.md) | **One decision end-to-end** — the onboarding A/B walked to a verdict (DS-focused). |
 | [docs/CASE_STUDY.md](docs/CASE_STUDY.md) | Business-facing case study, decisions, evidence, limitations. |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Local and cloud architecture. |
@@ -258,6 +270,7 @@ container build → authenticated `/health` smoke test.
 | [docs/PUBLIC_DATA_CALIBRATION.md](docs/PUBLIC_DATA_CALIBRATION.md) | Calibrating synthetic distributions to public benchmarks. |
 | [docs/REAL_DATA_PROVENANCE.md](docs/REAL_DATA_PROVENANCE.md) | Verified public sources behind the calibration anchors + real-dataset options. |
 | [docs/REAL_DATA_ADAPTER.md](docs/REAL_DATA_ADAPTER.md) | Running the fairness analysis on the real UCI Bank Marketing dataset. |
+| [docs/REAL_DATA_CRITEO.md](docs/REAL_DATA_CRITEO.md) | Running the A/B estimators on the real randomised Criteo Uplift experiment. |
 | [docs/ACCESS_CONTROL.md](docs/ACCESS_CONTROL.md) | RBAC / data-minimisation over sensitive wellbeing fields. |
 | [docs/MONITORING.md](docs/MONITORING.md) | Data, model, score, and GCP monitoring checks. |
 | [docs/OPERATIONS_RUNBOOK.md](docs/OPERATIONS_RUNBOOK.md) | Rollback triggers, triage, and GCP operations. |
