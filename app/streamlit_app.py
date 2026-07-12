@@ -323,6 +323,12 @@ def _render_experiments(data: DashboardData) -> None:
         "Experiment readouts focus on decision metrics, incrementality, "
         "unit economics, and guardrails."
     )
+    st.caption(
+        "🟢 Estimator behaviour (CUPED variance reduction, SRM, synthetic-control recovering "
+        "the embedded incrementality) is ground-truth-validated; the effect *magnitudes* are "
+        "synthetic. The same Welch/CUPED/SRM estimators are cross-checked on the real "
+        "randomised Criteo Uplift experiment (see docs/REAL_DATA_CRITEO.md)."
+    )
     onboarding, referral = st.columns(2)
     with onboarding:
         st.subheader("Onboarding A/B")
@@ -649,6 +655,12 @@ def _render_customer_outcomes(data: DashboardData) -> None:
             f"Individual-level vulnerability segments are hidden for the '{role}' role "
             "(data minimisation); aggregate gaps are shown for non-sensitive segments only."
         )
+    st.caption(
+        "🟡 Fairness-gap magnitudes are synthetic — illustrative of the method, not "
+        "real-world disparities. The same `outcome_gap` code is cross-checked on the real "
+        "UCI Bank Marketing dataset (see docs/REAL_DATA_ADAPTER.md) and is non-circular by "
+        "construction (docs/CREDIBILITY.md)."
+    )
     left, right = st.columns([1.1, 1])
     with left:
         st.subheader("Outcome Gaps By Segment")
@@ -919,6 +931,13 @@ def _render_monitoring(snapshot: MonitoringSnapshot) -> None:
 def main() -> None:
     _apply_app_style()
     st.title("Responsible Neobank Growth Platform")
+    st.caption(
+        "All data is synthetic. Read each figure as either **ground-truth-validated** "
+        "(method recovers a known embedded answer) or **synthetic — illustrative of "
+        "method, not real-world performance** (activation rates, £CLV, fairness-gap "
+        "magnitudes). The same analysis code is cross-checked on real public data "
+        "(UCI Bank Marketing; Criteo Uplift). See docs/CREDIBILITY.md."
+    )
 
     db_path = str(DEFAULT_DB_PATH)
 

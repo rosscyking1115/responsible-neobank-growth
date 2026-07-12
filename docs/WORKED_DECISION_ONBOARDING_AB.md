@@ -4,6 +4,12 @@ A single growth decision walked end to end, the way a product data scientist wou
 present it to a squad. Everything below is reproduced from the platform's own output on
 the synthetic dataset (commands at the bottom).
 
+> **Reading the numbers here.** The *reasoning and gate logic* are 🟢 ground-truth-validated;
+> the specific magnitudes (+4.5pp uplift, +1.2pp support) are 🟡 synthetic — illustrative of
+> method, not real-world performance. See [CREDIBILITY.md](CREDIBILITY.md). The same fairness
+> and A/B machinery is cross-checked on **real** data in
+> [REAL_DATA_ADAPTER.md](REAL_DATA_ADAPTER.md) and [REAL_DATA_CRITEO.md](REAL_DATA_CRITEO.md).
+
 ---
 
 ## Recommendation (in brief)

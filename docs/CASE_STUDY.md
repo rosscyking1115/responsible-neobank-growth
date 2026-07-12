@@ -1,4 +1,4 @@
-# Case Study: Customer Growth & Pricing Intelligence Platform
+# Case Study: Responsible Neobank Growth Platform
 
 ## Context
 
@@ -14,7 +14,10 @@ The product is designed around a realistic operating question:
 > economics?
 
 All data is synthetic. No real customer, bank, or proprietary business data is
-used.
+used. Read every figure below through [CREDIBILITY.md](CREDIBILITY.md): results are either
+🟢 *ground-truth-validated* (method recovers a known embedded answer) or 🟡 *synthetic —
+illustrative of method, not real-world performance*. The same code is cross-checked on real
+public data (UCI Bank Marketing; Criteo Uplift).
 
 ## Users
 
@@ -83,7 +86,7 @@ The project favours transparent, reviewable methods over opaque demos:
 
 ## Limitations
 
-This is a portfolio case study, not a production banking system. A live
+This is a reference case study, not a production banking system. A live
 regulated deployment would require stronger identity and access controls,
 formal data governance, privacy review, audit approvals, model-risk governance,
 consumer-outcome monitoring, infrastructure as code, and a managed feature/model

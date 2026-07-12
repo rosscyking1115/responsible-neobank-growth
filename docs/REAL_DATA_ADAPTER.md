@@ -26,10 +26,17 @@ The fairness analysis **reuses `src.wellbeing.metrics.outcome_gap`** — the sam
 the synthetic dashboard uses — so the definition of a fairness gap is identical across
 real and synthetic data.
 
+This is the **fairness / outcomes** cross-check. A companion adapter does the same for the
+**experimentation** chapter on the real randomised Criteo Uplift experiment — see
+[REAL_DATA_CRITEO.md](REAL_DATA_CRITEO.md). Both are framed in [CREDIBILITY.md](CREDIBILITY.md).
+
 ## Run it
 
 ```powershell
-# after downloading and unzipping bank-additional-full.csv
+# one command — downloads the real dataset from UCI on demand (cached to raw/real/)
+uv run python -m src.adapters.uci_bank_marketing
+
+# or point at a file you already have
 uv run python -m src.adapters.uci_bank_marketing --csv path/to/bank-additional-full.csv
 ```
 

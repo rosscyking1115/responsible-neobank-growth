@@ -1,6 +1,6 @@
 # API Contract
 
-The Customer Growth & Pricing Intelligence API is the product-service boundary
+The Responsible Neobank Growth API is the product-service boundary
 for the project. It is intentionally contract-first: endpoints keep stable
 request and response shapes while the backing logic can move from deterministic
 baselines to model artifacts and warehouse marts.
