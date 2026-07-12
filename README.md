@@ -256,6 +256,7 @@ container build → authenticated `/health` smoke test.
 | Document | Purpose |
 | --- | --- |
 | [docs/CREDIBILITY.md](docs/CREDIBILITY.md) | **How to read the numbers** — method-validation vs illustrative-magnitude, and the non-circularity guarantee. |
+| **Marketing measurement** (absorbed from [marketing-effectiveness-lab](https://github.com/rosscyking1115/marketing-effectiveness-lab)) | [Reconciliation case study](docs/case-studies/mmm-experiment-reconciliation.md) · [Parameter recovery & calibration](docs/methodology/parameter-recovery-validation.md) · [MMM benchmark note](docs/methodology/mmm-benchmark-note.md) |
 | [docs/WORKED_DECISION_ONBOARDING_AB.md](docs/WORKED_DECISION_ONBOARDING_AB.md) | **One decision end-to-end** — the onboarding A/B walked to a verdict (DS-focused). |
 | [docs/CASE_STUDY.md](docs/CASE_STUDY.md) | Business-facing case study, decisions, evidence, limitations. |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Local and cloud architecture. |

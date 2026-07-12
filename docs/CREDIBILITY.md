@@ -104,6 +104,13 @@ known ground-truth lift** to recover (it is ad-tech, and validates estimator *be
 *recovery*). They demonstrate the pipeline runs on real inputs; they do not turn the
 synthetic magnitudes into real-world performance.
 
+> **Related — the same ground-truth discipline in another domain.** The absorbed
+> marketing-measurement methodology validates its estimator the same way: it recovers *known*
+> generating parameters and reports interval calibration honestly (finding and regression-
+> testing a real posterior bug along the way) — see
+> [parameter-recovery-validation.md](methodology/parameter-recovery-validation.md) and the
+> [MMM ↔ experiment reconciliation](case-studies/mmm-experiment-reconciliation.md) case study.
+
 ---
 
 ## Why not just use real data?
