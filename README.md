@@ -27,6 +27,12 @@ change should **ship, iterate, or hold**.
 > **[docs/CREDIBILITY.md](docs/CREDIBILITY.md)** for the split, the non-circularity
 > guarantee, and why the core stays synthetic.
 
+> Part of my responsible-fintech cluster, alongside
+> [cashflow-risk](https://github.com/rosscyking1115/cashflow-risk) and
+> [cited-market-brief-agent](https://github.com/rosscyking1115/cited-market-brief-agent);
+> it also absorbed my marketing-measurement lab (see `docs/case-studies/`). Full project map →
+> [profile](https://github.com/rosscyking1115).
+
 ---
 
 ## Why this project exists
