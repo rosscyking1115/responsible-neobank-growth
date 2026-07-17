@@ -1,0 +1,17 @@
+scenario_id: happy-path
+description: >-
+  One referred customer completes the full funnel — campaign spend, application,
+  KYC approval, activation, first funding, referral qualification, reward booking
+  and settlement — with no delivery defects.
+seed: 42
+generator_version: 0.1.0
+events_fixture: fixtures/events/tiny/happy-path.jsonl
+truth_fixture: fixtures/truth/tiny/happy-path.json
+reward_amount_minor: 5000
+late_threshold_hours: 24
+prohibited_interpretation: >-
+  Synthetic engineering fixture only; conversion rates and amounts carry no
+  information about real customers, real funnels or Monzo.
+limitations: >-
+  Single-customer path; no concurrency, no volume, no realistic timing
+  distribution. Proves contract expressiveness, not business magnitude.

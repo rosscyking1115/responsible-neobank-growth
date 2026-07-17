@@ -1,0 +1,17 @@
+scenario_id: duplicate-delivery
+description: >-
+  A referral qualification is delivered twice with the same idempotency key and
+  distinct event identifiers; the canonical business event must count exactly
+  once while both deliveries are retained as landing evidence.
+seed: 42
+generator_version: 0.1.0
+events_fixture: fixtures/events/tiny/duplicate-delivery.jsonl
+truth_fixture: fixtures/truth/tiny/duplicate-delivery.json
+reward_amount_minor: 5000
+late_threshold_hours: 24
+prohibited_interpretation: >-
+  Synthetic engineering fixture only; the duplicate rate is injected, not an
+  estimate of real delivery reliability.
+limitations: >-
+  Exact-payload redelivery only; the conflicting-duplicate (same key, different
+  payload hash) case is a Plan 2 fault-injection scenario.

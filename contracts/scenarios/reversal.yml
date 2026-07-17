@@ -1,0 +1,17 @@
+scenario_id: reversal
+description: >-
+  A booked referral reward is reversed before settlement by a new reversal event
+  (events are never mutated); the subledger must net expense and payable to zero
+  and the referral lifecycle must terminate at reversed.
+seed: 42
+generator_version: 0.1.0
+events_fixture: fixtures/events/tiny/reversal.jsonl
+truth_fixture: fixtures/truth/tiny/reversal.json
+reward_amount_minor: 5000
+late_threshold_hours: 24
+prohibited_interpretation: >-
+  Synthetic engineering fixture only; the illustrative double-entry treatment is
+  not a claim about any real bank's accounting policy.
+limitations: >-
+  Reversal-after-settlement and reversal-beyond-booked-amount are reconciliation
+  exception cases specified in docs/contracts/reward-reconciliation.md.
