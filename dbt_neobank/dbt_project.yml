@@ -30,3 +30,13 @@ models:
     normalised:
       +schema: normalised
       +materialized: table
+    logical:
+      +schema: logical
+      +materialized: table
+
+vars:
+  # Expected referral reward entitlement in integer minor units; must match the
+  # simulator profile (config/simulator/*.yml reward_amount_minor).
+  reward_amount_minor: 5000
+  # Synthetic settlement SLA for pending_beyond_synthetic_sla exceptions (days).
+  reward_settlement_sla_days: 14

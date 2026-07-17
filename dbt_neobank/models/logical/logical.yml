@@ -1,0 +1,97 @@
+version: 2
+
+models:
+  - name: lgl_reward_entitlement
+    description: >-
+      Authoritative entitlement per qualified referral with current
+      reconciliation position (Finance-owned meaning; reward_reconciliation
+      interface).
+    config:
+      meta:
+        layer: logical
+        owner: finance
+        classification: synthetic_restricted
+        interface_version: 1
+        compatibility: backward_compatible
+    columns:
+      - name: referral_id
+        tests: [not_null, unique]
+      - name: entitled_minor
+        tests: [not_null]
+      - name: lifecycle_status
+        tests:
+          - accepted_values:
+              arguments:
+                values: [qualified, booked, settled, reversed]
+      - name: exception_reason
+        tests:
+          - accepted_values:
+              arguments:
+                values:
+                  - missing_posting
+                  - duplicate_posting
+                  - amount_mismatch
+                  - settlement_without_booking
+                  - reversal_beyond_booked_amount
+
+  - name: lgl_reward_ledger_reconciliation
+    description: >-
+      Daily reward reconciliation over warehouse activity days: cumulative
+      positions, ledger balance and append-only exception reason codes.
+    config:
+      meta:
+        layer: logical
+        owner: finance
+        classification: synthetic_restricted
+        interface_version: 1
+        compatibility: backward_compatible
+    columns:
+      - name: referral_id
+        tests: [not_null]
+      - name: reconciliation_date
+        tests: [not_null]
+      - name: lifecycle_status
+        tests:
+          - accepted_values:
+              arguments:
+                values: [qualified, booked, settled, reversed]
+      - name: is_balanced
+        tests: [not_null]
+      - name: exception_reason
+        tests:
+          - accepted_values:
+              arguments:
+                values:
+                  - missing_posting
+                  - duplicate_posting
+                  - amount_mismatch
+                  - settlement_without_booking
+                  - reversal_beyond_booked_amount
+                  - unbalanced_journal
+                  - pending_beyond_synthetic_sla
+
+unit_tests:
+  - name: unit_reconciliation_flags_missing_posting_with_age
+    description: A qualified referral with no booking accrues a missing_posting exception.
+    model: lgl_reward_ledger_reconciliation
+    given:
+      - input: ref('lnd_event_deliveries')
+        rows:
+          - {arrival_date: "2026-01-05"}
+          - {arrival_date: "2026-01-07"}
+      - input: ref('lgl_reward_entitlement')
+        rows:
+          - {referral_id: ref_000060, reward_id: null,
+             qualified_arrival_date: "2026-01-05", entitled_minor: 5000}
+      - input: ref('nrm_reward_event')
+        rows: []
+      - input: ref('nrm_reward_ledger_entry')
+        rows: []
+    expect:
+      rows:
+        - {referral_id: ref_000060, reconciliation_date: "2026-01-05",
+           exception_reason: missing_posting, exception_age_days: 0,
+           lifecycle_status: qualified, outstanding_payable_minor: 0}
+        - {referral_id: ref_000060, reconciliation_date: "2026-01-07",
+           exception_reason: missing_posting, exception_age_days: 2,
+           lifecycle_status: qualified, outstanding_payable_minor: 0}

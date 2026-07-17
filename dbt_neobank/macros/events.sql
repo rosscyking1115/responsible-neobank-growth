@@ -14,6 +14,14 @@
     {%- endif -%}
 {%- endmacro %}
 
+{% macro date_diff_days(later, earlier) -%}
+    {%- if target.type == 'bigquery' -%}
+        date_diff({{ later }}, {{ earlier }}, day)
+    {%- else -%}
+        ({{ later }} - {{ earlier }})
+    {%- endif -%}
+{%- endmacro %}
+
 {% macro json_value(column, key) -%}
     {%- if target.type == 'bigquery' -%}
         json_value({{ column }}, '$.{{ key }}')
