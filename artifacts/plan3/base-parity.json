@@ -1,0 +1,43 @@
+{
+  "tag": "base",
+  "left_prefix": "neobank_p3b_20260717",
+  "right_prefix": "neobank_p3o_20260717",
+  "interfaces": {
+    "lgl_growth_acquisition": {
+      "content_fingerprint": "8580936977301490177",
+      "row_count": "108204",
+      "sum_first_funding_amount_minor": "2098005783"
+    },
+    "lgl_referral_economics": {
+      "content_fingerprint": "2083061510091996771",
+      "row_count": "16095",
+      "sum_booked_minor": "60580000",
+      "sum_reversed_minor": "1205000",
+      "sum_settled_minor": "58100000"
+    },
+    "lgl_reward_entitlement": {
+      "content_fingerprint": "2827312813523244501",
+      "row_count": "12143",
+      "sum_booked_minor": "60580000",
+      "sum_entitled_minor": "60715000",
+      "sum_settled_minor": "58100000"
+    },
+    "lgl_reward_ledger_reconciliation": {
+      "content_fingerprint": "1964989470776207487",
+      "row_count": "1860131",
+      "sum_outstanding_payable_minor": "413795000"
+    },
+    "lgl_warehouse_health": {
+      "content_fingerprint": "-7735579364469705801",
+      "row_count": "927"
+    },
+    "prs_financial_reconciliation_daily": {
+      "content_fingerprint": "-5426316825184630193",
+      "row_count": "308",
+      "sum_booked_minor": "9277200000",
+      "sum_entitled_minor": "9300655000"
+    }
+  },
+  "differences": [],
+  "parity": true
+}
