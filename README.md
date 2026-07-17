@@ -177,6 +177,12 @@ rather than rewritten:
 - **Real-data cross-checks** — the same estimators re-run on real public data,
   UCI Bank Marketing and Criteo Uplift, as method validation
   ([UCI](docs/REAL_DATA_ADAPTER.md) · [Criteo](docs/REAL_DATA_CRITEO.md)).
+- **Marketing measurement** — this project absorbed my separate
+  marketing-effectiveness lab: the MMM-versus-experiment reconciliation and its
+  parameter-recovery checks now live here
+  ([reconciliation](docs/case-studies/mmm-experiment-reconciliation.md) ·
+  [parameter recovery](docs/methodology/parameter-recovery-validation.md) ·
+  [benchmark note](docs/methodology/mmm-benchmark-note.md)).
 
 These surface in the Streamlit decision app.
 
