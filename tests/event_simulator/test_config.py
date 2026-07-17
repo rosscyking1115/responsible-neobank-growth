@@ -135,10 +135,10 @@ def test_cli_validate_accepts_known_profiles_and_rejects_unknown() -> None:
     assert main(["validate", "--profile", "stress"]) == 2
 
 
-def test_cli_generate_is_not_yet_implemented() -> None:
+def test_cli_generate_rejects_unknown_profile() -> None:
     from src.event_simulator.cli import main
 
-    assert main(["generate", "--profile", "tiny", "--output", "data/generated/x"]) == 2
+    assert main(["generate", "--profile", "stress", "--output", "data/generated/x"]) == 2
 
 
 # --- registry ----------------------------------------------------------------
