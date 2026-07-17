@@ -1,0 +1,32 @@
+# Governed interface: warehouse_health (Plan 1 section 7.1)
+# Platform owns freshness, quality, runtime and cost definitions.
+name: warehouse_health
+version: 1
+status: proposed
+owner: platform
+purpose: >-
+  Which models and interfaces are stale, failing, expensive or slower than their
+  measured baseline; local test/freshness evidence in Plan 2, BigQuery bytes,
+  slot and cost fields populated only by Plan 3 measurement.
+audiences: [platform, governance]
+grain: one row per model per run day
+unique_key: [model_name, run_date]
+source_domain: dbt artifacts and run manifests; INFORMATION_SCHEMA.JOBS in Plan 3
+allowed_consumers: [looker, reporting, streamlit]
+freshness_slo:
+  warn_after: 2 days
+  error_after: 7 days
+classification: synthetic_restricted
+partition_policy: partition by run date (daily) intended for BigQuery
+compatibility: backward_compatible
+tests:
+  - unique model_name and run_date pair
+  - freshness status derives from declared SLOs
+  - cost fields remain null until a dated BigQuery measurement exists
+  - test results reconcile to dbt run artifacts
+exposures:
+  - streamlit_monitoring_tab
+  - future_looker_warehouse_health_explore
+deprecation_policy: >-
+  Health metric definitions change only with a version bump; historical run rows
+  are immutable evidence and are never restated.

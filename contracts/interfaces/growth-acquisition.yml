@@ -1,0 +1,35 @@
+# Governed interface: growth_acquisition (Plan 1 section 7.1)
+# Growth owns meaning; platform owns reliability.
+name: growth_acquisition
+version: 1
+status: proposed
+owner: growth
+purpose: >-
+  Where applicants progress or drop between application, KYC approval, activation
+  and funded activation, by campaign, referral cohort, experiment arm and
+  synthetic customer-outcome guardrail.
+audiences: [growth, product, governance]
+grain: one row per customer application journey
+unique_key: [application_id]
+source_domain: application_kyc_account + activation_funding + experiment + customer_outcome events
+allowed_consumers: [looker, reporting, ml, streamlit, api]
+freshness_slo:
+  warn_after: 24 hours
+  error_after: 72 hours
+classification: synthetic_restricted
+partition_policy: partition by application submission date (daily) with clustering on campaign and channel intended for BigQuery
+compatibility: backward_compatible
+tests:
+  - unique application_id
+  - not-null lifecycle state
+  - allowed lifecycle transitions only
+  - activation implies KYC approval
+  - experiment arm stable per customer
+exposures:
+  - streamlit_product_health_tab
+  - streamlit_experiments_tab
+  - activation_model_features
+  - future_looker_growth_acquisition_explore
+deprecation_policy: >-
+  Version bump plus compatibility view for one full plan cycle; consumers are
+  migrated and verified before any field is removed.

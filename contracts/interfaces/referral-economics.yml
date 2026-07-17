@@ -1,0 +1,33 @@
+# Governed interface: referral_economics (Plan 1 section 7.1)
+# Growth owns qualification/effectiveness; Finance owns booked reward cost.
+name: referral_economics
+version: 1
+status: proposed
+owner: growth
+purpose: >-
+  Whether referral activity creates incremental activated customers at
+  sustainable reward cost, by referral cohort, campaign and experiment estimate.
+audiences: [growth, finance, product]
+grain: one row per referral
+unique_key: [referral_id]
+source_domain: referral_reward events joined to activation_funding outcomes
+allowed_consumers: [looker, reporting, streamlit, finance]
+freshness_slo:
+  warn_after: 24 hours
+  error_after: 72 hours
+classification: synthetic_restricted
+partition_policy: partition by qualification date (daily) with clustering on cohort intended for BigQuery
+compatibility: backward_compatible
+tests:
+  - unique referral_id
+  - qualified referrals reference an existing invitation
+  - reward amounts are integer minor units
+  - entitlement equals reward_amount for each qualified referral
+  - incrementality estimates come only from governed experiment outputs
+exposures:
+  - streamlit_experiments_tab
+  - geo_referral_incrementality_analysis
+  - future_looker_referral_economics_explore
+deprecation_policy: >-
+  Version bump plus compatibility view for one full plan cycle; Finance cost
+  fields never change meaning without a new version.

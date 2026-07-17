@@ -1,0 +1,33 @@
+# Governed interface: reward_reconciliation (Plan 1 section 7.1)
+# Finance owns reconciliation rules; platform owns event/model correctness.
+name: reward_reconciliation
+version: 1
+status: proposed
+owner: finance
+purpose: >-
+  Which expected referral rewards are missing, duplicated, mismatched, pending
+  too long or incorrectly reversed, with daily entitlement, ledger and exception
+  totals that trace back to source events.
+audiences: [finance, platform, governance]
+grain: one row per reward per reconciliation day
+unique_key: [reward_id, reconciliation_date]
+source_domain: referral_reward events against the bounded reward subledger
+allowed_consumers: [looker, reporting, finance]
+freshness_slo:
+  warn_after: 24 hours
+  error_after: 48 hours
+classification: synthetic_restricted
+partition_policy: partition by reconciliation date (daily) intended for BigQuery
+compatibility: backward_compatible
+tests:
+  - unique reward_id and reconciliation_date pair
+  - debit equals credit per journal
+  - opening plus movements equals closing
+  - every exception carries a reason code and event trace
+  - injected fixture exceptions are detected exactly
+exposures:
+  - reward_reconciliation_daily_report
+  - future_looker_reward_reconciliation_explore
+deprecation_policy: >-
+  Reconciliation reason codes are append-only; removing or renaming one requires
+  a new interface version and a migration record.
