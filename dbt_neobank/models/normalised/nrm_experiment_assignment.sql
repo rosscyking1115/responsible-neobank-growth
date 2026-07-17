@@ -1,7 +1,10 @@
 {{ config(
     materialized='incremental',
     unique_key='canonical_event_key',
-    incremental_strategy='delete+insert'
+    incremental_strategy=('merge' if target.type == 'bigquery' else 'delete+insert'),
+    partition_by={'field': 'arrival_date', 'data_type': 'date', 'granularity': 'day'},
+    cluster_by=['experiment_id'],
+    labels={'route_c': 'plan2', 'layer': 'normalised'}
 ) }}
 
 -- Canonical experiment assignments: one stable variant per customer per

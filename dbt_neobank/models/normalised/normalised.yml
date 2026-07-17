@@ -10,6 +10,10 @@ models:
         classification: synthetic_restricted
         interface_version: 1
         compatibility: backward_compatible
+        freshness_slo: {warn_after: 24 hours, error_after: 72 hours}
+        partition_policy: partition by arrival_date (daily) intended for BigQuery
+        grain: one row per canonical application/KYC event
+        exposures: [growth_acquisition_interface]
     columns:
       - name: canonical_event_key
         tests: [not_null, unique]
@@ -23,7 +27,10 @@ models:
 
   - name: nrm_account_event
     description: Canonical account lifecycle events with integer minor units.
-    config: {meta: *governed_meta}
+    config:
+      meta:
+        <<: *governed_meta
+        grain: one row per canonical account lifecycle event
     columns:
       - name: canonical_event_key
         tests: [not_null, unique]
@@ -38,6 +45,8 @@ models:
     config:
       meta:
         <<: *governed_meta
+        grain: one row per account state interval
+        unique_key: [account_id, valid_from]
         incremental_exemption: >-
           Derived state over bounded entity counts, rebuilt from the
           incremental canonical events each run; BigQuery partition strategy
@@ -56,6 +65,8 @@ models:
     config:
       meta:
         <<: *governed_meta
+        grain: one row per account
+        unique_key: [account_id]
         incremental_exemption: >-
           Current-state snapshot rebuilt from incremental canonical events;
           merge materialisation considered in Plan 3.
@@ -69,7 +80,11 @@ models:
     description: >-
       Canonical referral lifecycle events; v1/v2 payloads adapt to one meaning
       (qualification_rule is null for v1).
-    config: {meta: *governed_meta}
+    config:
+      meta:
+        <<: *governed_meta
+        grain: one row per canonical referral lifecycle event
+        exposures: [referral_economics_interface]
     columns:
       - name: canonical_event_key
         tests: [not_null, unique]
@@ -86,6 +101,9 @@ models:
     config:
       meta:
         <<: *governed_meta
+        grain: one row per referral state interval
+        unique_key: [referral_id, valid_from]
+        exposures: [referral_economics_interface]
         incremental_exemption: >-
           Derived state over bounded entity counts, rebuilt from the
           incremental canonical events each run.
@@ -102,7 +120,12 @@ models:
     description: >-
       Canonical reward lifecycle events; settlements/reversals resolve their
       referral through the booking mapping.
-    config: {meta: *governed_meta}
+    config:
+      meta:
+        <<: *governed_meta
+        owner: finance
+        grain: one row per canonical reward lifecycle event
+        exposures: [referral_economics_interface, reward_reconciliation_interface]
     columns:
       - name: canonical_event_key
         tests: [not_null, unique]
@@ -122,9 +145,36 @@ models:
                 to: ref('nrm_referral_event')
                 field: referral_id
 
+  - name: nrm_reward_ledger_entry
+    description: >-
+      Double-entry journal lines over the three fictional subledger accounts;
+      illustrative treatment, not any real bank's accounting policy.
+    config:
+      meta:
+        <<: *governed_meta
+        owner: finance
+        grain: one row per journal line (two per reward event)
+        exposures: [reward_reconciliation_interface]
+    columns:
+      - name: ledger_entry_id
+        tests: [not_null, unique]
+      - name: entry_side
+        tests:
+          - accepted_values:
+              arguments:
+                values: [debit, credit]
+      - name: account
+        tests:
+          - accepted_values:
+              arguments:
+                values: [referral_reward_expense, referral_reward_payable, reward_cash_clearing]
+
   - name: nrm_campaign_spend
     description: Canonical campaign spend, integer minor units.
-    config: {meta: *governed_meta}
+    config:
+      meta:
+        <<: *governed_meta
+        grain: one row per canonical campaign spend record
     columns:
       - name: canonical_event_key
         tests: [not_null, unique]
@@ -133,7 +183,10 @@ models:
 
   - name: nrm_experiment_assignment
     description: Canonical experiment assignments; one stable variant per customer.
-    config: {meta: *governed_meta}
+    config:
+      meta:
+        <<: *governed_meta
+        grain: one row per canonical assignment event
     columns:
       - name: canonical_event_key
         tests: [not_null, unique]
@@ -145,7 +198,11 @@ models:
 
   - name: nrm_customer_outcome_event
     description: Canonical customer-outcome guardrail events (synthetic proxies).
-    config: {meta: *governed_meta}
+    config:
+      meta:
+        <<: *governed_meta
+        owner: governance
+        grain: one row per canonical customer-outcome event
     columns:
       - name: canonical_event_key
         tests: [not_null, unique]

@@ -13,6 +13,11 @@ models:
         classification: synthetic_restricted
         interface_version: 1
         compatibility: backward_compatible
+        grain: one row per qualified referral
+        unique_key: [referral_id]
+        freshness_slo: {warn_after: 24 hours, error_after: 48 hours}
+        partition_policy: not applicable at this grain; documented for BigQuery in Plan 3
+        exposures: [reward_reconciliation_reporting]
         incremental_exemption: >-
           Cross-entity governed interface rebuilt from incremental canonical
           events each run; BigQuery partition replacement is the Plan 3
@@ -49,6 +54,11 @@ models:
         classification: synthetic_restricted
         interface_version: 1
         compatibility: backward_compatible
+        grain: one row per qualified referral per reconciliation day
+        unique_key: [referral_id, reconciliation_date]
+        freshness_slo: {warn_after: 24 hours, error_after: 48 hours}
+        partition_policy: partition by reconciliation_date (daily) intended for BigQuery
+        exposures: [reward_reconciliation_reporting, future_looker_explores]
         incremental_exemption: >-
           Cross-entity governed interface rebuilt from incremental canonical
           events each run; BigQuery partition replacement is the Plan 3
@@ -91,6 +101,11 @@ models:
         classification: synthetic_restricted
         interface_version: 1
         compatibility: backward_compatible
+        grain: one row per customer application journey
+        unique_key: [application_id]
+        freshness_slo: {warn_after: 24 hours, error_after: 72 hours}
+        partition_policy: partition by application date (daily) intended for BigQuery
+        exposures: [streamlit_decision_dashboard, activation_scoring_service, future_looker_explores]
         incremental_exemption: >-
           Cross-entity governed interface rebuilt from incremental canonical
           events each run; BigQuery partition replacement is the Plan 3
@@ -124,6 +139,11 @@ models:
         classification: synthetic_restricted
         interface_version: 1
         compatibility: backward_compatible
+        grain: one row per referral
+        unique_key: [referral_id]
+        freshness_slo: {warn_after: 24 hours, error_after: 72 hours}
+        partition_policy: partition by qualification date (daily) intended for BigQuery
+        exposures: [reward_reconciliation_reporting, future_looker_explores]
         incremental_exemption: >-
           Cross-entity governed interface rebuilt from incremental canonical
           events each run; BigQuery partition replacement is the Plan 3
@@ -151,6 +171,11 @@ models:
         classification: synthetic_restricted
         interface_version: 1
         compatibility: backward_compatible
+        grain: one row per governed interface per run day
+        unique_key: [model_name, run_date]
+        freshness_slo: {warn_after: 2 days, error_after: 7 days}
+        partition_policy: partition by run_date (daily) intended for BigQuery
+        exposures: [streamlit_decision_dashboard, future_looker_explores]
         incremental_exemption: >-
           Cross-entity governed interface rebuilt from incremental canonical
           events each run; BigQuery partition replacement is the Plan 3

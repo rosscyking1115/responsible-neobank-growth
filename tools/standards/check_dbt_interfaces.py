@@ -43,6 +43,19 @@ def _is_governed(node: dict, rules: dict) -> bool:
     return node.get("name", "").startswith(tuple(rules["governed_prefixes"]))
 
 
+def _requirement_value(node: dict, meta: dict, key: str):
+    """Resolve a required declaration, accepting manifest-native equivalents:
+    purpose falls back to the model description; unique_key falls back to the
+    incremental config's unique_key."""
+    value = meta.get(key)
+    if value in (None, "", [], {}):
+        if key == "purpose":
+            value = node.get("description")
+        elif key == "unique_key":
+            value = node.get("config", {}).get("unique_key")
+    return value
+
+
 def check_manifest(manifest: dict, rules: dict) -> list[dict]:
     """Return one violation dict per broken rule: {model, rule, message}."""
     violations: list[dict] = []
@@ -53,7 +66,7 @@ def check_manifest(manifest: dict, rules: dict) -> list[dict]:
         meta = _meta(node)
 
         for requirement in rules["required_meta"]:
-            value = meta.get(requirement["key"])
+            value = _requirement_value(node, meta, requirement["key"])
             if value in (None, "", [], {}):
                 violations.append(
                     {
