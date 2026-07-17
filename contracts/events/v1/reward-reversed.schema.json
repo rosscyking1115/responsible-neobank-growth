@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "reward-reversed v1 payload",
+  "description": "A reversal is a new event linking to the original reward; events are never mutated in place.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["reward_id", "reversal_id", "amount_minor", "currency", "reversal_reason"],
+  "properties": {
+    "reward_id": { "type": "string", "pattern": "^rwd_[a-z0-9]{6,}$" },
+    "reversal_id": { "type": "string", "pattern": "^rev_[a-z0-9]{6,}$" },
+    "amount_minor": { "type": "integer", "minimum": 1, "description": "Integer minor units (pence); positive, direction implied by the event." },
+    "currency": { "type": "string", "enum": ["GBP"] },
+    "reversal_reason": { "type": "string", "enum": ["qualification_withdrawn", "account_closed_in_cooling_off", "operational_error"] }
+  },
+  "examples": [
+    {
+      "reward_id": "rwd_000001",
+      "reversal_id": "rev_000001",
+      "amount_minor": 5000,
+      "currency": "GBP",
+      "reversal_reason": "qualification_withdrawn"
+    }
+  ]
+}

@@ -1,0 +1,103 @@
+# Route C event registry (Plan 1, Task 3 — ADR-route-c-event-boundary).
+# Fictional namespace only: services belong to the invented "Northbank" synthetic
+# neobank. No real bank, brand, customer or account-number format is represented.
+#
+# Compatibility policy:
+# - envelope changes are additive within a major generator version;
+# - removing or retyping a required payload field requires a new schema version;
+# - consumers read through normalised models, never version-specific landing payloads;
+# - v1 and v2 events must coexist in at least one deterministic fixture.
+
+registry_version: 1
+
+services:
+  - name: campaign-service
+    description: Fictional marketing campaign and spend producer.
+  - name: onboarding-service
+    description: Fictional application intake producer.
+  - name: kyc-service
+    description: Fictional KYC decisioning producer.
+  - name: account-service
+    description: Fictional account lifecycle and funding producer.
+  - name: referral-service
+    description: Fictional referral invitation/qualification producer.
+  - name: rewards-service
+    description: Fictional reward booking/settlement/reversal producer.
+  - name: experimentation-service
+    description: Fictional experiment assignment producer.
+  - name: support-service
+    description: Fictional customer-outcome and complaint signal producer.
+
+events:
+  - name: campaign-spend-recorded
+    family: campaign_spend
+    source_service: campaign-service
+    schemas:
+      1: v1/campaign-spend-recorded.schema.json
+
+  - name: application-submitted
+    family: application_kyc_account
+    source_service: onboarding-service
+    schemas:
+      1: v1/application-submitted.schema.json
+
+  - name: kyc-decisioned
+    family: application_kyc_account
+    source_service: kyc-service
+    schemas:
+      1: v1/kyc-decisioned.schema.json
+
+  - name: account-activated
+    family: activation_funding
+    source_service: account-service
+    schemas:
+      1: v1/account-activated.schema.json
+
+  - name: account-funded
+    family: activation_funding
+    source_service: account-service
+    schemas:
+      1: v1/account-funded.schema.json
+
+  - name: referral-invited
+    family: referral_reward
+    source_service: referral-service
+    schemas:
+      1: v1/referral-invited.schema.json
+
+  - name: referral-qualified
+    family: referral_reward
+    source_service: referral-service
+    schemas:
+      1: v1/referral-qualified.schema.json
+      2: v2/referral-qualified.schema.json
+
+  - name: reward-booked
+    family: referral_reward
+    source_service: rewards-service
+    schemas:
+      1: v1/reward-booked.schema.json
+
+  - name: reward-settled
+    family: referral_reward
+    source_service: rewards-service
+    schemas:
+      1: v1/reward-settled.schema.json
+
+  - name: reward-reversed
+    family: referral_reward
+    source_service: rewards-service
+    schemas:
+      1: v1/reward-reversed.schema.json
+
+  - name: experiment-assigned
+    family: experiment
+    source_service: experimentation-service
+    schemas:
+      1: v1/experiment-assigned.schema.json
+
+  - name: customer-outcome-recorded
+    family: customer_outcome
+    source_service: support-service
+    schemas:
+      1: v1/customer-outcome-recorded.schema.json

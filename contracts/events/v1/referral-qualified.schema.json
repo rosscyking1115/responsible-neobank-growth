@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "referral-qualified v1 payload",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["referral_id", "referrer_customer_id", "referred_customer_id", "qualified_reason"],
+  "properties": {
+    "referral_id": { "type": "string", "pattern": "^ref_[a-z0-9]{6,}$" },
+    "referrer_customer_id": { "type": "string", "pattern": "^cus_[a-z0-9]{6,}$" },
+    "referred_customer_id": { "type": "string", "pattern": "^cus_[a-z0-9]{6,}$" },
+    "qualified_reason": { "type": "string", "enum": ["first_funding_completed", "activation_completed"] }
+  },
+  "examples": [
+    {
+      "referral_id": "ref_000001",
+      "referrer_customer_id": "cus_a00001",
+      "referred_customer_id": "cus_b00001",
+      "qualified_reason": "first_funding_completed"
+    }
+  ]
+}

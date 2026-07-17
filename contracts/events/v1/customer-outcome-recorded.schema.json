@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "customer-outcome-recorded v1 payload",
+  "description": "Bounded guardrail signal only. Synthetic proxy; must never be used for punitive decisions (see docs/FINANCIAL_WELLBEING_PROXIES.md use boundaries).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["customer_id", "outcome_type", "severity"],
+  "properties": {
+    "customer_id": { "type": "string", "pattern": "^cus_[a-z0-9]{6,}$" },
+    "outcome_type": { "type": "string", "enum": ["complaint", "support_contact", "hardship_indicator"] },
+    "severity": { "type": "string", "enum": ["low", "medium", "high"] }
+  },
+  "examples": [
+    {
+      "customer_id": "cus_b00001",
+      "outcome_type": "support_contact",
+      "severity": "low"
+    }
+  ]
+}

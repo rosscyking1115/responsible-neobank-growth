@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "application-submitted v1 payload",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["application_id", "customer_id", "channel", "requested_product"],
+  "properties": {
+    "application_id": { "type": "string", "pattern": "^app_[a-z0-9]{6,}$" },
+    "customer_id": { "type": "string", "pattern": "^cus_[a-z0-9]{6,}$" },
+    "channel": { "type": "string", "enum": ["organic", "paid_social", "paid_search", "referral", "partnership"] },
+    "campaign_id": { "type": ["string", "null"], "pattern": "^cmp_[a-z0-9_]{4,}$" },
+    "referral_id": { "type": ["string", "null"], "pattern": "^ref_[a-z0-9]{6,}$" },
+    "requested_product": { "type": "string", "enum": ["current_account"] }
+  },
+  "examples": [
+    {
+      "application_id": "app_000001",
+      "customer_id": "cus_a00001",
+      "channel": "referral",
+      "campaign_id": null,
+      "referral_id": "ref_000001",
+      "requested_product": "current_account"
+    }
+  ]
+}
