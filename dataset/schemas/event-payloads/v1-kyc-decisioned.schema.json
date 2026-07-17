@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "kyc-decisioned v1 payload",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["application_id", "customer_id", "decision", "decision_source"],
+  "properties": {
+    "application_id": { "type": "string", "pattern": "^app_[a-z0-9]{6,}$" },
+    "customer_id": { "type": "string", "pattern": "^cus_[a-z0-9]{6,}$" },
+    "decision": { "type": "string", "enum": ["approved", "rejected", "manual_review"] },
+    "decision_source": { "type": "string", "enum": ["automated", "manual"] }
+  },
+  "examples": [
+    {
+      "application_id": "app_000001",
+      "customer_id": "cus_a00001",
+      "decision": "approved",
+      "decision_source": "automated"
+    }
+  ]
+}

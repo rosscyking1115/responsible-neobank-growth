@@ -1,0 +1,18 @@
+{
+  "built_at_utc": "2026-07-17T18:41:27.611874+00:00",
+  "generator_version": "0.1.0",
+  "licence": {
+    "code": "MIT",
+    "data": "CC-BY-4.0 (proposed; confirm at publication)"
+  },
+  "note": "Data files are generator output, never hand-edited. standard data is built on demand and uploaded, not committed.",
+  "profiles": [
+    {
+      "batch_count": 72,
+      "delivery_count": 1833,
+      "logical_checksum": "dc04e5d3df162227231d32a26468061c7644b1141e35443954b21ba8e1a00ef1",
+      "profile": "tiny"
+    }
+  ],
+  "release_branch": "bigquery-only"
+}

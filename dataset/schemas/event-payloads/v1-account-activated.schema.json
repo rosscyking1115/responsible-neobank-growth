@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "account-activated v1 payload",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["account_id", "customer_id", "application_id"],
+  "properties": {
+    "account_id": { "type": "string", "pattern": "^acc_[a-z0-9]{6,}$" },
+    "customer_id": { "type": "string", "pattern": "^cus_[a-z0-9]{6,}$" },
+    "application_id": { "type": "string", "pattern": "^app_[a-z0-9]{6,}$" }
+  },
+  "examples": [
+    {
+      "account_id": "acc_000001",
+      "customer_id": "cus_a00001",
+      "application_id": "app_000001"
+    }
+  ]
+}

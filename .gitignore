@@ -22,6 +22,11 @@ data/
 *.duckdb.wal
 *.parquet
 
+# Dataset release candidate: the tiny tree is committed; the standard profile's
+# large data is built on demand and uploaded, never committed.
+dataset/data/standard/
+dataset/truth/standard-manifest.json
+
 # dbt build artifacts
 dbt_neobank/target/
 dbt_neobank/dbt_packages/
