@@ -1,10 +1,16 @@
-# Looker Semantic Layer — Architecture (Plan 1, not yet executed)
+# Looker Semantic Layer — Architecture and LookML (Plan 3, Task 9)
 
-> **Status:** design only, accepted 2026-07-17. **No Looker instance exists and no
-> LookML has been validated** — this directory documents what the Plan 3 trial
-> will build so the 14-day window is spent validating, not authoring. No Looker
-> experience is claimed anywhere until Plan 3's validators actually run
-> (claim level: `planned`).
+> **Status:** LookML **authored locally** on 2026-07-17 against the
+> parity-proven BigQuery interfaces (optimised lineage,
+> `neobank_p3o_20260717_*`). **No Looker instance has validated this yet** —
+> validation happens in the 14-day trial (LookML/SQL/Assert/Content
+> validators) and no Looker experience is claimed until it does
+> (claim level: `configured`).
+>
+> Implementation deviation from the Plan 1 field inventory: the
+> `reward_reconciliation` Explore keys on `referral_id` + `reconciliation_date`
+> (not `reward_id` + date) because a missing posting has no reward identifier —
+> the exception the interface exists to expose.
 
 ## Responsibility boundary
 
