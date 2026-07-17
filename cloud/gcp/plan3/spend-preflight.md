@@ -1,10 +1,10 @@
 # Plan 3 Spend Preflight — Approval Record
 
-> **Status: AWAITING APPROVAL.** Prepared 2026-07-17 (Plan 3, Task 1). No
-> billable action has occurred and none is authorised until Ross approves this
-> record; the mechanical gate is `approval.spend_preflight_approved` in
-> [run-config.yml](run-config.yml), enforced by
-> `tools/cloud/plan3_config.py::billable_execution_allowed`.
+> **Status: APPROVED by Ross on 2026-07-17** (in chat, after review of the
+> measured standard profile and the £10 ceiling). The mechanical gate
+> `approval.spend_preflight_approved` in [run-config.yml](run-config.yml) is
+> now open with approver and date recorded; the 80%-of-ceiling stop and all
+> query controls remain in force.
 
 ## What approval authorises
 

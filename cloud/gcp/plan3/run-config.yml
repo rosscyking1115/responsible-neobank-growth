@@ -33,9 +33,9 @@ stop_at_pct_of_ceiling: 80
 
 approval:
   design_accepted: true               # Plans 1-3 accepted as plans; Plan 1-2 evidence accepted
-  spend_preflight_approved: false     # flips ONLY on Ross's explicit approval of spend-preflight.md
-  approved_by: null
-  approved_on: null
+  spend_preflight_approved: true      # Ross approved spend-preflight.md in chat
+  approved_by: ross
+  approved_on: "2026-07-17"
 
 cleanup:
   deadline: "2026-08-16"

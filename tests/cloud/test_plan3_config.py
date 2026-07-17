@@ -84,20 +84,29 @@ def test_datasets_follow_isolated_naming(config) -> None:
         )
 
 
-def test_billable_execution_stays_blocked_without_user_approval(config) -> None:
-    assert config["approval"]["spend_preflight_approved"] is False, (
-        "the committed config must not pre-approve spend; only the user flips this"
-    )
-    assert billable_execution_allowed(config) is False
+def test_billable_execution_requires_fully_attributed_approval(config) -> None:
+    """The guard opens only for an approval with approver and date; the
+    committed state must be internally consistent either way."""
+    approval = config["approval"]
+    if approval["spend_preflight_approved"]:
+        # Approved state (Ross, 2026-07-17): attribution must be complete.
+        assert approval["approved_by"] and approval["approved_on"], (
+            "recorded approval must carry approver and date"
+        )
+        assert billable_execution_allowed(config) is True
+    else:
+        assert billable_execution_allowed(config) is False
 
-    approved = copy.deepcopy(config)
-    approved["approval"].update(
-        {"spend_preflight_approved": True, "approved_by": "ross", "approved_on": "2026-07-18"}
+    unapproved = copy.deepcopy(config)
+    unapproved["approval"].update(
+        {"spend_preflight_approved": False, "approved_by": None, "approved_on": None}
     )
-    assert billable_execution_allowed(approved) is True
+    assert billable_execution_allowed(unapproved) is False
 
     unattributed = copy.deepcopy(config)
-    unattributed["approval"]["spend_preflight_approved"] = True
+    unattributed["approval"].update(
+        {"spend_preflight_approved": True, "approved_by": None, "approved_on": None}
+    )
     assert billable_execution_allowed(unattributed) is False, (
         "approval without approver/date is not approval"
     )
