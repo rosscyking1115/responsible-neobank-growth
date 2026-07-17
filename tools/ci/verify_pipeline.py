@@ -98,7 +98,7 @@ def main() -> int:
             break
 
     missing = [a for a in REQUIRED_ARTIFACTS if not (ROOT / a).exists()]
-    with open(ROOT / "artifacts" / "plan2" / "blue-green-report.json", encoding="utf-8") as f:
+    with open(ROOT / "artifacts" / "ci" / "blue-green-report.json", encoding="utf-8") as f:
         parity = json.load(f).get("parity") is True
 
     summary = {
@@ -110,7 +110,7 @@ def main() -> int:
         and not missing
         and parity,
     }
-    out = ROOT / "artifacts" / "plan2" / "local-verification.json"
+    out = ROOT / "artifacts" / "ci" / "local-verification.json"
     out.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8", newline="\n")
     print(json.dumps(summary, indent=2))
     return 0 if summary["ok"] else 1

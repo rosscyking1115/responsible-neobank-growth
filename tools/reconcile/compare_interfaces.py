@@ -229,7 +229,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--source", type=Path, default=ROOT / "data" / "generated" / "tiny-a")
     parser.add_argument("--workdir", type=Path, default=ROOT / "data" / "bluegreen")
     parser.add_argument(
-        "--output", type=Path, default=ROOT / "artifacts" / "plan2" / "blue-green-report.json"
+        "--output", type=Path, default=ROOT / "artifacts" / "ci" / "blue-green-report.json"
     )
     args = parser.parse_args(argv)
 

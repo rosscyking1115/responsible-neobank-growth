@@ -101,6 +101,7 @@ def main(argv: list[str] | None = None) -> int:
     violations = check_manifest(manifest, load_rules(args.rules))
 
     if args.json_output:
+        args.json_output.parent.mkdir(parents=True, exist_ok=True)
         args.json_output.write_text(
             json.dumps({"violations": violations}, indent=2) + "\n", encoding="utf-8"
         )
