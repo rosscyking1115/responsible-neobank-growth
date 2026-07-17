@@ -73,7 +73,7 @@ select
     cast(null as {{ float_type() }}) as incremental_activated_estimate,
     cast(null as {{ float_type() }}) as incremental_activated_ci_low,
     cast(null as {{ float_type() }}) as incremental_activated_ci_high,
-    cast(null as varchar) as estimate_method
+    cast(null as {{ string_type() }}) as estimate_method
 from invitations
 left join qualifications on invitations.referral_id = qualifications.referral_id
 left join rewards on invitations.referral_id = rewards.referral_id

@@ -89,10 +89,10 @@ select
         else 'fresh'
     end as freshness_status,
     -- Plan 3 measurement fields: null until a dated BigQuery run exists.
-    cast(null as varchar) as strategy,
+    cast(null as {{ string_type() }}) as strategy,
     cast(null as bigint) as bytes_processed,
     cast(null as bigint) as bytes_billed,
     cast(null as bigint) as total_slot_ms,
     cast(null as {{ float_type() }}) as estimated_cost,
-    cast(null as varchar) as pricing_date
+    cast(null as {{ string_type() }}) as pricing_date
 from with_freshness

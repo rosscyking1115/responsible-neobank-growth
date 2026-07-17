@@ -49,6 +49,14 @@
     {%- endif %}
 {% endmacro %}
 
+{% macro string_type() -%}
+    {%- if target.type == 'bigquery' -%}
+        string
+    {%- else -%}
+        varchar
+    {%- endif -%}
+{%- endmacro %}
+
 {% macro ts_add_days(expression, days) -%}
     {%- if target.type == 'bigquery' -%}
         timestamp_add({{ expression }}, interval {{ days }} day)
