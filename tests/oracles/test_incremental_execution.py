@@ -57,7 +57,10 @@ def test_backfill_window_is_bounded(report) -> None:
 
 
 def test_backfill_log_records_reason_and_operator() -> None:
-    log_path = ROOT / "artifacts" / "plan2" / "backfill-log.jsonl"
+    # conftest redirects the log to a temp path so the committed snapshot is not
+    # churned; the harness fixture has already written this run's entry there.
+    from tools.reconcile.backfill import LOG_PATH as log_path
+
     assert log_path.exists()
     records = [json.loads(line) for line in log_path.read_text(encoding="utf-8").splitlines()]
     assert records, "backfill must be recorded"

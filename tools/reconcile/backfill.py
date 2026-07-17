@@ -22,7 +22,10 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-LOG_PATH = ROOT / "artifacts" / "plan2" / "backfill-log.jsonl"
+_DEFAULT_LOG = ROOT / "artifacts" / "plan2" / "backfill-log.jsonl"
+# Overridable so test runs do not churn the committed evidence snapshot
+# (tests set NEOBANK_BACKFILL_LOG to a temp path via conftest).
+LOG_PATH = Path(os.environ.get("NEOBANK_BACKFILL_LOG", str(_DEFAULT_LOG)))
 
 MODEL_SELECTION = [
     "path:models/normalised",
