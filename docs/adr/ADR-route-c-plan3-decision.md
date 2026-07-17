@@ -4,8 +4,9 @@
 
 Accepted — 2026-07-17 (Plan 3, Task 12). Outcome recorded:
 **partial go — BigQuery only**.
-Plan 4 execution begins only after the user reviews and **accepts** this
-result; publication and release decisions remain Plan 4's own gates.
+**User (Ross) reviewed and accepted this result on 2026-07-17.** Plan 4
+proceeds on the BigQuery-only release branch; publication and release
+decisions remain Plan 4's own gates.
 
 ## Context
 
