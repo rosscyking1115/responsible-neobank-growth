@@ -52,6 +52,27 @@ def test_oracle_detects_missing_posting() -> None:
     assert any("exceptions" in m for m in mismatches)
 
 
+def test_oracle_detects_duplicate_posting(tmp_path: Path) -> None:
+    """Two bookings for one referral must raise exactly one duplicate_posting."""
+    scenario = load_scenario(SCENARIOS_DIR / "duplicate-delivery.yml")
+    events_path = ROOT / scenario["events_fixture"]
+    lines = events_path.read_text(encoding="utf-8").splitlines()
+    booked = next(json.loads(line) for line in lines if '"reward-booked"' in line)
+    second = json.loads(json.dumps(booked))
+    second["event_id"] = "evt_dd-duplicate-booking-000011"
+    second["idempotency_key"] = "idk_book_000011"
+    second["payload"]["reward_id"] = "rwd_000011"
+    tampered = tmp_path / "events.jsonl"
+    tampered.write_text("\n".join(lines + [json.dumps(second)]) + "\n", encoding="utf-8")
+
+    faulty_scenario = dict(scenario)
+    # pathlib joins an absolute path as-is, so the oracle reads the tampered file.
+    faulty_scenario["events_fixture"] = str(tampered)
+
+    observed = compute_observed(faulty_scenario)
+    assert {"reason": "duplicate_posting", "count": 1} in observed["reconciliation"]["exceptions"]
+
+
 def test_known_truth_ledger_invariants_hold() -> None:
     """Outstanding payable must equal booked minus settled minus reversed."""
     for scenario_id in [
