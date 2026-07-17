@@ -15,7 +15,19 @@ with reward_events as (
     select *
     from {{ ref('nrm_reward_event') }}
     where 1 = 1
-        {{ incremental_ingestion_filter() }}
+        {#-
+          Ledger completeness and reference healing: re-select any canonical
+          reward event that is not yet journalised OR whose journal lines still
+          carry an unresolved referral, regardless of ingestion window
+          (standard-scale repair proof, 2026-07-17).
+        -#}
+        {{ incremental_ingestion_filter(
+            extra_or_clause=(
+                'event_id not in (select event_id from ' ~ this ~ ') '
+                ~ 'or event_id in (select event_id from ' ~ this
+                ~ ' where referral_id is null)'
+            ) if is_incremental() else none
+        ) }}
 ),
 
 entries as (

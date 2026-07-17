@@ -31,7 +31,7 @@
   end), executed via tools/reconcile/backfill.py so reason and operator are
   recorded.
 #}
-{% macro incremental_ingestion_filter(ts_column='ingested_at') %}
+{% macro incremental_ingestion_filter(ts_column='ingested_at', extra_or_clause=none) %}
     {%- if is_incremental() %}
     and (
         {{ ts_column }} > {{ ts_sub_days(
@@ -44,6 +44,9 @@
             {{ ts_column }} >= cast('{{ var("backfill_start") }}' as timestamp)
             and {{ ts_column }} < cast('{{ var("backfill_end") }}' as timestamp)
         )
+        {%- endif %}
+        {%- if extra_or_clause %}
+        or ({{ extra_or_clause }})
         {%- endif %}
     )
     {%- endif %}

@@ -16,7 +16,18 @@ with reward_events as (
     select *
     from {{ ref('lnd_reward_events') }}
     where is_canonical
-        {{ incremental_ingestion_filter() }}
+        {#-
+          Out-of-order arrival repair: a settlement/reversal that arrived
+          before its booking resolves referral_id to null; such rows are
+          re-selected on every incremental run until the booking mapping
+          resolves them (found by the standard-scale repair proof, 2026-07-17).
+        -#}
+        {{ incremental_ingestion_filter(
+            extra_or_clause=(
+                'idempotency_key in (select canonical_event_key from '
+                ~ this ~ ' where referral_id is null)'
+            ) if is_incremental() else none
+        ) }}
 ),
 
 all_bookings as (

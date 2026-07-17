@@ -1,0 +1,21 @@
+{
+  "run_id": "route-c-p3-20260717",
+  "strategy": "incremental",
+  "phase": "delta",
+  "rep": 1,
+  "prefix": "neobank_p3o_20260717",
+  "window": [
+    "2026-07-17T17:16:45Z",
+    "2026-07-17T17:17:30Z"
+  ],
+  "runtime_seconds": 31.3,
+  "runtime_source": "dbt log",
+  "totals": {
+    "job_count": 30,
+    "bytes_processed": 1328332079,
+    "bytes_billed": 1482686464,
+    "total_slot_ms": 904037,
+    "cache_hits": 0
+  },
+  "estimated_cost_gbp": 0.0093
+}
