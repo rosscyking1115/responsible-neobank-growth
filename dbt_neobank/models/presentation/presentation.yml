@@ -1,0 +1,104 @@
+version: 2
+
+models:
+  - name: prs_growth_acquisition
+    description: Consumer-shaped Growth journeys; replaceable consumer of the governed interface.
+    config: &presentation_config
+      meta:
+        layer: presentation
+        owner: growth
+        classification: synthetic_restricted
+    columns:
+      - name: application_id
+        tests: [not_null, unique]
+      - name: is_funded
+        tests: [not_null]
+
+  - name: prs_referral_economics
+    description: Consumer-shaped referral economics.
+    config: *presentation_config
+    columns:
+      - name: referral_id
+        tests: [not_null, unique]
+
+  - name: prs_financial_reconciliation_daily
+    description: Daily reconciliation rollup for Finance reporting.
+    config:
+      meta:
+        layer: presentation
+        owner: finance
+        classification: synthetic_restricted
+    columns:
+      - name: reconciliation_date
+        tests: [not_null, unique]
+      - name: exception_count
+        tests: [not_null]
+
+  - name: prs_warehouse_health_daily
+    description: Daily warehouse-health rollup; cost fields null until Plan 3.
+    config:
+      meta:
+        layer: presentation
+        owner: platform
+        classification: synthetic_restricted
+    columns:
+      - name: model_name
+        tests: [not_null]
+
+  - name: prs_ml_activation_features
+    description: Activation-model features served from the governed interface.
+    config: *presentation_config
+    columns:
+      - name: application_id
+        tests: [not_null, unique]
+
+exposures:
+  - name: streamlit_decision_dashboard
+    label: Streamlit decision dashboard
+    type: dashboard
+    maturity: high
+    description: Seven-tab internal decision-support dashboard (app/streamlit_app.py).
+    depends_on:
+      - ref('prs_growth_acquisition')
+      - ref('prs_warehouse_health_daily')
+    owner:
+      name: Cheng-Yuan King
+      email: rosscyking@gmail.com
+
+  - name: activation_scoring_service
+    label: FastAPI activation scoring
+    type: ml
+    maturity: high
+    description: Batch scoring and /score endpoints consuming activation features.
+    depends_on:
+      - ref('prs_ml_activation_features')
+    owner:
+      name: Cheng-Yuan King
+      email: rosscyking@gmail.com
+
+  - name: reward_reconciliation_reporting
+    label: Reward reconciliation daily report
+    type: analysis
+    maturity: medium
+    description: Finance-facing daily reconciliation rollup.
+    depends_on:
+      - ref('prs_financial_reconciliation_daily')
+    owner:
+      name: Cheng-Yuan King
+      email: rosscyking@gmail.com
+
+  - name: future_looker_explores
+    label: Looker Explores (Plan 3)
+    type: dashboard
+    maturity: low
+    description: >-
+      Planned LookML Explores (growth_acquisition, referral_economics,
+      reward_reconciliation, warehouse_health); not activated in Plan 2.
+    depends_on:
+      - ref('prs_growth_acquisition')
+      - ref('prs_referral_economics')
+      - ref('prs_financial_reconciliation_daily')
+      - ref('prs_warehouse_health_daily')
+    owner:
+      name: Cheng-Yuan King
+      email: rosscyking@gmail.com

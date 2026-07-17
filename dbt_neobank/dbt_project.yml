@@ -33,6 +33,9 @@ models:
     logical:
       +schema: logical
       +materialized: table
+    presentation:
+      +schema: presentation
+      +materialized: table
 
 vars:
   # Expected referral reward entitlement in integer minor units; must match the

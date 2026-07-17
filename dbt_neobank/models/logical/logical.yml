@@ -70,6 +70,86 @@ models:
                   - unbalanced_journal
                   - pending_beyond_synthetic_sla
 
+  - name: lgl_growth_acquisition
+    description: >-
+      Governed growth_acquisition interface: one row per customer application
+      journey from application to funded activation with experiment arm and
+      synthetic outcome guardrail (Growth owns meaning; platform owns
+      reliability).
+    config:
+      meta:
+        layer: logical
+        owner: growth
+        classification: synthetic_restricted
+        interface_version: 1
+        compatibility: backward_compatible
+    columns:
+      - name: application_id
+        tests: [not_null, unique]
+      - name: customer_id
+        tests: [not_null]
+      - name: journey_stage
+        tests:
+          - accepted_values:
+              arguments:
+                values: [applied, rejected, manual_review, approved, activated, funded]
+      - name: experiment_variant
+        tests:
+          - accepted_values:
+              arguments:
+                values: [control, treatment]
+
+  - name: lgl_referral_economics
+    description: >-
+      Governed referral_economics interface: one row per referral with
+      qualification, activation outcome and Finance-owned booked reward cost.
+      Incrementality estimates come only from governed experiment outputs and
+      are null in Plan 2.
+    config:
+      meta:
+        layer: logical
+        owner: growth
+        classification: synthetic_restricted
+        interface_version: 1
+        compatibility: backward_compatible
+    columns:
+      - name: referral_id
+        tests: [not_null, unique]
+      - name: lifecycle_status
+        tests:
+          - accepted_values:
+              arguments:
+                values: [invited, qualified, booked, settled, reversed]
+      - name: booked_minor
+        tests: [not_null]
+
+  - name: lgl_warehouse_health
+    description: >-
+      Governed warehouse_health interface: one row per governed interface per
+      warehouse activity day; local freshness/volume evidence now, BigQuery
+      cost fields null until Plan 3 measures them.
+    config:
+      meta:
+        layer: logical
+        owner: platform
+        classification: synthetic_restricted
+        interface_version: 1
+        compatibility: backward_compatible
+    columns:
+      - name: model_name
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [growth_acquisition, referral_economics, reward_reconciliation]
+      - name: run_date
+        tests: [not_null]
+      - name: freshness_status
+        tests:
+          - accepted_values:
+              arguments:
+                values: [fresh, warn, error]
+
 unit_tests:
   - name: unit_reconciliation_flags_missing_posting_with_age
     description: A qualified referral with no booking accrues a missing_posting exception.
