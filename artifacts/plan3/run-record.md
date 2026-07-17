@@ -98,6 +98,22 @@
   dataset (job metadata only, no query text).
 - No result is extrapolated to production or Monzo scale.
 
+## 2026-07-17 — Looker access outcome (Tasks 9–11)
+
+- LookML authored locally and committed (model, 4 views, 3 dashboards, Assert
+  tests) against the parity-proven optimised lineage; readiness tests pass.
+  Claim level: **configured**.
+- Trial signup submitted by Ross (business email `rosscykinglabs@gmail.com`,
+  company RossCyKing Labs, UK) → outcome: **"Our team will reach out to you
+  shortly"** — sales-mediated contact, **no instance provisioned**. Screenshot
+  retained by Ross; no payment was requested or offered.
+- Per Plan 3 §14.4: prepared LookML retained; **no BI substitute used; no
+  Looker execution claimed**. Outcome recorded as
+  **`partial go — BigQuery only`**, with a documented upgrade path: if a
+  genuine no-cost trial is provisioned before the cleanup deadline
+  (2026-08-16), the validation stage runs and the record is upgraded by dated
+  addendum.
+
 ## Spend log
 
 | Date | Action | Bytes billed | Est. cost | Cumulative |
