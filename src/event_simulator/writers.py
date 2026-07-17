@@ -57,18 +57,21 @@ def write_output(faulted, config: SimulatorConfig, output_dir: Path) -> dict:
     for day in sorted(by_day):
         events = sorted(by_day[day], key=lambda e: (e["ingested_at"], e["event_id"]))
         content = "\n".join(_canonical_line(e) for e in events) + "\n"
+        checksum = hashlib.sha256(content.encode()).hexdigest()
         relative = f"batches/ingest-{day}.jsonl"
         (output_dir / relative).write_text(content, encoding="utf-8", newline="\n")
         batches.append(
             {
-                "batch_id": f"batch-{day}",
+                # Content-scoped id: the same content is the same batch (idempotent
+                # replay); different content on the same day is a different batch.
+                "batch_id": f"batch-{day}-{checksum[:8]}",
                 "path": relative,
                 "row_count": len(events),
                 "min_occurred_at": min(e["occurred_at"] for e in events),
                 "max_occurred_at": max(e["occurred_at"] for e in events),
                 "min_ingested_at": events[0]["ingested_at"],
                 "max_ingested_at": events[-1]["ingested_at"],
-                "checksum": hashlib.sha256(content.encode()).hexdigest(),
+                "checksum": checksum,
                 "schema_registry_version": 1,
                 "truth_manifest": "manifest.json#truth",
             }
