@@ -1,0 +1,43 @@
+# Plan 3 run configuration (Plan 3, Task 1).
+# Accepting Plan 3 approved the DESIGN, not a bill: approval.spend_preflight_approved
+# stays false in this file until Ross explicitly approves
+# cloud/gcp/plan3/spend-preflight.md, and every provisioning/query script must
+# gate on tools/cloud/plan3_config.py::billable_execution_allowed.
+
+run_id: route-c-p3-20260717
+region: europe-west2
+# Project already public in this repository's cloud docs; reused per Plan 3 §4.1
+# with strict labelling and dataset isolation.
+gcp_project: neobank-growth-platform-ross
+
+labels:
+  route_c: plan3
+  run: route-c-p3-20260717
+
+datasets:
+  - neobank_p3_raw_route_c_p3_20260717
+  - neobank_p3_baseline_route_c_p3_20260717
+  - neobank_p3_optimised_route_c_p3_20260717
+  - neobank_p3_evidence_route_c_p3_20260717
+  - neobank_p3_looker_route_c_p3_20260717
+
+dataset_expiry_days: 30
+
+# Query controls (docs/runbooks/bigquery-budget-and-cleanup.md)
+max_bytes_billed_per_query: 1073741824   # 1 GiB default; exceptions need a recorded dry run
+custom_query_quota_gib_per_day: 200
+
+# Spend contract
+spend_ceiling_gbp: 10
+stop_at_pct_of_ceiling: 80
+
+approval:
+  design_accepted: true               # Plans 1-3 accepted as plans; Plan 1-2 evidence accepted
+  spend_preflight_approved: false     # flips ONLY on Ross's explicit approval of spend-preflight.md
+  approved_by: null
+  approved_on: null
+
+cleanup:
+  deadline: "2026-08-16"
+  commands_reviewed: true
+  runbook: cloud/gcp/plan3/cleanup-runbook.md
