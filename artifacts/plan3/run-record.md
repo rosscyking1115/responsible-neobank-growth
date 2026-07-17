@@ -47,6 +47,26 @@
 - Remaining stages (dbt builds, F-vs-I benchmark) blocked on billing
   enablement (sandbox blocks DML); watch armed.
 
+## 2026-07-17 — billing enabled; benchmark phases armed (Tasks 4–5 start)
+
+- Ross linked billing account `01C196-FFCF87-70548B`; `billingEnabled: True`
+  verified; a labelled MERGE probe now **succeeds** (DML unblocked); probe
+  table deleted.
+- 16 legacy raw tables batch-loaded (free) into the Plan 3 raw dataset for the
+  current-graph rerun, alongside the two event tables.
+- dbt now stamps every BigQuery job with the invocation/node ids
+  (`query-comment: job-label: true`) — attribution verified earlier with the
+  labelled probe.
+- **Phases pre-registered before any output** (`artifacts/plan3/phase-manifest.json`):
+  90/9/1 by delivery count over `ingested_at`; Base cutoff
+  `2026-05-07T04:39:31Z` (509,364 deliveries = 90.0%), Delta cutoff
+  `2026-06-07T00:26:47Z`. Raw tables renamed `*_all`; the dbt sources read
+  phase views so phase advances are pure view DDL.
+- **Contractual dry runs recorded:** full delivery-view scan 274.4 MB;
+  largest legacy source (transactions) 5.9 MB — every stage far under the
+  1 GiB per-query cap; whole-build totals in single-digit GB (free tier).
+- Baseline (`neobank_p3b_20260717_*`) full build launched on the Base phase.
+
 ## Spend log
 
 | Date | Action | Bytes billed | Est. cost | Cumulative |
