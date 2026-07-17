@@ -20,6 +20,24 @@ inventory confirms whether they still exist and whether any scheduled job
 could generate charges during the benchmark window (if so, it is flagged to
 Ross before proceeding — not silently disabled).
 
+## Live read-only inventory (executed 2026-07-17, authenticated as the owner)
+
+- **Billing is NOT enabled** on `neobank-growth-platform-ross`: the project is
+  in BigQuery **sandbox** mode. Nothing in the project can currently generate a
+  charge; conversely, **DML is blocked** (empirically confirmed: a labelled
+  MERGE probe failed with "DML queries are not allowed in the free tier"; the
+  probe table was deleted). The incremental benchmark strategy requires DML, so
+  the full F-versus-I comparison cannot run until billing is enabled — decision
+  recorded with the user before proceeding.
+- BigQuery datasets present (historical run): `neobank_raw`, `neobank_staging`,
+  `neobank_intermediate`, `neobank_marts`, `neobank_ml`, `neobank_monitoring`.
+- Cloud Run: service `neobank-api`; jobs `neobank-activation-score-load`,
+  `neobank-score-monitoring` (dormant — no billing means no execution charges).
+- Cloud Scheduler: not queryable while billing is disabled (API refuses);
+  consistent with zero charge risk during the benchmark window.
+- Plan 3 dataset created so far: `neobank_p3_raw_route_c_p3_20260717`
+  (labelled, 30-day table expiry, europe-west2).
+
 ## Plan 3 resources to be created (after spend approval only)
 
 | Resource | Name | Controls |
