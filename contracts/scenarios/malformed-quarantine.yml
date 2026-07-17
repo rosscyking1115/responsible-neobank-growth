@@ -14,4 +14,4 @@ prohibited_interpretation: >-
   estimate of real producer quality.
 limitations: >-
   One malformation type (missing required field); type-invalid and unknown-event
-  malformations are covered by the event contract tests and Plan 2 ingestion.
+  malformations are covered by the event contract tests and the ingestion layer ingestion.

@@ -1,4 +1,4 @@
-# Governed interface: growth_acquisition (Plan 1 section 7.1)
+# Governed interface: growth_acquisition
 # Growth owns meaning; platform owns reliability.
 name: growth_acquisition
 version: 1
@@ -12,7 +12,7 @@ audiences: [growth, product, governance]
 grain: one row per customer application journey
 unique_key: [application_id]
 source_domain: application_kyc_account + activation_funding + experiment + customer_outcome events
-allowed_consumers: [looker, reporting, ml, streamlit, api]
+allowed_consumers: [bi, reporting, ml, streamlit, api]
 freshness_slo:
   warn_after: 24 hours
   error_after: 72 hours
@@ -29,7 +29,7 @@ exposures:
   - streamlit_product_health_tab
   - streamlit_experiments_tab
   - activation_model_features
-  - future_looker_growth_acquisition_explore
+  - future_bi_growth_acquisition_view
 deprecation_policy: >-
   Version bump plus compatibility view for one full plan cycle; consumers are
   migrated and verified before any field is removed.

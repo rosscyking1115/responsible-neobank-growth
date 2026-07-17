@@ -1,4 +1,4 @@
-"""Standards enforcement against the real dbt manifest (Plan 2, Task 11).
+"""Standards enforcement against the real dbt manifest.
 
 Every governed model in the actual project must satisfy the interface
 standards; a violation here fails CI, not just the fixtures. Requires a parsed
@@ -36,7 +36,7 @@ def test_real_manifest_has_governed_models(manifest) -> None:
         if node.get("resource_type") == "model"
         and node["name"].startswith(("nrm_", "lgl_"))
     ]
-    assert len(governed) >= 16, f"expected the Route C governed models, got {len(governed)}"
+    assert len(governed) >= 16, f"expected the governed models, got {len(governed)}"
 
 
 def test_every_governed_model_satisfies_the_standards(manifest) -> None:

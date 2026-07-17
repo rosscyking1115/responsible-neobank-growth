@@ -85,7 +85,7 @@
     "ref_fad21985fd": "settled",
     "ref_ff836770f2": "settled"
   },
-  "limitations": "Deterministic seeded generation with injected defects; no concurrency, no realistic timing distributions, no real-world calibration of failure rates. Engineering truth only (ADR-route-c-synthetic-truth).",
+  "limitations": "Deterministic seeded generation with injected defects; no concurrency, no realistic timing distributions, no real-world calibration of failure rates. Engineering truth only (the synthetic-truth contract).",
   "profile": "tiny",
   "prohibited_interpretation": "Synthetic engineering benchmark only. Volumes, rates and amounts are generated for oracle coverage and carry no information about real customers, real funnels or Monzo.",
   "reconciliation": {

@@ -1,15 +1,14 @@
 # Reward Reconciliation Contract
 
-> **Status:** Accepted 2026-07-17 (Plan 1, Task 7). Freezes the bounded
-> referral-reward subledger semantics for Plan 2. Detection behaviour is
+> **Status:** Accepted 2026-07-17. Freezes the bounded
+> referral-reward subledger semantics for the ingestion layer. Detection behaviour is
 > executable now: `tests/oracles/test_reward_reconciliation_truth.py` proves the
 > tiny fixtures expose incorrect reversal treatment and missing postings exactly.
 
 ## Scope
 
-Finance is limited to the referral-reward subledger (Route C scope,
-`docs/architecture/route-c-product-scope.md`). No general ledger, payments
-processor or bank-wide reconciliation platform is represented.
+Finance is limited to the referral-reward subledger by design. No general ledger,
+payments processor or bank-wide reconciliation platform is represented.
 
 ## Lifecycle
 
@@ -61,13 +60,13 @@ truth and tests change together before publication.
 - `reversal_beyond_booked_amount`;
 - `pending_beyond_synthetic_sla`.
 
-Plan 1 fixtures exercise `missing_posting` exactly; Plan 2 fault injection must
+the contract layer fixtures exercise `missing_posting` exactly; the ingestion layer fault injection must
 cover the remainder with the same exact-truth discipline. Reason codes are
 append-only (interface deprecation policy).
 
 ## Daily outputs
 
-For each reward and day, Plan 2 calculates: expected entitlement; booked,
+For each reward and day, the ingestion layer calculates: expected entitlement; booked,
 settled and reversed amounts; outstanding payable; debit/credit balance;
 lifecycle status; reconciliation status; exception reason and age; owning
 interface and source event trace. The `referral-known-truth` fixture declares

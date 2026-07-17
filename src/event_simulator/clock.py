@@ -1,4 +1,4 @@
-"""Deterministic UTC virtual clock (Plan 2 section 5.4)."""
+"""Deterministic UTC virtual clock."""
 
 from datetime import UTC, datetime, timedelta
 

@@ -1,4 +1,4 @@
-"""Deterministic identity derivation (Plan 2 section 5.3).
+"""Deterministic identity derivation.
 
 Identifiers are derived from (namespace, seed, sequence) via SHA-256 — never
 from random UUIDs or unseeded randomness — so the same configuration always

@@ -1,4 +1,4 @@
-"""Consumer compatibility contract tests (Plan 2, Task 10).
+"""Consumer compatibility contract tests.
 
 Each preserved consumer path must work through a compatibility relation over
 the governed interfaces: required columns and grain hold, no consumer needs
@@ -21,7 +21,7 @@ pytestmark = pytest.mark.skipif(
 )
 
 # Required columns per compatibility relation: the contract each preserved
-# consumer actually depends on (Task 5 consumer map).
+# consumer actually depends on.
 REQUIRED_CONTRACTS = {
     "main_compatibility.cmp_fct_activation": {
         "key": "user_id",

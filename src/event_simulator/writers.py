@@ -1,4 +1,4 @@
-"""Deterministic batch writer and content comparison (Plan 2, Tasks 4 and 6.1).
+"""Deterministic batch writer and content comparison.
 
 Deliveries are written as immutable, partition-addressable daily batches
 (JSONL, sorted, sorted-key JSON) plus a run manifest carrying the truth

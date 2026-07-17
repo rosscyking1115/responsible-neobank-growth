@@ -1,5 +1,5 @@
 -- Daily reconciliation rollup for Finance reporting and the future
--- reward_reconciliation Looker Explore. One row per reconciliation day.
+-- reward_reconciliation BI view. One row per reconciliation day.
 select
     reconciliation_date,
     count(*) as entitlements,

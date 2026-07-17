@@ -1,4 +1,4 @@
-# tiny profile — contract, CI and failure tests (ADR-route-c-synthetic-truth).
+# tiny profile — contract, CI and failure tests (the synthetic-truth contract).
 # Capped at 5,000 deliveries; includes every mandatory failure scenario; exact
 # truth committed alongside generated output.
 profile: tiny

@@ -1,4 +1,4 @@
-"""Governed interface contract tests (Plan 1, Task 6).
+"""Governed interface contract tests.
 
 Gate G0.5: the four interface manifests must validate against the interface
 schema; a manifest missing owner, grain, unique key, freshness, classification,
@@ -25,7 +25,7 @@ EXPECTED_INTERFACES = {
     "warehouse_health",
 }
 
-# Plan 1 section 7.1 ownership assignments.
+# the contract layer section 7.1 ownership assignments.
 EXPECTED_OWNERS = {
     "growth_acquisition": "growth",
     "referral_economics": "growth",
@@ -73,7 +73,7 @@ def test_interface_manifests_validate() -> None:
     for name, manifest in load_interfaces().items():
         jsonschema.validate(instance=manifest, schema=schema)
         assert manifest["owner"] == EXPECTED_OWNERS[name], (
-            f"{name}: owner must follow Plan 1 section 7.1"
+            f"{name}: owner must follow the contract layer section 7.1"
         )
 
 

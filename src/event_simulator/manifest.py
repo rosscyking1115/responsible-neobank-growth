@@ -1,9 +1,9 @@
-"""Truth-manifest construction (Plan 2 sections 5.2 and 8.2).
+"""Truth-manifest construction.
 
 Business truth (lifecycle end states, ledger totals, expected exceptions) is
 carried by the injectors' explicit bookkeeping. Delivery-level counts
 (duplicates, quarantine, lateness, freshness) are derived from the final
-stream using the event registry — a separate implementation from the Plan 1
+stream using the event registry — a separate implementation from the contract layer
 oracle that the tests use for verification.
 """
 
@@ -29,7 +29,7 @@ PROHIBITED_INTERPRETATION = (
 LIMITATIONS = (
     "Deterministic seeded generation with injected defects; no concurrency, "
     "no realistic timing distributions, no real-world calibration of failure "
-    "rates. Engineering truth only (ADR-route-c-synthetic-truth)."
+    "rates. Engineering truth only (the synthetic-truth contract)."
 )
 
 

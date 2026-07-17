@@ -1,2 +1,2 @@
-"""Append-only local event ingestion (Plan 2). Loader, quarantine and run
-manifests are implemented in Task 5; this package is scaffolded in Task 1."""
+"""Append-only local event ingestion. Loader, quarantine and run
+manifests are implemented in; this package is scaffolded in."""

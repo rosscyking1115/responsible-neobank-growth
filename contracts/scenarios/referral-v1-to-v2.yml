@@ -14,4 +14,4 @@ prohibited_interpretation: >-
   not a record of any real schema rollout.
 limitations: >-
   Canonical equivalence at the normalised layer (v1 rows exposing a null
-  qualification_rule) is asserted structurally here and executed in Plan 2.
+  qualification_rule) is asserted structurally here and executed in the ingestion layer.

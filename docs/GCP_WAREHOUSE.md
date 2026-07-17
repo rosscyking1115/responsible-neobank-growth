@@ -124,9 +124,8 @@ through Cloud Storage and BigQuery.
 > a **one-off smoke test**. What was *not* done is leaving a standing daily
 > schedule running, and production security controls remain undeployed. Both
 > dated records stand; this note reconciles them rather than rewriting either.
-> The current Route C cloud evidence is the dated 2026-07-17 BigQuery benchmark
-> run ([artifacts/plan3/run-record.md](../artifacts/plan3/run-record.md)); the
-> 2026-05-30/31 figures above are historical.
+> The current cloud evidence is the dated 2026-07-17 BigQuery benchmark
+> run; the 2026-05-30/31 figures above are historical.
 
 ## BigQuery Dataset Layout
 

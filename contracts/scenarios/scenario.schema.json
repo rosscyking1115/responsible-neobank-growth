@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Route C scenario manifest",
-  "description": "Declares one deterministic tiny scenario: which event fixture it plays, which truth manifest states its exact expected outcomes, and the interpretation limits (ADR-route-c-synthetic-truth).",
+  "title": "Scenario manifest",
+  "description": "Declares one deterministic tiny scenario: which event fixture it plays, which truth manifest states its exact expected outcomes, and the interpretation limits (the synthetic-truth contract).",
   "type": "object",
   "additionalProperties": false,
   "required": [

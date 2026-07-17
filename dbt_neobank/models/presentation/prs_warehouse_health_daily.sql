@@ -1,5 +1,5 @@
 -- Daily warehouse-health rollup (Monitoring tab and the future
--- warehouse_health Looker Explore). Cost fields stay null until Plan 3
+-- warehouse_health BI view). Cost fields stay null until the BigQuery benchmark
 -- supplies measurements; nulls must never be rendered as zero cost.
 select
     model_name,

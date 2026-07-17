@@ -1,4 +1,4 @@
-"""Blue/green interface reconciliation harness (Plan 2, Tasks 8.5 and 9).
+"""Blue/green interface reconciliation harness.
 
 Proves incremental and full-refresh parity on identical final event sets:
 
@@ -229,7 +229,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--source", type=Path, default=ROOT / "data" / "generated" / "tiny-a")
     parser.add_argument("--workdir", type=Path, default=ROOT / "data" / "bluegreen")
     parser.add_argument(
-        "--output", type=Path, default=ROOT / "artifacts" / "plan2" / "blue-green-report.json"
+        "--output", type=Path, default=ROOT / "artifacts" / "ci" / "blue-green-report.json"
     )
     args = parser.parse_args(argv)
 

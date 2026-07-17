@@ -1,4 +1,4 @@
-"""Build the synthetic event benchmark dataset release tree (Plan 4, Task 6).
+"""Build the synthetic event benchmark dataset release tree.
 
 Assembles ``dataset/`` deterministically from generated simulator output plus
 the committed contracts and configs, computes SHA256SUMS, and writes a build

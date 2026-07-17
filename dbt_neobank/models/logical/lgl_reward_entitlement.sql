@@ -1,6 +1,6 @@
 -- One row per qualified referral: the authoritative entitlement and its
 -- current reconciliation position. Entitlement rules live here (dbt), never in
--- a BI layer (ADR-route-c-dbt-looker-boundary).
+-- a BI layer (the dbt/presentation boundary).
 with qualified as (
     select
         referral_id,

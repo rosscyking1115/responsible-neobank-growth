@@ -1,4 +1,4 @@
--- Consumer-shaped Growth acquisition journeys (Looker/Streamlit/reporting).
+-- Consumer-shaped Growth acquisition journeys (BI/Streamlit/reporting).
 -- Replaceable consumer of lgl_growth_acquisition; never a second source of
 -- business truth.
 select

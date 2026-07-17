@@ -1,4 +1,4 @@
-# Governed interface: reward_reconciliation (Plan 1 section 7.1)
+# Governed interface: reward_reconciliation
 # Finance owns reconciliation rules; platform owns event/model correctness.
 name: reward_reconciliation
 version: 1
@@ -12,7 +12,7 @@ audiences: [finance, platform, governance]
 grain: one row per reward per reconciliation day
 unique_key: [reward_id, reconciliation_date]
 source_domain: referral_reward events against the bounded reward subledger
-allowed_consumers: [looker, reporting, finance]
+allowed_consumers: [bi, reporting, finance]
 freshness_slo:
   warn_after: 24 hours
   error_after: 48 hours
@@ -27,7 +27,7 @@ tests:
   - injected fixture exceptions are detected exactly
 exposures:
   - reward_reconciliation_daily_report
-  - future_looker_reward_reconciliation_explore
+  - future_bi_reward_reconciliation_view
 deprecation_policy: >-
   Reconciliation reason codes are append-only; removing or renaming one requires
   a new interface version and a migration record.

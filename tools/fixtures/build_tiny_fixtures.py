@@ -1,4 +1,4 @@
-"""Build the tiny Route C event fixtures (Plan 1, Task 4).
+"""Build the tiny event fixtures.
 
 Deterministic and literal-driven: no randomness, no wall clock. Rerunning
 rewrites ``fixtures/events/tiny/*.jsonl`` and ``fixtures/truth/tiny/*.json``
@@ -539,7 +539,7 @@ TRUTH_RECONCILIATION_BREAK = {
 
 
 def build_referral_known_truth() -> ScenarioBuilder:
-    """Plan 1 section 8.3: the mandatory hand-built combined referral case."""
+    """the contract layer section 8.3: the mandatory hand-built combined referral case."""
     b = ScenarioBuilder("referral-known-truth", "kt")
     # ref_100001 — valid invite + qualification that settles normally (05 Jan).
     b.invited("100001", "a10001", "2026-01-04T18:00:00Z")

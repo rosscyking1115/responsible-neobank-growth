@@ -1,4 +1,4 @@
-"""Delivery classification for ingestion (Plan 2 section 6.3).
+"""Delivery classification for ingestion.
 
 Quarantine is evidence, not silent dropping: every invalid delivery records
 identifiers where recoverable, the failing rule, a retriable classification and

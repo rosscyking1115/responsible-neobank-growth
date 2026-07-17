@@ -4,7 +4,7 @@
     incremental_strategy=('merge' if target.type == 'bigquery' else 'delete+insert'),
     partition_by={'field': 'arrival_date', 'data_type': 'date', 'granularity': 'day'},
     cluster_by=['event_type'],
-    labels={'route_c': 'plan2', 'layer': 'normalised'}
+    labels={'project': 'neobank', 'layer': 'normalised'}
 ) }}
 
 -- Canonical reward lifecycle events (booked/settled/reversed). Settlements

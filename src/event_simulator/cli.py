@@ -1,4 +1,4 @@
-"""Simulator CLI (Plan 2, Tasks 1 and 4).
+"""Simulator CLI.
 
 ``validate`` checks a profile configuration; ``generate`` produces the
 deterministic delivery batches and truth manifest; ``compare`` verifies two

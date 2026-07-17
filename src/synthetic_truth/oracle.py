@@ -1,4 +1,4 @@
-"""Independent truth oracle for the tiny Route C event fixtures.
+"""Independent truth oracle for the tiny event fixtures.
 
 The oracle recomputes observable facts (delivery counts, duplicates,
 quarantines, late arrivals, lifecycle end states, subledger totals and
@@ -6,7 +6,7 @@ reconciliation exceptions) directly from a scenario's raw event fixture and
 compares them with the hand-declared truth manifest. Truth manifests are never
 generated from this code — that separation is what makes a mismatch meaningful.
 
-Semantics locked by ADR-route-c-event-boundary and ADR-route-c-synthetic-truth:
+Semantics locked by the event-boundary contract and the synthetic-truth contract:
 
 - a delivery is quarantined when its envelope or registered payload schema
   fails validation; quarantined deliveries never mutate canonical state;

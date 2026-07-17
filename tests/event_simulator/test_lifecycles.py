@@ -1,6 +1,6 @@
-"""Valid domain lifecycle tests (Plan 2, Task 2).
+"""Valid domain lifecycle tests.
 
-Only Gate 0-approved lifecycle transitions may be emitted; valid paths produce
+Only approved lifecycle transitions may be emitted; valid paths produce
 schema-valid events with deterministic identity and time. Invalid transitions
 raise before any event exists.
 """
@@ -27,7 +27,7 @@ def generation():
 def test_every_generated_event_is_schema_valid(generation) -> None:
     valid, quarantined = classify_deliveries(generation.events)
     assert quarantined == [], (
-        "Task 2 generates only valid events; the first quarantined event is "
+        " generates only valid events; the first quarantined event is "
         f"{quarantined[0] if quarantined else None}"
     )
     assert len(valid) == len(generation.events)

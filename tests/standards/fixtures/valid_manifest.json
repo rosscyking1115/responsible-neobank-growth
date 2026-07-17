@@ -15,7 +15,7 @@
           "classification": "synthetic_restricted",
           "interface_version": 1,
           "compatibility": "backward_compatible",
-          "exposures": ["streamlit_product_health_tab", "future_looker_growth_acquisition_explore"],
+          "exposures": ["streamlit_product_health_tab", "future_bi_growth_acquisition_view"],
           "partition_policy": "partition by application submission date (daily)"
         }
       }
@@ -37,7 +37,7 @@
           "compatibility": "backward_compatible",
           "exposures": ["referral_economics_interface"],
           "partition_policy": "not applicable: tiny reference volume, documented",
-          "incremental_exemption": "tiny fixture volume in Plan 1; incremental materialisation deferred to Plan 2 with the real event volume"
+          "incremental_exemption": "tiny fixture volume in the contract layer; incremental materialisation deferred to the ingestion layer with the real event volume"
         }
       }
     },

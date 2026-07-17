@@ -1,4 +1,4 @@
-"""Reproducibility tests (Plan 2, Task 4).
+"""Reproducibility tests.
 
 Repeated runs in separate directories must produce identical logical content
 (batch files and checksums); environment metadata is declared non-semantic and

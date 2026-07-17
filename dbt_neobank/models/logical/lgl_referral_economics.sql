@@ -1,7 +1,7 @@
 -- Governed interface: referral_economics (contracts/interfaces/referral-economics.yml).
 -- One row per referral: qualification, activation outcome and Finance-owned
 -- booked reward cost. Incrementality estimate columns are declared but null in
--- Plan 2 — they are populated only from governed experiment outputs, never
+-- the ingestion layer — they are populated only from governed experiment outputs, never
 -- recomputed in a BI layer (docs/metrics/metric-ownership.yml).
 with invitations as (
     select
@@ -69,7 +69,7 @@ select
     coalesce(rewards.outstanding_payable_minor, 0) as outstanding_payable_minor,
     coalesce(rewards.lifecycle_status, 'invited') as lifecycle_status,
     rewards.exception_reason,
-    -- Populated only from governed experiment outputs (Plan 2: not computed).
+    -- Populated only from governed experiment outputs.
     cast(null as {{ float_type() }}) as incremental_activated_estimate,
     cast(null as {{ float_type() }}) as incremental_activated_ci_low,
     cast(null as {{ float_type() }}) as incremental_activated_ci_high,

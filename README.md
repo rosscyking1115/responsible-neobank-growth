@@ -20,17 +20,13 @@ what does each actually cost?
 > shaped which problems I chose, not how any of it is built. See
 > [Safety & ethics](#safety--ethics).
 
-**What ran, and what didn't** — every figure below traces to
-[`evidence/registry.yml`](evidence/registry.yml), and a claim audit fails CI on
-any number that doesn't:
+**What ran:**
 
-- the four-layer warehouse executed on BigQuery under a £10 approved cap — one
-  dated benchmark run, not a live service;
+- the four-layer warehouse runs locally on DuckDB and executed on BigQuery under
+  a small, capped budget — one dated benchmark run, not a live service;
 - full-refresh and incremental builds matched exactly at every governed
   interface, across all three phases;
-- the cost result is measured and mixed, and I report it that way (below);
-- the LookML is written and reviewed but never validated in a Looker instance —
-  the trial was access-limited, so I claim no Looker experience.
+- the cost result is measured and mixed, and I report it that way (below).
 
 ## Why known truth
 
@@ -60,9 +56,9 @@ Landing (lnd_*)  ->  Normalised (nrm_*)  ->  Logical / governed interfaces (lgl_
         |                                    Presentation (prs_*)
         |                                          |
         |                          +---------------+----------------+
-        |                          v               v                v
-        |                     Looker (LookML   Streamlit /      ML features /
-        |                     written)         decision app     scoring
+        |                          v                                v
+        |                     Streamlit /                      ML features /
+        |                     decision app                     scoring
         v
 Truth manifest  ->  correctness + reward-reconciliation oracle
 BigQuery job metadata  ->  warehouse-health interface
@@ -70,25 +66,24 @@ BigQuery job metadata  ->  warehouse-health interface
 
 Only normalised and logical models are governed interfaces; presentation models
 are replaceable. The existing analytics reach the interfaces through
-compatibility views, so nothing that already worked was thrown away. Decisions
-are written up in [docs/adr/](docs/adr/README.md); the full local and cloud
-picture is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+compatibility views, so nothing that already worked was thrown away. The full
+local and cloud picture is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## What holds up
 
-Each row traces to a record in [`evidence/registry.yml`](evidence/registry.yml).
+Each result is checked by a test or a command in this repository — run
+`uv run python -m tools.ci.verify_pipeline` to reproduce the local proof end to
+end.
 
-| Result | Evidence |
+| Result | How it's checked |
 |---|---|
-| Standard profile: 568,789 deliveries in 356 batches, identical checksum across two runs | [phase manifest](artifacts/plan3/phase-manifest.json) |
-| BigQuery run: 68 dbt models and 215 tests green (this is the current cloud evidence; the older 13-table/107-check run is historical) | [current-graph summary](artifacts/plan3/current-graph/summary.json) |
-| Full versus incremental: exact match at all six governed interfaces, base/delta/repair | [base](artifacts/plan3/base-parity.json) · [delta](artifacts/plan3/delta-parity.json) · [repair](artifacts/plan3/repair-parity.json) |
-| Cost, measured and mixed: incremental billed +1.95% bytes but used −62.7% compute; partitioning cut one query's scan 523.9× | [benchmark summary](artifacts/plan3/benchmark-summary.json) · [results CSV](artifacts/plan3/warehouse-cost-results.csv) |
-| Late-event recovery: a held-back day missed by the lookback, recovered by a bounded backfill; two staleness bugs found and fixed at scale | [run record](artifacts/plan3/run-record.md) |
-| Reward reconciliation: debits equal credits, opening plus movements equals closing, every injected exception caught | [execution oracle](tests/oracles/test_reward_reconciliation_execution.py) |
-| Reproducible from a clean clone with no cloud account | [reproducibility](artifacts/plan4/reproducibility.md) |
-| Dataset published on Hugging Face (CC-BY-4.0), verified from a clean download | [release record](artifacts/plan4/dataset-release.md) |
-| Spend: 844 jobs, 32.99 GB billed, about £0.21 (likely £0 under the free tier) against a £10 cap | [run record](artifacts/plan3/run-record.md) |
+| Standard profile: 568,789 deliveries in 356 batches, identical logical checksum across two runs | `cli generate` ×2 + `cli compare` (`tests/event_simulator/test_reproducibility.py`) |
+| dbt build: 68 models, 217 data tests, 4 unit tests green | `uv run dbt build` (`PASS=289`); also executed on BigQuery |
+| Full versus incremental: exact match at all six governed interfaces (base/delta/repair) | blue/green harness `tools/reconcile/compare_interfaces.py` (`tests/oracles/test_incremental_execution.py`) |
+| Cost, measured and mixed: incremental billed +1.95% bytes but used −62.7% compute; partitioning cut one query's scan 523.9× | BigQuery benchmark (below) |
+| Late-event recovery: a held-back day missed by the 3-day lookback, recovered by a bounded backfill | `tools/reconcile/backfill.py` (`tests/oracles/test_incremental_execution.py`) |
+| Reward reconciliation: debits equal credits, opening plus movements equals closing, every injected exception caught | `tests/oracles/test_reward_reconciliation_execution.py` + `dbt_neobank/tests/logical/` |
+| Full local suite: 494 pytest tests and 289 dbt-build results pass with no cloud account | `uv run pytest` · `uv run dbt build` |
 
 ## Quick start (local, no cloud account)
 
@@ -108,7 +103,7 @@ Run the whole local proof — generation, ingestion, dbt build, standards,
 full-versus-incremental parity, tests:
 
 ```powershell
-uv run python -m tools.ci.verify_plan2
+uv run python -m tools.ci.verify_pipeline
 ```
 
 ## Governed interfaces
@@ -141,18 +136,7 @@ shows where byte savings actually come from — the same seven-day reconciliatio
 query scanned 523.9× fewer bytes on partitioned storage. Full refresh stays the
 simpler choice for the raw-scan parts; incremental's win here is compute, and
 partitioning is what buys bytes. None of it is extrapolated to production or
-Monzo scale. Method and absolute numbers:
-[the case study](docs/case-study/analytics-engineering-case-study.md).
-
-## Looker — written, not validated
-
-There is a full LookML project in [`looker/`](looker/README.md): a model, four
-Explores, three dashboards, Assert tests, all against the governed BigQuery
-interfaces. It has not run in a Looker instance. The trial signup returned a
-sales-contact page with no instance, so I claim no Looker experience and no
-validated LookML. If a genuine no-cost trial turns up before the cleanup
-deadline, the validators run and the record gets a dated addendum
-([Plan 3 decision](docs/adr/ADR-route-c-plan3-decision.md)).
+Monzo scale.
 
 ## Downstream consumers (the responsible-growth work)
 
@@ -212,7 +196,7 @@ and analysis are kept separate so the recovery is not circular (tested in
 | Event simulator | seeded generators, virtual clock, JSON Schema contracts |
 | Ingestion | append-only Parquet, checksum-gated batch registry, quarantine |
 | Analytics engineering | dbt (four layers, incremental, contracts, unit tests), DuckDB local / BigQuery |
-| Semantic / BI | LookML (written), Streamlit decision app |
+| Application | Streamlit decision app, FastAPI service |
 | Experimentation | CUPED, SRM, DiD, synthetic control (`scipy`, `statsmodels`, `linearmodels`) |
 | Modelling | `scikit-learn`, isotonic calibration, model card, batch scoring |
 | Quality | `pytest`, `ruff`, GitHub Actions, standards-as-code |
@@ -227,17 +211,14 @@ src/
   experiments/ modelling/ wellbeing/ inclusion/ release_decisions/ protection/  downstream consumers
   adapters/         real-data method-validation adapters
 dbt_neobank/      four-layer warehouse (landing/normalised/logical/presentation/compatibility)
-looker/           LookML project (written)
-tools/            standards, reconciliation harness, cloud runner, release audit
-docs/             architecture, ADRs, contracts, case study, module docs
-evidence/         claim registry (source of every public number)
-artifacts/        dated baseline / gate0 / plan2 / plan3 / plan4 evidence
+dataset/          synthetic event benchmark (tiny committed; standard built on demand)
+tools/            standards checker, reconciliation harness, dataset builder, local verify runner
+docs/             architecture, contracts, metrics, module docs
 tests/            pytest suite
 ```
 
-More: [docs/adr/](docs/adr/README.md) ·
+More: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) ·
 [docs/CREDIBILITY.md](docs/CREDIBILITY.md) ·
-[the case study](docs/case-study/analytics-engineering-case-study.md) ·
 [docs/GCP_WAREHOUSE.md](docs/GCP_WAREHOUSE.md) ·
 [docs/CLOUD_RUN_DEPLOYMENT.md](docs/CLOUD_RUN_DEPLOYMENT.md).
 

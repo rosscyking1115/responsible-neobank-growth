@@ -14,10 +14,10 @@ clean-targets:
   - target
   - dbt_packages
 
-# Job attribution (Plan 3 section 7.1): every BigQuery job carries the dbt
+# Job attribution: every BigQuery job carries the dbt
 # invocation and node ids as job labels plus a query comment.
 query-comment:
-  comment: "route_c_plan3 {{ invocation_id }}"
+  comment: "neobank {{ invocation_id }}"
   job-label: true
 
 models:

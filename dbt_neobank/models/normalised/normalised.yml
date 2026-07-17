@@ -50,7 +50,7 @@ models:
         incremental_exemption: >-
           Derived state over bounded entity counts, rebuilt from the
           incremental canonical events each run; BigQuery partition strategy
-          decided in Plan 3.
+          decided in the BigQuery benchmark.
     columns:
       - name: account_id
         tests: [not_null]
@@ -69,7 +69,7 @@ models:
         unique_key: [account_id]
         incremental_exemption: >-
           Current-state snapshot rebuilt from incremental canonical events;
-          merge materialisation considered in Plan 3.
+          merge materialisation considered in the BigQuery benchmark.
     columns:
       - name: account_id
         tests: [not_null, unique]

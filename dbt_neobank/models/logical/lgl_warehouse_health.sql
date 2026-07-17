@@ -1,7 +1,7 @@
 -- Governed interface: warehouse_health (contracts/interfaces/warehouse-health.yml).
 -- One row per governed interface per warehouse activity day with local
 -- freshness and volume evidence. BigQuery bytes, slot and cost fields remain
--- null until Plan 3 supplies dated measurements — nulls are never displayed as
+-- null until the BigQuery benchmark supplies dated measurements — nulls are never displayed as
 -- zero cost.
 with interface_families as (
     select 'growth_acquisition' as model_name, 'application-submitted' as event_name
@@ -88,7 +88,7 @@ select
             then 'warn'
         else 'fresh'
     end as freshness_status,
-    -- Plan 3 measurement fields: null until a dated BigQuery run exists.
+    -- the BigQuery benchmark measurement fields: null until a dated BigQuery run exists.
     cast(null as {{ string_type() }}) as strategy,
     cast(null as bigint) as bytes_processed,
     cast(null as bigint) as bytes_billed,

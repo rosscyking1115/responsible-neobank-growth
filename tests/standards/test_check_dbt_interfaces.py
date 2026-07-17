@@ -1,8 +1,8 @@
-"""Standards-as-code prototype tests (Plan 1, Task 8).
+"""Standards-as-code prototype tests.
 
 Gate G0.5: standards violations must be mechanically detectable. Every invalid
 manifest fixture fails for exactly one expected rule; the valid fixture passes.
-The prototype inspects dbt-artifact-shaped JSON; Plan 2 expands it to the real
+The prototype inspects dbt-artifact-shaped JSON; the ingestion layer expands it to the real
 manifest.
 """
 

@@ -1,4 +1,4 @@
-# Route C event registry (Plan 1, Task 3 — ADR-route-c-event-boundary).
+# Event registry.
 # Fictional namespace only: services belong to the invented "Northbank" synthetic
 # neobank. No real bank, brand, customer or account-number format is represented.
 #
