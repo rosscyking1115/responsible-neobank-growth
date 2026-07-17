@@ -39,6 +39,13 @@ STAGES: list[tuple[str, list[str]]] = [
          "--warehouse", "data/warehouse"],
     ),
     (
+        # The legacy graph still reads the batch generator's output (preserved
+        # consumers); a clean checkout has neither, so generate both worlds.
+        "generate-batch-raw",
+        ["python", "-m", "data_generator.generate", "--users", "5000", "--months", "6",
+         "--seed", "42", "--output-dir", "raw/ci"],
+    ),
+    (
         "dbt-build",
         ["dbt", "build", "--project-dir", "dbt_neobank", "--profiles-dir", "dbt_neobank",
          "--target", "dev"],
