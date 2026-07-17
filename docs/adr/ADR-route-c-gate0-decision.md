@@ -3,8 +3,9 @@
 ## Status
 
 Accepted — 2026-07-17 (Plan 1, Task 10). Outcome recorded: **go**.
-Plan 2 execution begins only after the user reviews and **accepts** this result
-(Plan 1 §17); this ADR does not by itself start Plan 2.
+**User (Ross) reviewed and accepted the Gate 0 result on 2026-07-17** (Plan 1
+§17 satisfied). Plan 2 is authorised with the bounded scope in the Gate 0
+report; Plans 3–4 remain blocked on their own gates.
 
 ## Context
 
