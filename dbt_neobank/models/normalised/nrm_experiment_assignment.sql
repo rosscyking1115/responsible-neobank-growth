@@ -1,3 +1,9 @@
+{{ config(
+    materialized='incremental',
+    unique_key='canonical_event_key',
+    incremental_strategy='delete+insert'
+) }}
+
 -- Canonical experiment assignments: one stable variant per customer per
 -- experiment (assignment stability tested).
 select
@@ -12,3 +18,4 @@ select
     arrival_date
 from {{ ref('lnd_experiment_events') }}
 where is_canonical
+    {{ incremental_ingestion_filter() }}

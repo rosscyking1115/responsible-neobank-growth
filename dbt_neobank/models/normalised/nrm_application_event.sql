@@ -1,3 +1,9 @@
+{{ config(
+    materialized='incremental',
+    unique_key='canonical_event_key',
+    incremental_strategy='delete+insert'
+) }}
+
 -- Canonical, version-independent application/KYC events: one row per
 -- canonical business event (duplicates suppressed at landing).
 select
@@ -17,3 +23,4 @@ select
     arrival_date
 from {{ ref('lnd_application_events') }}
 where is_canonical
+    {{ incremental_ingestion_filter() }}

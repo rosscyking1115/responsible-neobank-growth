@@ -13,6 +13,10 @@ models:
         classification: synthetic_restricted
         interface_version: 1
         compatibility: backward_compatible
+        incremental_exemption: >-
+          Cross-entity governed interface rebuilt from incremental canonical
+          events each run; BigQuery partition replacement is the Plan 3
+          strategy (see docs/contracts/incremental-correctness.md).
     columns:
       - name: referral_id
         tests: [not_null, unique]
@@ -45,6 +49,10 @@ models:
         classification: synthetic_restricted
         interface_version: 1
         compatibility: backward_compatible
+        incremental_exemption: >-
+          Cross-entity governed interface rebuilt from incremental canonical
+          events each run; BigQuery partition replacement is the Plan 3
+          strategy (see docs/contracts/incremental-correctness.md).
     columns:
       - name: referral_id
         tests: [not_null]
@@ -83,6 +91,10 @@ models:
         classification: synthetic_restricted
         interface_version: 1
         compatibility: backward_compatible
+        incremental_exemption: >-
+          Cross-entity governed interface rebuilt from incremental canonical
+          events each run; BigQuery partition replacement is the Plan 3
+          strategy (see docs/contracts/incremental-correctness.md).
     columns:
       - name: application_id
         tests: [not_null, unique]
@@ -112,6 +124,10 @@ models:
         classification: synthetic_restricted
         interface_version: 1
         compatibility: backward_compatible
+        incremental_exemption: >-
+          Cross-entity governed interface rebuilt from incremental canonical
+          events each run; BigQuery partition replacement is the Plan 3
+          strategy (see docs/contracts/incremental-correctness.md).
     columns:
       - name: referral_id
         tests: [not_null, unique]
@@ -135,6 +151,10 @@ models:
         classification: synthetic_restricted
         interface_version: 1
         compatibility: backward_compatible
+        incremental_exemption: >-
+          Cross-entity governed interface rebuilt from incremental canonical
+          events each run; BigQuery partition replacement is the Plan 3
+          strategy (see docs/contracts/incremental-correctness.md).
     columns:
       - name: model_name
         tests:

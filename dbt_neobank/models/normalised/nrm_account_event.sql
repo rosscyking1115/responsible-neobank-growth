@@ -1,3 +1,9 @@
+{{ config(
+    materialized='incremental',
+    unique_key='canonical_event_key',
+    incremental_strategy='delete+insert'
+) }}
+
 -- Canonical account lifecycle events (activated, funded) with integer
 -- minor-unit currency.
 select
@@ -16,3 +22,4 @@ select
     arrival_date
 from {{ ref('lnd_account_events') }}
 where is_canonical
+    {{ incremental_ingestion_filter() }}

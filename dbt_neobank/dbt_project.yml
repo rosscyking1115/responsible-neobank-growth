@@ -38,6 +38,11 @@ models:
       +materialized: table
 
 vars:
+  # Incremental ingestion lookback (docs/contracts/incremental-correctness.md).
+  lookback_days: 3
+  # Bounded backfill window (exclusive end); set only via tools/reconcile/backfill.py.
+  backfill_start: ""
+  backfill_end: ""
   # Expected referral reward entitlement in integer minor units; must match the
   # simulator profile (config/simulator/*.yml reward_amount_minor).
   reward_amount_minor: 5000

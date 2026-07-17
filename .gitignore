@@ -11,6 +11,7 @@ artifacts/*
 # (immutable dated evidence)
 !artifacts/baseline/
 !artifacts/gate0/
+!artifacts/plan2/
 
 # Data generated locally
 raw/

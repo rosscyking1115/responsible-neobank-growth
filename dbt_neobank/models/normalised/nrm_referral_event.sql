@@ -1,3 +1,9 @@
+{{ config(
+    materialized='incremental',
+    unique_key='canonical_event_key',
+    incremental_strategy='delete+insert'
+) }}
+
 -- Canonical referral lifecycle events with v1/v2 payload adaptation: v1 and
 -- v2 qualifications share one canonical meaning; v1 rows expose a null
 -- qualification_rule (documented new nullable field, ADR-route-c-event-boundary).
@@ -18,3 +24,4 @@ select
     arrival_date
 from {{ ref('lnd_referral_events') }}
 where is_canonical
+    {{ incremental_ingestion_filter() }}

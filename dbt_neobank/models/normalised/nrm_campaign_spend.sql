@@ -1,3 +1,9 @@
+{{ config(
+    materialized='incremental',
+    unique_key='canonical_event_key',
+    incremental_strategy='delete+insert'
+) }}
+
 -- Canonical campaign spend records, integer minor units.
 select
     idempotency_key as canonical_event_key,
@@ -12,3 +18,4 @@ select
     arrival_date
 from {{ ref('lnd_campaign_events') }}
 where is_canonical
+    {{ incremental_ingestion_filter() }}

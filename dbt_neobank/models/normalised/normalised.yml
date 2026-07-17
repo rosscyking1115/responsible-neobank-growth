@@ -35,7 +35,13 @@ models:
 
   - name: nrm_account_history
     description: Account state intervals ordered by business occurrence time.
-    config: {meta: *governed_meta}
+    config:
+      meta:
+        <<: *governed_meta
+        incremental_exemption: >-
+          Derived state over bounded entity counts, rebuilt from the
+          incremental canonical events each run; BigQuery partition strategy
+          decided in Plan 3.
     columns:
       - name: account_id
         tests: [not_null]
@@ -47,7 +53,12 @@ models:
 
   - name: nrm_account_current
     description: Single current-state row per account with first-funding facts.
-    config: {meta: *governed_meta}
+    config:
+      meta:
+        <<: *governed_meta
+        incremental_exemption: >-
+          Current-state snapshot rebuilt from incremental canonical events;
+          merge materialisation considered in Plan 3.
     columns:
       - name: account_id
         tests: [not_null, unique]
@@ -72,7 +83,12 @@ models:
 
   - name: nrm_referral_history
     description: Referral state intervals per the locked lifecycle.
-    config: {meta: *governed_meta}
+    config:
+      meta:
+        <<: *governed_meta
+        incremental_exemption: >-
+          Derived state over bounded entity counts, rebuilt from the
+          incremental canonical events each run.
     columns:
       - name: referral_id
         tests: [not_null]
@@ -145,6 +161,9 @@ unit_tests:
       v1 and v2 qualifications normalise to one canonical meaning (v1 exposes a
       null qualification_rule); non-canonical duplicate deliveries are dropped.
     model: nrm_referral_event
+    overrides:
+      macros:
+        is_incremental: false
     given:
       - input: ref('lnd_referral_events')
         rows:
@@ -168,6 +187,9 @@ unit_tests:
   - name: unit_nrm_reward_event_resolves_referral_for_settlements
     description: A settlement without referral_id resolves it via the booking.
     model: nrm_reward_event
+    overrides:
+      macros:
+        is_incremental: false
     given:
       - input: ref('lnd_reward_events')
         rows:

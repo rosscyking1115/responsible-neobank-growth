@@ -1,7 +1,22 @@
+{{ config(
+    materialized='incremental',
+    unique_key='canonical_event_key',
+    incremental_strategy='delete+insert'
+) }}
+
 -- Canonical reward lifecycle events (booked/settled/reversed). Settlements
 -- and reversals carry no referral_id in their payloads, so it is resolved
--- through the booking's reward -> referral mapping.
+-- through the booking's reward -> referral mapping (the mapping always reads
+-- the full canonical landing set, so late settlements resolve against
+-- earlier bookings).
 with reward_events as (
+    select *
+    from {{ ref('lnd_reward_events') }}
+    where is_canonical
+        {{ incremental_ingestion_filter() }}
+),
+
+all_bookings as (
     select *
     from {{ ref('lnd_reward_events') }}
     where is_canonical
@@ -9,7 +24,7 @@ with reward_events as (
 
 reward_to_referral as (
     select reward_id, min(referral_id) as referral_id
-    from reward_events
+    from all_bookings
     where event_name = 'reward-booked'
     group by reward_id
 )

@@ -1,3 +1,9 @@
+{{ config(
+    materialized='incremental',
+    unique_key='ledger_entry_id',
+    incremental_strategy='delete+insert'
+) }}
+
 -- Double-entry journal lines for the bounded referral-reward subledger
 -- (docs/contracts/reward-reconciliation.md). Two lines per canonical reward
 -- event over the three fictional accounts; not a claim about any real bank's
@@ -5,6 +11,8 @@
 with reward_events as (
     select *
     from {{ ref('nrm_reward_event') }}
+    where 1 = 1
+        {{ incremental_ingestion_filter() }}
 ),
 
 entries as (
@@ -13,6 +21,7 @@ entries as (
         reward_id,
         referral_id,
         occurred_at,
+        ingested_at,
         arrival_date,
         amount_minor,
         'debit' as entry_side,
@@ -30,6 +39,7 @@ entries as (
         reward_id,
         referral_id,
         occurred_at,
+        ingested_at,
         arrival_date,
         amount_minor,
         'credit' as entry_side,
@@ -50,5 +60,6 @@ select
     account,
     amount_minor,
     occurred_at,
+    ingested_at,
     arrival_date
 from entries

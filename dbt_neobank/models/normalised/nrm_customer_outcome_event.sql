@@ -1,3 +1,9 @@
+{{ config(
+    materialized='incremental',
+    unique_key='canonical_event_key',
+    incremental_strategy='delete+insert'
+) }}
+
 -- Canonical customer-outcome guardrail events. Synthetic proxies only; never
 -- inputs to punitive decisions (docs/FINANCIAL_WELLBEING_PROXIES.md).
 select
@@ -11,3 +17,4 @@ select
     arrival_date
 from {{ ref('lnd_customer_outcome_events') }}
 where is_canonical
+    {{ incremental_ingestion_filter() }}
