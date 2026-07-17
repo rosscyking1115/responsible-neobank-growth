@@ -33,8 +33,24 @@
   `7fb8b85813d7d182…` across two runs). Local loader run into
   `data/warehouse-standard/` for Parquet upload (loads are free).
 
+## 2026-07-17 — standard profile loaded and reconciled (Task 3)
+
+- Local loader over the standard profile: 356 batches, 565,960 valid,
+  2,829 quarantined (matches the 0.5% malformed rate).
+- Consolidated Parquet (88.9 MB deliveries + 0.4 MB quarantine) batch-loaded
+  into `neobank_p3_raw_route_c_p3_20260717.raw_event_deliveries` /
+  `.raw_event_quarantine` — loads are free.
+- **Source reconciliation exact on all checks**
+  (`artifacts/plan3/source-load-manifest.json`): total 568,789; unique
+  idempotency keys 560,360; duplicates 5,600; quarantined 2,829; event_ids
+  unique. Cloud source state equals the local run manifest.
+- Remaining stages (dbt builds, F-vs-I benchmark) blocked on billing
+  enablement (sandbox blocks DML); watch armed.
+
 ## Spend log
 
 | Date | Action | Bytes billed | Est. cost | Cumulative |
 |---|---|---|---|---|
 | 2026-07-17 | Dataset creation ×5, probe CTAS (sandbox, no billing possible) | 0 | £0.00 | £0.00 |
+| 2026-07-17 | Parquet batch loads ×2 (loads are free) | 0 | £0.00 | £0.00 |
+| 2026-07-17 | Source reconciliation count queries ×3 (~90 MB scans, sandbox free tier) | 0 | £0.00 | £0.00 |

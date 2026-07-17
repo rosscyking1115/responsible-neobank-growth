@@ -1,0 +1,24 @@
+{
+  "run_id": "route-c-p3-20260717",
+  "observed": {
+    "bq_valid_rows": 565960,
+    "bq_unique_event_ids": 565960,
+    "bq_unique_idempotency_keys": 560360,
+    "bq_quarantined_rows": 2829,
+    "bq_total_deliveries": 568789
+  },
+  "expected": {
+    "manifest_delivery_count": 568789,
+    "manifest_unique_business_events": 560360,
+    "manifest_quarantined": 2829,
+    "manifest_duplicates": 5600
+  },
+  "checks": {
+    "total_matches": true,
+    "quarantine_matches": true,
+    "unique_keys_match": true,
+    "duplicates_match": true,
+    "event_ids_unique": true
+  },
+  "all_pass": true
+}
