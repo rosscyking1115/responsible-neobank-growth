@@ -1,11 +1,11 @@
-"""Valid-lifecycle event generation (Plan 2, Task 2).
+"""Valid-lifecycle event generation.
 
 Walks each synthetic customer through the approved funnel and emits
 schema-valid events in deterministic order. Randomness comes only from seeded
-``random.Random`` instances with per-domain sub-seeds (Plan 2 section 5.2);
+``random.Random`` instances with per-domain sub-seeds;
 time comes from offsets against the configured virtual window. Fault injection
 (duplicates, late arrivals, reversals, malformed payloads, outages) is layered
-on top by ``scenarios`` in Task 3 so truth stays separable from defects.
+on top by ``scenarios`` in so truth stays separable from defects.
 """
 
 import random

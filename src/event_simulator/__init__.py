@@ -1,4 +1,4 @@
-"""Deterministic synthetic event simulator for the Route C benchmark (Plan 2).
+"""Deterministic synthetic event simulator for the synthetic event benchmark.
 
 Everything in this package must be reproducible from (profile config, seed):
 time comes from the virtual clock, identities from seeded derivation, and

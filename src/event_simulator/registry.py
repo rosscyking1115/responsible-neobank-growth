@@ -1,4 +1,4 @@
-"""Event registry access for the simulator (Plan 2, Task 1).
+"""Event registry access for the simulator.
 
 The registry under ``contracts/events/`` is the single source of truth for
 event names, versions, payload schemas and producer services. The simulator

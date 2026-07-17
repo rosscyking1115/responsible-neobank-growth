@@ -3,9 +3,9 @@ version: 2
 sources:
   - name: neobank_events
     description: >-
-      Route C synthetic event delivery store (append-only). Local DuckDB reads
+      synthetic event delivery store (append-only). Local DuckDB reads
       the loader's Parquet output directly via the event_deliveries_table()
-      macro; these source declarations are used on the BigQuery target (Plan 3).
+      macro; these source declarations are used on the BigQuery target.
     database: "{{ env_var('GCP_PROJECT_ID', '') }}"
     schema: "{{ env_var('NEOBANK_BQ_EVENTS_DATASET', 'neobank_events') }}"
     tables:

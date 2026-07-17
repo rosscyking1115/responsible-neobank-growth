@@ -1,4 +1,4 @@
-"""Dataset package validation (Plan 4, Task 6).
+"""Dataset package validation.
 
 The committed dataset tree must be internally consistent: checksums match,
 required files present, truth manifest agrees with the shipped batches, the

@@ -16,11 +16,11 @@ models:
         grain: one row per qualified referral
         unique_key: [referral_id]
         freshness_slo: {warn_after: 24 hours, error_after: 48 hours}
-        partition_policy: not applicable at this grain; documented for BigQuery in Plan 3
+        partition_policy: not applicable at this grain; documented for the BigQuery benchmark
         exposures: [reward_reconciliation_reporting]
         incremental_exemption: >-
           Cross-entity governed interface rebuilt from incremental canonical
-          events each run; BigQuery partition replacement is the Plan 3
+          events each run; BigQuery partition replacement is the BigQuery benchmark
           strategy (see docs/contracts/incremental-correctness.md).
     columns:
       - name: referral_id
@@ -58,10 +58,10 @@ models:
         unique_key: [referral_id, reconciliation_date]
         freshness_slo: {warn_after: 24 hours, error_after: 48 hours}
         partition_policy: partition by reconciliation_date (daily) intended for BigQuery
-        exposures: [reward_reconciliation_reporting, future_looker_explores]
+        exposures: [reward_reconciliation_reporting, future_bi_dashboards]
         incremental_exemption: >-
           Cross-entity governed interface rebuilt from incremental canonical
-          events each run; BigQuery partition replacement is the Plan 3
+          events each run; BigQuery partition replacement is the BigQuery benchmark
           strategy (see docs/contracts/incremental-correctness.md).
     columns:
       - name: referral_id
@@ -105,10 +105,10 @@ models:
         unique_key: [application_id]
         freshness_slo: {warn_after: 24 hours, error_after: 72 hours}
         partition_policy: partition by application date (daily) intended for BigQuery
-        exposures: [streamlit_decision_dashboard, activation_scoring_service, future_looker_explores]
+        exposures: [streamlit_decision_dashboard, activation_scoring_service, future_bi_dashboards]
         incremental_exemption: >-
           Cross-entity governed interface rebuilt from incremental canonical
-          events each run; BigQuery partition replacement is the Plan 3
+          events each run; BigQuery partition replacement is the BigQuery benchmark
           strategy (see docs/contracts/incremental-correctness.md).
     columns:
       - name: application_id
@@ -131,7 +131,7 @@ models:
       Governed referral_economics interface: one row per referral with
       qualification, activation outcome and Finance-owned booked reward cost.
       Incrementality estimates come only from governed experiment outputs and
-      are null in Plan 2.
+      are null in the ingestion layer.
     config:
       meta:
         layer: logical
@@ -143,10 +143,10 @@ models:
         unique_key: [referral_id]
         freshness_slo: {warn_after: 24 hours, error_after: 72 hours}
         partition_policy: partition by qualification date (daily) intended for BigQuery
-        exposures: [reward_reconciliation_reporting, future_looker_explores]
+        exposures: [reward_reconciliation_reporting, future_bi_dashboards]
         incremental_exemption: >-
           Cross-entity governed interface rebuilt from incremental canonical
-          events each run; BigQuery partition replacement is the Plan 3
+          events each run; BigQuery partition replacement is the BigQuery benchmark
           strategy (see docs/contracts/incremental-correctness.md).
     columns:
       - name: referral_id
@@ -163,7 +163,7 @@ models:
     description: >-
       Governed warehouse_health interface: one row per governed interface per
       warehouse activity day; local freshness/volume evidence now, BigQuery
-      cost fields null until Plan 3 measures them.
+      cost fields null until the BigQuery benchmark measures them.
     config:
       meta:
         layer: logical
@@ -175,10 +175,10 @@ models:
         unique_key: [model_name, run_date]
         freshness_slo: {warn_after: 2 days, error_after: 7 days}
         partition_policy: partition by run_date (daily) intended for BigQuery
-        exposures: [streamlit_decision_dashboard, future_looker_explores]
+        exposures: [streamlit_decision_dashboard, future_bi_dashboards]
         incremental_exemption: >-
           Cross-entity governed interface rebuilt from incremental canonical
-          events each run; BigQuery partition replacement is the Plan 3
+          events each run; BigQuery partition replacement is the BigQuery benchmark
           strategy (see docs/contracts/incremental-correctness.md).
     columns:
       - name: model_name

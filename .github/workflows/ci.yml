@@ -74,7 +74,7 @@ jobs:
         run: uv run dbt build --project-dir dbt_neobank --profiles-dir dbt_neobank
 
       - name: Standards-as-code against the real manifest
-        run: uv run python -m tools.standards.check_dbt_interfaces --manifest dbt_neobank/target/manifest.json --json-output artifacts/plan2/standards-report.json
+        run: uv run python -m tools.standards.check_dbt_interfaces --manifest dbt_neobank/target/manifest.json --json-output artifacts/ci/standards-report.json
 
       - name: Blue/green interface reconciliation
         run: uv run python -m tools.reconcile.compare_interfaces --scenario all
@@ -82,15 +82,15 @@ jobs:
       - name: Pipeline-gated tests (oracles, consumer contracts, standards)
         run: uv run pytest tests/oracles tests/migration tests/standards -q
 
-      - name: Upload Route C evidence artifacts
+      - name: Upload evidence artifacts
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: route-c-plan2-evidence
+          name: pipeline-evidence
           path: |
-            artifacts/plan2/blue-green-report.json
-            artifacts/plan2/standards-report.json
-            artifacts/plan2/backfill-log.jsonl
+            artifacts/ci/blue-green-report.json
+            artifacts/ci/standards-report.json
+            artifacts/ci/backfill-log.jsonl
             dbt_neobank/target/run_results.json
 
       - name: Build API container

@@ -5,7 +5,7 @@
 --
 -- Grain note: days are warehouse activity days (distinct arrival dates), not a
 -- full calendar spine; partition-by-day replacement is the intended BigQuery
--- strategy (Plan 3). Reason codes are append-only.
+-- strategy. Reason codes are append-only.
 with days as (
     select distinct arrival_date as reconciliation_date
     from {{ ref('lnd_event_deliveries') }}

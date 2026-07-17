@@ -1,4 +1,4 @@
-"""Reward-reconciliation oracle specification tests (Plan 1, Task 7).
+"""Reward-reconciliation oracle specification tests.
 
 Gate G0.6: reconciliation truth must detect incorrect reversal treatment and
 missing postings exactly, and the ledger invariants must hold on every tiny

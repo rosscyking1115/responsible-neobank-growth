@@ -1,4 +1,4 @@
-"""Simulator configuration and determinism-utility tests (Plan 2, Task 1).
+"""Simulator configuration and determinism-utility tests.
 
 Invalid seeds, naive timestamps, unsupported profiles, unknown event families
 and uncontrolled wall-clock/random-identity access must fail before any

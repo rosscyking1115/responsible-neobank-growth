@@ -1,4 +1,4 @@
-"""Blue/green interface reconciliation harness (Plan 2, Tasks 8.5 and 9).
+"""Blue/green interface reconciliation harness.
 
 Proves incremental and full-refresh parity on identical final event sets:
 

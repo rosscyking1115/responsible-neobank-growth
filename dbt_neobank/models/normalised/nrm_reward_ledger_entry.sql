@@ -4,7 +4,7 @@
     incremental_strategy=('merge' if target.type == 'bigquery' else 'delete+insert'),
     partition_by={'field': 'arrival_date', 'data_type': 'date', 'granularity': 'day'},
     cluster_by=['account'],
-    labels={'route_c': 'plan2', 'layer': 'normalised'}
+    labels={'project': 'neobank', 'layer': 'normalised'}
 ) }}
 
 -- Double-entry journal lines for the bounded referral-reward subledger

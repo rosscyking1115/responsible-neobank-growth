@@ -14,4 +14,4 @@ prohibited_interpretation: >-
   estimate of real delivery reliability.
 limitations: >-
   Exact-payload redelivery only; the conflicting-duplicate (same key, different
-  payload hash) case is a Plan 2 fault-injection scenario.
+  payload hash) case is a the ingestion layer fault-injection scenario.

@@ -35,7 +35,7 @@ models:
         tests: [not_null]
 
   - name: prs_warehouse_health_daily
-    description: Daily warehouse-health rollup; cost fields null until Plan 3.
+    description: Daily warehouse-health rollup; cost fields null until the BigQuery benchmark measures them.
     config:
       meta:
         layer: presentation
@@ -87,13 +87,13 @@ exposures:
       name: Cheng-Yuan King
       email: rosscyking@gmail.com
 
-  - name: future_looker_explores
-    label: Looker Explores (Plan 3)
+  - name: future_bi_dashboards
+    label: BI dashboards
     type: dashboard
     maturity: low
     description: >-
-      Planned LookML Explores (growth_acquisition, referral_economics,
-      reward_reconciliation, warehouse_health); not activated in Plan 2.
+      Governed presentation interfaces (growth_acquisition, referral_economics,
+      reward_reconciliation, warehouse_health); BI consumption not wired.
     depends_on:
       - ref('prs_growth_acquisition')
       - ref('prs_referral_economics')

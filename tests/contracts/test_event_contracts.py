@@ -1,6 +1,6 @@
-"""Route C event contract tests (Plan 1, Task 3).
+"""event contract tests.
 
-Locked by ADR-route-c-event-boundary: every synthetic backend event validates
+Locked by the event-boundary contract: every synthetic backend event validates
 against the shared envelope schema plus its registered payload schema/version.
 Invalid envelopes, unknown events/versions, wrong currency types, naive
 timestamps, missing idempotency keys and incompatible v2 payloads must fail.
@@ -213,7 +213,7 @@ def test_all_registered_payload_examples_validate() -> None:
 def test_wrong_currency_type_fails() -> None:
     # JSON Schema treats a zero-fraction float (50.0) as a valid integer, so the
     # schema layer guards against fractional major units and string amounts;
-    # rejecting float *representations* is the ingestion layer's job (Plan 2).
+    # rejecting float *representations* is the ingestion layer's job.
     schema = payload_schema("reward-booked", 1)
     payload = valid_reward_booked_v1()
     payload["amount_minor"] = 50.5  # fractional major units are forbidden

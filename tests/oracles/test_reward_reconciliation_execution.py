@@ -1,4 +1,4 @@
-"""Reward reconciliation execution oracle (Plan 2, Task 7).
+"""Reward reconciliation execution oracle.
 
 Compares the *built* DuckDB warehouse against the generation run's truth
 manifest: exact ledger totals, lifecycle states and exception identities for

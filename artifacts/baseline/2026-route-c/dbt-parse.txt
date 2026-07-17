@@ -1,4 +1,0 @@
-01:05:47  Running with dbt=1.11.11
-01:05:48  Registered adapter: duckdb=1.10.1
-01:05:48  Unable to do partial parsing because config vars, config profile, or config target have changed
-01:05:51  Performance info: dbt_neobank\target\perf_info.json

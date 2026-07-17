@@ -1,10 +1,10 @@
-"""Fault injection over valid lifecycles (Plan 2 section 5.5).
+"""Fault injection over valid lifecycles.
 
 Faults are applied *after* valid generation so the truth manifest can
 distinguish intended business state from delivery defects. Injectors mutate a
 copy of the delivery stream and the business-truth aggregates explicitly; the
 manifest then derives final delivery-level counts from the resulting stream.
-Verification is independent: tests recompute everything with the Plan 1 oracle.
+Verification is independent: tests recompute everything with the contract layer oracle.
 """
 
 import random

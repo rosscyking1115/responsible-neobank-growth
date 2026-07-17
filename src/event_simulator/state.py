@@ -1,6 +1,6 @@
-"""Lifecycle state machines and truth capture (Plan 2, Task 2).
+"""Lifecycle state machines and truth capture.
 
-Transitions are locked by the Gate 0 contract
+Transitions are locked by the reward-reconciliation contract
 (docs/contracts/reward-reconciliation.md): invited -> qualified -> booked ->
 settled, with reversed as an alternative terminal after booking. Anything else
 raises before an event can be emitted.
@@ -19,7 +19,7 @@ ALLOWED_TRANSITIONS: dict[str | None, set[str]] = {
 
 
 class LifecycleError(ValueError):
-    """Raised on a transition the Gate 0 contract does not allow."""
+    """Raised on a transition the reward-reconciliation contract does not allow."""
 
 
 class ReferralLifecycle:
@@ -40,7 +40,7 @@ class ReferralLifecycle:
 
 @dataclass
 class GenerationTruth:
-    """Exact truth captured while generating (extended by Task 3 manifests)."""
+    """Exact truth captured while generating (extended by manifests)."""
 
     event_counts: dict[str, int] = field(default_factory=dict)
     referral_end_states: dict[str, str] = field(default_factory=dict)

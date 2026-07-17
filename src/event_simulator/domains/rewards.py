@@ -2,7 +2,7 @@
 
 Valid generation books every qualified referral and settles it when the
 settlement date fits the window; reversals and reconciliation breaks are fault
-scenarios (Task 3), not part of the valid lifecycle stream.
+scenarios, not part of the valid lifecycle stream.
 """
 
 from datetime import datetime, timedelta

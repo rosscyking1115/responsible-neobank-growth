@@ -1,6 +1,6 @@
-# Standards-as-code rules for governed Route C interfaces (Plan 1 section 12.2).
+# Standards-as-code rules for governed interfaces.
 # The checker inspects dbt-artifact-shaped JSON; it does not recreate dbt.
-# Plan 2 runs these rules against the real dbt manifest in CI.
+# the ingestion layer runs these rules against the real dbt manifest in CI.
 
 governed_prefixes: [nrm_, lgl_]
 

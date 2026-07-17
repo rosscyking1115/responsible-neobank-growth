@@ -1,11 +1,11 @@
 version: 2
 
-# Compatibility contract (Plan 2 section 7.5): each model declares its source
+# Compatibility contract: each model declares its source
 # governed interface, consumers, differences from the former source,
 # deprecation status and removal gate. The legacy relations keep building from
 # the preserved batch models until each consumer verifies against these
 # compatibility relations (deprecation gate below); nothing is deleted in
-# Plan 2.
+# the ingestion layer.
 
 models:
   - name: cmp_fct_activation
@@ -19,7 +19,7 @@ models:
         classification: synthetic_restricted
         deprecation_status: parallel-run
         removal_gate: >-
-          Legacy relation is swapped only after every consumer in the Task 5
+          Legacy relation is swapped only after every consumer in the
           consumer map verifies against the compatibility relation.
         source_interface: growth_acquisition
         consumers: [streamlit_product_health_tab, activation_model]

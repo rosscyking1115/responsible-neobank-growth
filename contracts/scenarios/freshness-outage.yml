@@ -15,4 +15,4 @@ prohibited_interpretation: >-
   availability measurement of any real system.
 limitations: >-
   Replaces the previous fixed-date freshness proxy with testable arrival-gap
-  semantics; SLO wiring into dbt source freshness is Plan 2 work.
+  semantics; SLO wiring into dbt source freshness is the ingestion layer work.

@@ -1,6 +1,6 @@
-"""Typed, validated simulator configuration (Plan 2 section 5.1).
+"""Typed, validated simulator configuration.
 
-Profiles are locked by ADR-route-c-synthetic-truth: ``tiny`` (capped at 5,000
+Profiles are locked by the synthetic-truth contract: ``tiny`` (capped at 5,000
 deliveries, exact truth committed) and ``standard`` (generated on demand).
 ``stress`` remains deferred and is rejected here on purpose.
 """

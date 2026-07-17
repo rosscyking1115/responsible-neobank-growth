@@ -1,4 +1,4 @@
-"""Append-only local event loader (Plan 2 section 6).
+"""Append-only local event loader.
 
 Reads a generated run (batches + manifest), verifies each batch's checksum,
 classifies deliveries against the registry and keymap, and appends immutable

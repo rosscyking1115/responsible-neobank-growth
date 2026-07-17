@@ -1,10 +1,10 @@
-"""Local end-to-end verification of the Plan 2 pipeline (Plan 2, Task 12).
+"""Local end-to-end verification of the analytics pipeline.
 
 Reproduces every mandatory CI stage from the current checkout and fails when a
 truth/reconciliation artifact is missing at the end. This is the single
-command behind the Plan 2 acceptance evidence:
+command behind the pipeline acceptance evidence:
 
-    uv run python -m tools.ci.verify_plan2
+    uv run python -m tools.ci.verify_pipeline
 """
 
 import json
@@ -54,7 +54,7 @@ STAGES: list[tuple[str, list[str]]] = [
         "standards",
         ["python", "-m", "tools.standards.check_dbt_interfaces",
          "--manifest", "dbt_neobank/target/manifest.json",
-         "--json-output", "artifacts/plan2/standards-report.json"],
+         "--json-output", "artifacts/ci/standards-report.json"],
     ),
     (
         "blue-green",
@@ -67,9 +67,9 @@ STAGES: list[tuple[str, list[str]]] = [
 ]
 
 REQUIRED_ARTIFACTS = [
-    "artifacts/plan2/blue-green-report.json",
-    "artifacts/plan2/standards-report.json",
-    "artifacts/plan2/backfill-log.jsonl",
+    "artifacts/ci/blue-green-report.json",
+    "artifacts/ci/standards-report.json",
+    "artifacts/ci/backfill-log.jsonl",
     "dbt_neobank/target/run_results.json",
     "data/generated/tiny-a/manifest.json",
 ]

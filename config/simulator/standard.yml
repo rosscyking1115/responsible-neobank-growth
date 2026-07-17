@@ -1,4 +1,4 @@
-# standard profile — later public benchmark and BigQuery proof (Plan 2 §5.1).
+# standard profile — later public benchmark and BigQuery proof.
 # Generated locally on demand; configuration and manifest committed, data
 # ignored. No claim that the volume resembles Monzo.
 profile: standard

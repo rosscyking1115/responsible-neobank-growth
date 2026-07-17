@@ -1,4 +1,4 @@
-"""Batch registry and run manifests for ingestion (Plan 2 section 6.1).
+"""Batch registry and run manifests for ingestion.
 
 The registry is the idempotency boundary: a batch (content-scoped id plus
 checksum) loads exactly once. The keymap carries accepted

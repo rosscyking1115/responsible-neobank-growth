@@ -1,7 +1,7 @@
 # Incremental Correctness Contract
 
-> **Status:** Accepted 2026-07-17 (Plan 1, Task 7). Freezes the semantics Plan 2
-> must implement and Plan 3 must measure. Oracle behaviour is executable now:
+> **Status:** Accepted 2026-07-17. Freezes the semantics the ingestion layer
+> must implement and the BigQuery benchmark must measure. Oracle behaviour is executable now:
 > `tests/oracles/test_incremental_oracle_spec.py` proves the tiny fixtures
 > distinguish full truth from dropped-late-event and duplicate-counting failures.
 
@@ -16,11 +16,10 @@
 ## Watermark and lookback
 
 - Default lookback: a **3-day** ingestion lookback (an operational policy for this
-  benchmark, not a universal banking recommendation). Gate 0 adopts this value;
-  Plan 2 implements it.
-- Plan 2 fixtures must include a delivery at **2 days 23 hours** (recovered by the
+  benchmark, not a universal banking recommendation).
+- Fixtures must include a delivery at **2 days 23 hours** (recovered by the
   ordinary lookback) and one at **3 days 1 hour** (requiring explicit bounded
-  backfill). The Plan 1 `late-arrival` fixture exercises the inside-lookback case
+  backfill). The `late-arrival` fixture exercises the inside-lookback case
   at 48 hours.
 - A pipeline that silently drops arrivals beyond its watermark produces fewer
   canonical events and less entitlement than the truth manifest — the oracle
@@ -49,7 +48,7 @@ explicitly retains it; canonical outputs may never double-count
 
 ## Blue/green comparison
 
-For every mandatory scenario, Plan 2 must:
+For every mandatory scenario, the ingestion layer must:
 
 1. build a clean full-refresh reference in an isolated schema/database;
 2. build the same final event set through chronological incremental batches;

@@ -14,4 +14,4 @@ prohibited_interpretation: >-
   real reconciliation failure rates.
 limitations: >-
   One exception type; duplicate posting, amount mismatch and invalid transitions
-  are specified in docs/contracts/reward-reconciliation.md for Plan 2 execution.
+  are specified in docs/contracts/reward-reconciliation.md for the ingestion layer execution.

@@ -14,4 +14,4 @@ prohibited_interpretation: >-
   of real pipeline latency.
 limitations: >-
   The beyond-lookback variant (requiring explicit bounded backfill) is specified
-  in docs/contracts/incremental-correctness.md and exercised in Plan 2.
+  in docs/contracts/incremental-correctness.md and exercised in the ingestion layer.

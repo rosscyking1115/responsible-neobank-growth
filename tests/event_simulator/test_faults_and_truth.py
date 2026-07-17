@@ -1,8 +1,8 @@
-"""Fault-scenario and truth-manifest tests (Plan 2, Task 3).
+"""Fault-scenario and truth-manifest tests.
 
 Every scenario must produce the exact expected defect and truth; changing the
 seed changes identifiers and content but never the declared scenario
-semantics. Verification uses the independent Plan 1 oracle
+semantics. Verification uses the independent the contract layer oracle
 (src/synthetic_truth/oracle.py), not the injectors' own bookkeeping.
 """
 

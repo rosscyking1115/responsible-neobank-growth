@@ -1,8 +1,8 @@
-"""Standards-as-code checker for governed Route C interfaces (Plan 1, Task 8).
+"""Standards-as-code checker for governed interfaces.
 
 Prototype scope: inspects dbt-artifact-shaped JSON (``nodes`` keyed by unique
 id, each with ``name``, ``resource_type`` and ``config.meta``) and reports one
-violation per broken rule. It deliberately does not recreate dbt; Plan 2 points
+violation per broken rule. It deliberately does not recreate dbt; the ingestion layer points
 it at the real ``manifest.json`` in CI.
 
 Usage:

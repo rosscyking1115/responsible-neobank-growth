@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/rosscyking1115/responsible-neobank-growth/contracts/events/event-envelope.schema.json",
   "title": "Neobank synthetic event envelope",
-  "description": "Shared envelope for every synthetic backend event (ADR-route-c-event-boundary). Timestamps are UTC ('Z' or '+00:00' only); a naive or non-UTC timestamp is invalid. Payloads are validated separately against the registered event/version schema.",
+  "description": "Shared envelope for every synthetic backend event (the event-boundary contract). Timestamps are UTC ('Z' or '+00:00' only); a naive or non-UTC timestamp is invalid. Payloads are validated separately against the registered event/version schema.",
   "type": "object",
   "additionalProperties": false,
   "required": [

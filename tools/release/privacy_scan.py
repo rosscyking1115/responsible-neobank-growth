@@ -1,13 +1,13 @@
-"""Privacy and secret scan for the release candidate (Plan 4, Task 5).
+"""Privacy and secret scan for the release candidate.
 
 Scans a set of files for patterns that must never appear in a public
 synthetic-data release: real-looking emails/phones, credential-shaped strings,
 private GCP project ids, signed URLs, and real bank/card/account-number
-formats. Fictional Route C identifiers (cus_/ref_/rwd_/... hex) are recognised
+formats. Fictional identifiers (cus_/ref_/rwd_/... hex) are recognised
 and not flagged.
 
 These checks reduce accidental disclosure; they do not certify privacy in
-general (Plan 4 §8.6).
+general.
 
 Usage: python -m tools.release.privacy_scan <path> [<path> ...]
 """

@@ -1,4 +1,4 @@
-"""Incremental execution proof (Plan 2, Task 9).
+"""Incremental execution proof.
 
 Runs the blue/green harness end to end on the tiny profile: chronological
 batches, same-batch replay, beyond-lookback hold-back with demonstrated miss,

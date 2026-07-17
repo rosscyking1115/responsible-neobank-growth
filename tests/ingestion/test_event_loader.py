@@ -1,4 +1,4 @@
-"""Append-only ingestion tests (Plan 2, Task 5).
+"""Append-only ingestion tests.
 
 Frozen outcomes: replayed batches are idempotent at the batch registry; a
 malformed payload lands in quarantine with evidence; a conflicting duplicate

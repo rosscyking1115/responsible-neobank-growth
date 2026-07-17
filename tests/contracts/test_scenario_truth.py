@@ -1,4 +1,4 @@
-"""Route C scenario truth tests (Plan 1, Task 4).
+"""scenario truth tests.
 
 Every scenario manifest must validate against the scenario schema, reference
 existing event/truth fixtures, and — critically — its hand-declared truth must
@@ -158,7 +158,7 @@ def test_verify_scenario_raises_on_mismatch(tmp_path: Path) -> None:
         verify_scenario(tampered_manifest)
 
 
-# --- required hand-built truth case (Plan 1 section 8.3) --------------------
+# --- required hand-built truth case --------------------
 
 
 def test_known_truth_case_contains_all_mandatory_defects() -> None:

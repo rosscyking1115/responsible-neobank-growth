@@ -1,4 +1,4 @@
-"""Incremental-correctness oracle specification tests (Plan 1, Task 7).
+"""Incremental-correctness oracle specification tests.
 
 Gate G0.6: the tiny truth fixtures must distinguish full truth from the two
 classic incremental failure modes — dropping late events and double-counting

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Route C governed interface manifest",
-  "description": "Contract every governed normalised/logical interface must satisfy (Plan 1 section 7). Field names may improve later, but every concept here must remain enforced.",
+  "title": "Governed interface manifest",
+  "description": "Contract every governed normalised/logical interface must satisfy. Field names may improve later, but every concept here must remain enforced.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -44,7 +44,7 @@
     "allowed_consumers": {
       "type": "array",
       "minItems": 1,
-      "items": { "type": "string", "enum": ["looker", "reporting", "ml", "streamlit", "api", "finance"] }
+      "items": { "type": "string", "enum": ["bi", "reporting", "ml", "streamlit", "api", "finance"] }
     },
     "freshness_slo": {
       "type": "object",

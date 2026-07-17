@@ -1,3 +1,0 @@
-01:05:42  Running with dbt=1.11.11
-01:05:43  Warning: No packages were found in packages.yml
-01:05:43  Warning: No packages were found in packages.yml

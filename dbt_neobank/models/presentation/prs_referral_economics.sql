@@ -1,4 +1,4 @@
--- Consumer-shaped referral economics (Looker/Streamlit/Finance reporting).
+-- Consumer-shaped referral economics (BI/Streamlit/Finance reporting).
 select
     referral_id,
     referrer_customer_id,

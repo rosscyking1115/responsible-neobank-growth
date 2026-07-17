@@ -1,4 +1,4 @@
-"""Privacy/secret scan tests (Plan 4, Task 5).
+"""Privacy/secret scan tests.
 
 The committed release-candidate data must be clean, and the scanner must detect
 seeded real-looking contact strings, credentials and card/account formats
