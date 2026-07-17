@@ -1,0 +1,18 @@
+Wrote 16 parquet files to C:\dev\portfolio\neobank-growth\neobank-product-analytics\raw\ci
+- users: 5,000 rows
+- experiment_assignments: 5,000 rows
+- activation_ground_truth: 5,000 rows
+- transactions: 69,512 rows
+- sessions: 54,360 rows
+- feature_events: 3,383 rows
+- support_contacts: 495 rows
+- referrals: 642 rows
+- region_daily_signups: 2,172 rows
+- pricing_offer_catalog: 4 rows
+- pricing_exposures: 1,896 rows
+- pricing_outcomes: 1,896 rows
+- experiment_ground_truth: 2 rows
+- wellbeing_proxies: 5,000 rows
+- onboarding_events: 5,000 rows
+- protection_events: 1,500 rows
+Config: {'users': 5000, 'months': 6, 'start_date': datetime.date(2025, 1, 1), 'seed': 42, 'd7_treatment_lift': 0.03, 'referral_incrementality': 0.6}

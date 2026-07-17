@@ -1,0 +1,45 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.13, pytest-9.0.3, pluggy-1.6.0
+rootdir: C:\dev\portfolio\neobank-growth\neobank-product-analytics
+configfile: pyproject.toml
+testpaths: tests
+plugins: anyio-4.13.0, Faker-40.18.0
+collected 217 items
+
+tests\test_activation_model.py .....                                     [  2%]
+tests\test_api_service.py .........                                      [  6%]
+tests\test_batch_scoring.py ..                                           [  7%]
+tests\test_bigquery_score_load_plan.py .......                           [ 10%]
+tests\test_bigquery_score_monitoring_plan.py ....                        [ 12%]
+tests\test_bigquery_verify_plan.py .....                                 [ 14%]
+tests\test_calibration.py .......                                        [ 17%]
+tests\test_calibration_monitoring_report.py ....                         [ 19%]
+tests\test_cloud_config_export.py ....                                   [ 21%]
+tests\test_cloud_run_api_deploy_plan.py ...                              [ 23%]
+tests\test_cloud_run_job_deploy_plan.py ....                             [ 24%]
+tests\test_cloud_run_job_entrypoints.py ....                             [ 26%]
+tests\test_cloud_run_scheduler_plan.py .....                             [ 29%]
+tests\test_criteo_adapter.py .......                                     [ 32%]
+tests\test_customer_outcomes.py .......                                  [ 35%]
+tests\test_customer_protection.py ...........                            [ 40%]
+tests\test_dashboard_data.py ......                                      [ 43%]
+tests\test_data_generator.py ...                                         [ 44%]
+tests\test_digital_inclusion.py ........                                 [ 48%]
+tests\test_experiment_analysis.py ......                                 [ 51%]
+tests\test_gcp_cleanup_plan.py ....                                      [ 52%]
+tests\test_gcp_load_plan.py .....                                        [ 55%]
+tests\test_gcs_upload_plan.py .....                                      [ 57%]
+tests\test_geo_incrementality.py ....                                    [ 59%]
+tests\test_model_monitoring_report.py ....                               [ 61%]
+tests\test_monitoring_snapshot.py ....                                   [ 63%]
+tests\test_no_circularity.py ....                                        [ 64%]
+tests\test_pricing_governance.py ..........                              [ 69%]
+tests\test_pricing_scenario_runs.py ...                                  [ 70%]
+tests\test_project_metadata.py ..                                        [ 71%]
+tests\test_rbac.py .........                                             [ 76%]
+tests\test_release_decisions.py ..................                       [ 84%]
+tests\test_responsible_growth_report.py .....                            [ 86%]
+tests\test_uci_adapter.py .........                                      [ 90%]
+tests\test_wellbeing.py ....................                             [100%]
+
+============================ 217 passed in 22.94s =============================
