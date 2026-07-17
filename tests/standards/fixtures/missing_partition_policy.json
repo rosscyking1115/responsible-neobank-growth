@@ -1,0 +1,23 @@
+{
+  "nodes": {
+    "model.neobank.lgl_growth_acquisition": {
+      "name": "lgl_growth_acquisition",
+      "resource_type": "model",
+      "path": "models/logical/lgl_growth_acquisition.sql",
+      "config": {
+        "materialized": "incremental",
+        "meta": {
+          "owner": "growth",
+          "purpose": "Application-to-funded-activation journeys",
+          "grain": "one row per customer application journey",
+          "unique_key": ["application_id"],
+          "freshness_slo": {"warn_after": "24 hours", "error_after": "72 hours"},
+          "classification": "synthetic_restricted",
+          "interface_version": 1,
+          "compatibility": "backward_compatible",
+          "exposures": ["streamlit_product_health_tab"]
+        }
+      }
+    }
+  }
+}

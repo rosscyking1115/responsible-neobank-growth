@@ -1,0 +1,50 @@
+# Standards-as-code rules for governed Route C interfaces (Plan 1 section 12.2).
+# The checker inspects dbt-artifact-shaped JSON; it does not recreate dbt.
+# Plan 2 runs these rules against the real dbt manifest in CI.
+
+governed_prefixes: [nrm_, lgl_]
+
+layer_prefixes:
+  landing: lnd_
+  normalised: nrm_
+  logical: lgl_
+  presentation: prs_
+
+required_meta:
+  - key: owner
+    rule: owner
+    message: governed interface must declare a semantic owner
+  - key: purpose
+    rule: purpose
+    message: governed interface must declare its purpose
+  - key: grain
+    rule: grain
+    message: governed interface must declare its grain
+  - key: unique_key
+    rule: unique_key
+    message: governed interface must declare a unique key
+  - key: freshness_slo
+    rule: freshness_slo
+    message: governed interface must declare a freshness SLO
+  - key: classification
+    rule: classification
+    message: governed interface must declare a synthetic/sensitivity classification
+  - key: interface_version
+    rule: interface_version
+    message: governed interface must declare its version
+  - key: compatibility
+    rule: compatibility
+    message: governed interface must declare its compatibility policy
+  - key: exposures
+    rule: exposures
+    message: governed interface must declare downstream exposures
+  - key: partition_policy
+    rule: partition_policy
+    message: governed interface must declare a partition policy or explicit not-applicable
+
+# Incremental materialisation is required unless meta.incremental_exemption
+# documents the reason.
+incremental:
+  rule: incremental_materialization
+  exemption_key: incremental_exemption
+  message: governed interface must be incremental or carry a documented exemption
