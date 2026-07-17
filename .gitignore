@@ -13,6 +13,7 @@ artifacts/*
 !artifacts/gate0/
 !artifacts/plan2/
 !artifacts/plan3/
+!artifacts/plan4/
 
 # Data generated locally
 raw/
