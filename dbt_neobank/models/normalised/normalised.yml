@@ -1,0 +1,208 @@
+version: 2
+
+models:
+  - name: nrm_application_event
+    description: Canonical version-independent application/KYC events.
+    config:
+      meta: &governed_meta
+        layer: normalised
+        owner: growth
+        classification: synthetic_restricted
+        interface_version: 1
+        compatibility: backward_compatible
+    columns:
+      - name: canonical_event_key
+        tests: [not_null, unique]
+      - name: event_type
+        tests:
+          - accepted_values:
+              arguments:
+                values: [application_submitted, kyc_decisioned]
+      - name: application_id
+        tests: [not_null]
+
+  - name: nrm_account_event
+    description: Canonical account lifecycle events with integer minor units.
+    config: {meta: *governed_meta}
+    columns:
+      - name: canonical_event_key
+        tests: [not_null, unique]
+      - name: event_type
+        tests:
+          - accepted_values:
+              arguments:
+                values: [account_activated, account_funded]
+
+  - name: nrm_account_history
+    description: Account state intervals ordered by business occurrence time.
+    config: {meta: *governed_meta}
+    columns:
+      - name: account_id
+        tests: [not_null]
+      - name: state
+        tests:
+          - accepted_values:
+              arguments:
+                values: [activated, funded]
+
+  - name: nrm_account_current
+    description: Single current-state row per account with first-funding facts.
+    config: {meta: *governed_meta}
+    columns:
+      - name: account_id
+        tests: [not_null, unique]
+      - name: current_state
+        tests: [not_null]
+
+  - name: nrm_referral_event
+    description: >-
+      Canonical referral lifecycle events; v1/v2 payloads adapt to one meaning
+      (qualification_rule is null for v1).
+    config: {meta: *governed_meta}
+    columns:
+      - name: canonical_event_key
+        tests: [not_null, unique]
+      - name: referral_id
+        tests: [not_null]
+      - name: event_type
+        tests:
+          - accepted_values:
+              arguments:
+                values: [referral_invited, referral_qualified]
+
+  - name: nrm_referral_history
+    description: Referral state intervals per the locked lifecycle.
+    config: {meta: *governed_meta}
+    columns:
+      - name: referral_id
+        tests: [not_null]
+      - name: state
+        tests:
+          - accepted_values:
+              arguments:
+                values: [invited, qualified, booked, settled, reversed]
+
+  - name: nrm_reward_event
+    description: >-
+      Canonical reward lifecycle events; settlements/reversals resolve their
+      referral through the booking mapping.
+    config: {meta: *governed_meta}
+    columns:
+      - name: canonical_event_key
+        tests: [not_null, unique]
+      - name: reward_id
+        tests: [not_null]
+      - name: amount_minor
+        tests: [not_null]
+      - name: currency
+        tests:
+          - accepted_values:
+              arguments:
+                values: [GBP]
+      - name: referral_id
+        tests:
+          - relationships:
+              arguments:
+                to: ref('nrm_referral_event')
+                field: referral_id
+
+  - name: nrm_campaign_spend
+    description: Canonical campaign spend, integer minor units.
+    config: {meta: *governed_meta}
+    columns:
+      - name: canonical_event_key
+        tests: [not_null, unique]
+      - name: campaign_id
+        tests: [not_null]
+
+  - name: nrm_experiment_assignment
+    description: Canonical experiment assignments; one stable variant per customer.
+    config: {meta: *governed_meta}
+    columns:
+      - name: canonical_event_key
+        tests: [not_null, unique]
+      - name: variant
+        tests:
+          - accepted_values:
+              arguments:
+                values: [control, treatment]
+
+  - name: nrm_customer_outcome_event
+    description: Canonical customer-outcome guardrail events (synthetic proxies).
+    config: {meta: *governed_meta}
+    columns:
+      - name: canonical_event_key
+        tests: [not_null, unique]
+      - name: outcome_type
+        tests:
+          - accepted_values:
+              arguments:
+                values: [complaint, support_contact, hardship_indicator]
+
+unit_tests:
+  - name: unit_nrm_referral_event_adapts_v1_and_v2_and_dedupes
+    description: >-
+      v1 and v2 qualifications normalise to one canonical meaning (v1 exposes a
+      null qualification_rule); non-canonical duplicate deliveries are dropped.
+    model: nrm_referral_event
+    given:
+      - input: ref('lnd_referral_events')
+        rows:
+          - {idempotency_key: idk_q1, event_id: evt_a, event_name: referral-qualified,
+             referral_id: ref_000001, schema_version: 1, is_canonical: true,
+             qualification_rule: null}
+          - {idempotency_key: idk_q1, event_id: evt_b, event_name: referral-qualified,
+             referral_id: ref_000001, schema_version: 1, is_canonical: false,
+             qualification_rule: null}
+          - {idempotency_key: idk_q2, event_id: evt_c, event_name: referral-qualified,
+             referral_id: ref_000002, schema_version: 2, is_canonical: true,
+             qualification_rule: rule_v2_first_funding_within_30d}
+    expect:
+      rows:
+        - {canonical_event_key: idk_q1, event_type: referral_qualified,
+           referral_id: ref_000001, schema_version: 1, qualification_rule: null}
+        - {canonical_event_key: idk_q2, event_type: referral_qualified,
+           referral_id: ref_000002, schema_version: 2,
+           qualification_rule: rule_v2_first_funding_within_30d}
+
+  - name: unit_nrm_reward_event_resolves_referral_for_settlements
+    description: A settlement without referral_id resolves it via the booking.
+    model: nrm_reward_event
+    given:
+      - input: ref('lnd_reward_events')
+        rows:
+          - {idempotency_key: idk_b1, event_id: evt_b1, event_name: reward-booked,
+             reward_id: rwd_000001, referral_id: ref_000001, amount_minor: 5000,
+             is_canonical: true}
+          - {idempotency_key: idk_s1, event_id: evt_s1, event_name: reward-settled,
+             reward_id: rwd_000001, referral_id: null, amount_minor: 5000,
+             is_canonical: true}
+    expect:
+      rows:
+        - {canonical_event_key: idk_b1, event_type: reward_booked,
+           reward_id: rwd_000001, referral_id: ref_000001}
+        - {canonical_event_key: idk_s1, event_type: reward_settled,
+           reward_id: rwd_000001, referral_id: ref_000001}
+
+  - name: unit_nrm_account_current_orders_by_occurrence_not_arrival
+    description: >-
+      Current state derives from business occurrence order even when the later
+      state arrived first (late-arrival repair semantics).
+    model: nrm_account_current
+    given:
+      - input: ref('nrm_account_history')
+        rows:
+          - {account_id: acc_000001, customer_id: cus_a00001, state: activated,
+             valid_from: "2026-01-05 09:00:00", valid_to: "2026-01-05 12:00:00",
+             is_current: false}
+          - {account_id: acc_000001, customer_id: cus_a00001, state: funded,
+             valid_from: "2026-01-05 12:00:00", valid_to: null, is_current: true}
+      - input: ref('nrm_account_event')
+        rows:
+          - {account_id: acc_000001, event_type: account_funded,
+             occurred_at: "2026-01-05 12:00:00", amount_minor: 10000,
+             is_first_funding: true}
+    expect:
+      rows:
+        - {account_id: acc_000001, current_state: funded,
+           first_funding_amount_minor: 10000}

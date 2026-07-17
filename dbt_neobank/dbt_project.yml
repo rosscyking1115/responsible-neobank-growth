@@ -24,3 +24,9 @@ models:
       +schema: intermediate
     marts:
       +schema: marts
+    landing:
+      +schema: landing
+      +materialized: view
+    normalised:
+      +schema: normalised
+      +materialized: table

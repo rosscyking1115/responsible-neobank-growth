@@ -1,0 +1,119 @@
+version: 2
+
+sources:
+  - name: neobank_events
+    description: >-
+      Route C synthetic event delivery store (append-only). Local DuckDB reads
+      the loader's Parquet output directly via the event_deliveries_table()
+      macro; these source declarations are used on the BigQuery target (Plan 3).
+    database: "{{ env_var('GCP_PROJECT_ID', '') }}"
+    schema: "{{ env_var('NEOBANK_BQ_EVENTS_DATASET', 'neobank_events') }}"
+    tables:
+      - name: raw_event_deliveries
+      - name: raw_event_quarantine
+
+models:
+  - name: lnd_event_deliveries
+    description: >-
+      Typed envelope over valid deliveries. Owns delivery-versus-canonical
+      identity (is_canonical = first delivery per idempotency key by arrival).
+      No business metrics.
+    config:
+      meta:
+        layer: landing
+        owner: platform
+    columns:
+      - name: event_id
+        tests: [not_null, unique]
+      - name: idempotency_key
+        tests: [not_null]
+      - name: event_name
+        tests: [not_null]
+      - name: occurred_at
+        tests: [not_null]
+      - name: ingested_at
+        tests: [not_null]
+      - name: schema_version
+        tests: [not_null]
+      - name: is_canonical
+        tests: [not_null]
+
+  - name: lnd_event_quarantine
+    description: Quarantined deliveries with failing rule, severity and payload hash.
+    config:
+      meta:
+        layer: landing
+        owner: platform
+    columns:
+      - name: error_code
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [schema_validation_failed, unknown_event_version, conflicting_duplicate]
+      - name: batch_id
+        tests: [not_null]
+
+  - name: lnd_application_events
+    description: Application/KYC family deliveries, payload flattened.
+    config: {meta: {layer: landing, owner: platform}}
+    columns:
+      - name: application_id
+        tests: [not_null]
+      - name: customer_id
+        tests: [not_null]
+
+  - name: lnd_account_events
+    description: Activation/funding family deliveries, payload flattened.
+    config: {meta: {layer: landing, owner: platform}}
+    columns:
+      - name: account_id
+        tests: [not_null]
+
+  - name: lnd_referral_events
+    description: Referral family deliveries (v1 and v2), payload flattened.
+    config: {meta: {layer: landing, owner: platform}}
+    columns:
+      - name: referral_id
+        tests: [not_null]
+      - name: schema_version
+        tests:
+          - accepted_values:
+              arguments:
+                values: [1, 2]
+                quote: false
+
+  - name: lnd_reward_events
+    description: Reward family deliveries, payload flattened.
+    config: {meta: {layer: landing, owner: platform}}
+    columns:
+      - name: reward_id
+        tests: [not_null]
+      - name: amount_minor
+        tests: [not_null]
+
+  - name: lnd_campaign_events
+    description: Campaign spend deliveries, payload flattened.
+    config: {meta: {layer: landing, owner: platform}}
+    columns:
+      - name: campaign_id
+        tests: [not_null]
+
+  - name: lnd_experiment_events
+    description: Experiment assignment deliveries, payload flattened.
+    config: {meta: {layer: landing, owner: platform}}
+    columns:
+      - name: experiment_id
+        tests: [not_null]
+
+  - name: lnd_customer_outcome_events
+    description: Customer-outcome guardrail deliveries, payload flattened.
+    config: {meta: {layer: landing, owner: platform}}
+    columns:
+      - name: customer_id
+        tests: [not_null]
+      - name: severity
+        tests:
+          - accepted_values:
+              arguments:
+                values: [low, medium, high]

@@ -153,3 +153,25 @@ def load_run(source_dir: Path, warehouse_dir: Path) -> LoadResult:
         },
     )
     return result
+
+
+def main(argv: list[str] | None = None) -> int:
+    import argparse
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--source", required=True, type=Path)
+    parser.add_argument("--warehouse", required=True, type=Path)
+    args = parser.parse_args(argv)
+    result = load_run(args.source, args.warehouse)
+    print(
+        f"{result.run_id}: loaded={result.batches_loaded} skipped={result.batches_skipped} "
+        f"failed={result.batches_failed} valid={result.valid_rows} "
+        f"quarantined={result.quarantined_rows}"
+    )
+    return 1 if result.batches_failed else 0
+
+
+if __name__ == "__main__":
+    import sys
+
+    sys.exit(main())
