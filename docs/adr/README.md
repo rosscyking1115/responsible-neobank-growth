@@ -22,6 +22,7 @@ documents as current architecture.
 | [Gate 0](ADR-route-c-gate0-decision.md) | **go** — contracts express the hard cases; migration preserves validated capability (2026-07-17) |
 | [Plan 2](ADR-route-c-plan2-decision.md) | **go-to-plan-3** — local event warehouse with exact full/incremental parity (2026-07-17) |
 | [Plan 3](ADR-route-c-plan3-decision.md) | **partial go — BigQuery only** — benchmark measured (mixed result); Looker access-limited (2026-07-17) |
+| [Plan 4](ADR-route-c-plan4-decision.md) | **release** — GitHub v1.0.0 and the Hugging Face dataset published and verified; project enters maintenance (2026-07-17) |
 
 ## Rejected routes (recorded in the ADRs above)
 
