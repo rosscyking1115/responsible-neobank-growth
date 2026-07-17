@@ -14,6 +14,6 @@ calibration-anchors,README.md + docs/PUBLIC_DATA_CALIBRATION.md,Synthetic wellbe
 deterministic-generation,README.md (Key features),Deterministic seeded synthetic data generation,executed-local,artifacts/baseline/2026-route-c/data-generation.txt,verified,Seed-42 CI-equivalent run reproduced locally 2026-07-17
 monitoring-snapshot,README.md (badge),Weekly monitoring snapshot workflow runs,configured,.github/workflows/monitoring-snapshot.yml,configured,Workflow exists; current remote badge state not re-verified from local checkout
 rbac-minimisation,README.md + docs/ACCESS_CONTROL.md,RBAC restricts individual-level sensitive wellbeing fields to governance roles,executed-local,src/access/rbac.py + tests/test_rbac.py,verified,9 RBAC tests pass in baseline suite
-streamlit-7-tabs,README.md (architecture diagram),Streamlit dashboard has 7 decision tabs,configured,app/,needs-verification,Tab count to be confirmed during Task 5 consumer map enumeration
+streamlit-7-tabs,README.md (architecture diagram),Streamlit dashboard has 7 decision tabs,configured,app/streamlit_app.py,verified,7 tabs confirmed in st.tabs() during Task 5 (Product health / Customer outcomes / Digital inclusion / Customer protection / Pricing intelligence / Experiments / Monitoring)
 api-service,README.md + docs/API.md,FastAPI service returns scoring/offer/pricing decisions with reason codes,executed-local,api/ + tests,verified,API contract tests pass in baseline suite
 mit-license,README.md + LICENSE,Released under MIT License,configured,LICENSE,verified,MIT (c) 2026 Cheng-Yuan King
