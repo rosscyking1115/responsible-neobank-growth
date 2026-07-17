@@ -3,9 +3,9 @@
 ## Status
 
 Accepted — 2026-07-17 (Plan 2, Task 12). Outcome recorded: **go-to-plan-3**.
-Plan 3 execution begins only after the user reviews and **accepts** this
-result, and separately approves the Plan 3 spend preflight (Plan 3 §5.1); this
-ADR does not by itself start Plan 3 or authorise any cloud charge.
+**User (Ross) reviewed and accepted the Plan 2 result on 2026-07-17.** Plan 3
+may begin its £0 preflight work; **no billable cloud action is authorised until
+the user separately approves the Plan 3 spend preflight** (Plan 3 §5.1).
 
 ## Context
 
