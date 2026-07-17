@@ -67,6 +67,37 @@
   1 GiB per-query cap; whole-build totals in single-digit GB (free tier).
 - Baseline (`neobank_p3b_20260717_*`) full build launched on the Base phase.
 
+## 2026-07-17 — benchmark complete (Tasks 4–8)
+
+- **Task 4:** full current graph + Route C (68 models, 215 tests) green on
+  BigQuery after one cross-dialect fix (`varchar` → `string_type()` macro);
+  artifacts in `current-graph/`. Supersedes the 13-table/107-check historical
+  record as current cloud evidence.
+- **Task 5:** base parity exact across all 6 governed interfaces
+  (`base-parity.json`).
+- **Task 6 (Delta, 3 repetitions each):** byte-identical scans per strategy
+  across reps. **Result (honest, mixed):** incremental billed **+1.95% MORE
+  bytes** than full rebuild (unpartitioned raw source — every strategy scans
+  the full landing view) while using **62.7% less compute** (median slot-ms
+  765,826 vs 2,172,197) at comparable runtime. `benchmark/` + `benchmark-summary.json`
+  + `warehouse-cost-results.csv`.
+- **Task 7 (Repair):** held-back day (2026-01-03, 7,492 deliveries) missed by
+  the ordinary lookback (recorded pre-backfill: financial interfaces diverged),
+  bounded backfill recovered it — and the at-scale run exposed **two real
+  staleness defects** the tiny-scale blue/green could not: (1) settlements
+  arriving before their booking froze `referral_id NULL`; (2) their ledger
+  lines stayed stale after healing. Fixed with self-healing re-selection
+  clauses + two new invariants (`assert_reward_references_resolved`,
+  `assert_ledger_is_complete`), green on DuckDB and BigQuery.
+  **Final parity: exact** (`repair-parity.json`).
+- **Task 8 (ablation):** identical 7-day reconciliation query, identical 52-row
+  result: **2,449 bytes (partitioned) vs 1,282,960 bytes (unpartitioned) —
+  523.9× fewer bytes processed**; both billed at the 10 MB per-query minimum at
+  this absolute scale. This locates where incremental byte savings actually
+  come from. Evidence mart `warehouse_job_evidence` built in the evidence
+  dataset (job metadata only, no query text).
+- No result is extrapolated to production or Monzo scale.
+
 ## Spend log
 
 | Date | Action | Bytes billed | Est. cost | Cumulative |
@@ -74,3 +105,4 @@
 | 2026-07-17 | Dataset creation ×5, probe CTAS (sandbox, no billing possible) | 0 | £0.00 | £0.00 |
 | 2026-07-17 | Parquet batch loads ×2 (loads are free) | 0 | £0.00 | £0.00 |
 | 2026-07-17 | Source reconciliation count queries ×3 (~90 MB scans, sandbox free tier) | 0 | £0.00 | £0.00 |
+| 2026-07-17 | Full benchmark run: 844 query jobs (builds, parity, repair, ablation, evidence mart) | 32,994,492,416 | £0.21 (0 if free tier applies) | ≤£0.21 |
