@@ -36,6 +36,20 @@ Looker trial's validation queries. Nothing else.
   10 GB/month; our footprint (~0.1–0.5 GB) is within it and expires with the
   datasets.
 
+## Standard profile — measured (2026-07-17, Plan 3 precondition satisfied)
+
+- Generated locally: **568,789 deliveries in 356 daily batches, 312.6 MB raw
+  JSONL**, ~13 minutes wall time after the validator-cache fix
+  (`perf: precompile event schema validators`).
+- Run manifest with truth, per-batch checksums and logical checksum:
+  `data/generated/standard/manifest.json` (logical checksum `7fb8b85813d7d182…`).
+- Determinism verified at scale on 2026-07-17: a second independent run
+  produced the identical logical checksum and
+  `python -m src.event_simulator.cli compare` reported
+  **"outputs are logically identical"** (exit 0).
+- Note: the accepted configuration (120k customers, 1M delivery cap) lands at
+  ~569k deliveries — recorded as the benchmark size; no claim of 1M is made.
+
 ## Estimated usage (bases stated; dry runs will replace estimates)
 
 These are **size-based estimates**, not dry runs. Before the first billable
@@ -45,7 +59,7 @@ estimate materially exceeds the planning figure.
 
 | Stage | Basis | Estimated scan |
 |---|---|---|
-| Load standard profile (~0.6M deliveries) | batch load | £0 (loads are free) |
+| Load standard profile (569k deliveries, 312.6 MB raw) | batch load | £0 (loads are free) |
 | Current-graph rerun (Plan 3 §8.2) | ~50k-user batch dataset, 34 legacy relations | ~10 GB |
 | Route C base build ×2 schemas (baseline + optimised) | ~0.35 GB raw scanned across ~30 models | ~25 GB |
 | Delta + Repair, F and I strategies | 4 further builds + 2 incremental runs | ~50 GB |
