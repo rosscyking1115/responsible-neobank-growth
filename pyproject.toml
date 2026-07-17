@@ -36,7 +36,7 @@ dependencies = [
 [project.urls]
 Homepage = "https://github.com/rosscyking1115/responsible-neobank-growth"
 Repository = "https://github.com/rosscyking1115/responsible-neobank-growth"
-Dashboard = "https://neobank-appuct-analytics.streamlit.app/"
+Dashboard = "https://responsible-neobank-growth.streamlit.app/"
 
 [project.optional-dependencies]
 gcp = [

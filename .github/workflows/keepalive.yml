@@ -24,7 +24,7 @@ jobs:
       - name: Wake / keep the apps warm
         run: |
           for APP in \
-            "https://neobank-appuct-analytics.streamlit.app" \
+            "https://responsible-neobank-growth.streamlit.app" \
             "https://marketing-effectiveness-lab.streamlit.app" ; do
             # Health endpoint returns "ok" when serving; also hit root to trigger a wake.
             curl -fsS --retry 5 --retry-all-errors --max-time 60 "$APP/_stcore/health" || true

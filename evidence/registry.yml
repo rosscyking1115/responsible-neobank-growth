@@ -240,15 +240,16 @@ claims:
     group: demo
     statement: >-
       A public Streamlit dashboard of the decision-support platform is
-      deployed at neobank-appuct-analytics.streamlit.app.
+      deployed at responsible-neobank-growth.streamlit.app.
     level: external
     scope: Streamlit Community Cloud deployment
     evidence_paths:
-      - "https://neobank-appuct-analytics.streamlit.app/"
-    commit: "9d680ab"
+      - "https://responsible-neobank-growth.streamlit.app/"
+    commit: "3407b2f"
     limitations: >-
-      Owner-confirmed deployment slug (the 'appuct' spelling is the real
-      subdomain); availability depends on the free hosting tier.
+      Renamed 2026-07-17 from the old 'appuct' slug (a workaround for
+      Streamlit's ban on 'prod' in subdomains) to match the repository;
+      availability depends on the free hosting tier and the app may sleep.
     surfaces: [README.md]
 
   # --- dataset ----------------------------------------------------------------

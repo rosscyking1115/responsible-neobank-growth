@@ -4,7 +4,7 @@
 [![Monitoring Snapshot](https://github.com/rosscyking1115/responsible-neobank-growth/actions/workflows/monitoring-snapshot.yml/badge.svg)](https://github.com/rosscyking1115/responsible-neobank-growth/actions/workflows/monitoring-snapshot.yml)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue.svg)](pyproject.toml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Live dashboard](https://img.shields.io/badge/demo-Streamlit-ff4b4b)](https://neobank-appuct-analytics.streamlit.app/)
+[![Live dashboard](https://img.shields.io/badge/demo-Streamlit-ff4b4b)](https://responsible-neobank-growth.streamlit.app/)
 [![Dataset on Hugging Face](https://img.shields.io/badge/dataset-Hugging%20Face-yellow)](https://huggingface.co/datasets/rosscyking/responsible-neobank-growth-events)
 
 I built a synthetic neobank whose backend events misbehave on purpose — late,
