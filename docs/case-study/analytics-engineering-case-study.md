@@ -1,138 +1,128 @@
-# Case Study: A Governed Event-to-Interface Warehouse with a Measured Cost Benchmark
+# Case study: a governed event warehouse, and an honest cost benchmark
 
-> Independent, synthetic reference project. No affiliation with Monzo or any
-> bank; Monzo's public engineering writing informed the problem framing, not any
-> internal implementation. Every number here resolves to
-> [`evidence/registry.yml`](../../evidence/registry.yml).
+> Independent, synthetic. No affiliation with Monzo or any bank; their public
+> engineering writing shaped which problems I picked, not how any of it is
+> built. Every number traces to [`evidence/registry.yml`](../../evidence/registry.yml).
 
-## 1. The question
+## The question
 
-Can a data team turn duplicated, late, reversed and schema-evolving backend
-events into trusted Growth and referral-reward interfaces, and prove that an
-incremental warehouse produces the same truth at a measured cost — without
-inventing an unbounded banking system or overstating what was built?
+Can a data team take duplicated, late, reversed and schema-evolving backend
+events and turn them into Growth and referral-reward interfaces people can
+trust — and show that an incremental warehouse gives the same answer as a full
+rebuild at a cost you can actually measure? And can it do that without inventing
+an unbounded bank or overselling what got built?
 
-## 2. Where this started
+## Where it started
 
 The repository began as a batch-sourced data-science portfolio: entity tables
-generated directly, with strong experimentation and responsible-growth
-methodology on top. That framing hid the hard analytics-engineering problems —
-late arrivals, duplicate deliveries, corrections, reversals, malformed payloads
-and schema evolution had no representation, so no model could demonstrate it
-handled them. The project needed a source boundary where those problems exist
-and where the correct answer is known exactly.
+generated directly, with solid experimentation and responsible-growth work on
+top. That framing hid the hard part. Late arrivals, duplicate deliveries,
+corrections, reversals, malformed payloads, schema changes — none of them
+existed in the data, so nothing could show it handled them. I needed a source
+where those problems are real and the correct answer is already known.
 
-## 3. Why synthetic known truth was kept, not replaced
+## Why I kept synthetic truth instead of switching to real data
 
 Customer-level neobank data is private, and a real slice would not carry the
-embedded ground truth needed to validate causal and reconciliation methods. So
-the core stayed synthetic — but the synthetic contract was made stricter: every
-scenario declares a truth manifest, and results are separated into engineering
-truth (exact, manifest-known), analytical method validation (recovery against
-seeded truth and two real public datasets), and illustrative business magnitude
-(never evidence about real customers). Generation and analysis are kept
-separate and the non-circularity is tested.
+embedded ground truth that causal and reconciliation methods need to be checked.
+So the core stayed synthetic — but I tightened the contract around it. Every
+scenario declares a truth manifest, and results are split three ways:
+engineering truth (exact, manifest-known), method validation (recovery against
+seeded truth and two real public datasets), and illustrative magnitude (never
+evidence about real customers). Generation and analysis stay separate, and the
+non-circularity is tested.
 
-## 4. Event contracts and failure scenarios
+## The event contracts
 
-Every event shares one versioned envelope (`event_id`, `idempotency_key`,
-`occurred_at`/`emitted_at`/`ingested_at`, `schema_version`, `payload`, …) with
-currency in integer minor units and UTC timestamps. Twelve event types across
-six locked families are validated against a JSON-Schema registry. A hand-built
-"known-truth" fixture encodes the difficult cases with exact expected totals —
-duplicate delivery, late arrival, reversal, malformed-to-quarantine, and an
-intentionally missing posting — so the contracts were proven expressive before
-any volume existed. The standard profile then generates 568,789 deliveries
-deterministically (identical logical checksums across two independent runs).
+Every event shares one versioned envelope — `event_id`, `idempotency_key`,
+`occurred_at`/`emitted_at`/`ingested_at` in UTC, `schema_version`, `payload` —
+with money in integer minor units. Twelve event types across six locked families
+validate against a JSON-Schema registry. Before generating any volume, I
+hand-built a known-truth fixture with the difficult cases and their exact totals:
+a duplicate delivery, a late arrival, a reversal, a malformed payload sent to
+quarantine, and a deliberately missing posting. That proved the contracts could
+express the hard cases first. The standard profile then generates 568,789
+deliveries deterministically — two independent runs produced the same logical
+checksum.
 
-## 5. Four layers and governed interfaces
+## Four layers, and interfaces that are actually governed
 
-Models are `landing → normalised → logical → presentation`. Landing owns
-payload flattening, ingestion metadata, deduplication and quarantine; normalised
-owns canonical version-independent events and SCD2/current state; logical owns
-governed cross-entity interfaces; presentation owns replaceable consumer shapes.
-Only normalised and logical become governed interfaces, each with one
-authoritative grain, one owner, freshness SLOs and a compatibility policy,
-enforced against the real dbt manifest by a standards checker. Existing
-analytics reach the interfaces through **compatibility relations** — the
-Welch/CUPED/SRM estimators behind the experiments view run unchanged on governed
-data — so validated capability was preserved, not rewritten, and nothing was
-deleted.
+Models run `landing → normalised → logical → presentation`. Landing flattens
+payloads, keeps ingestion metadata, deduplicates and quarantines. Normalised
+builds canonical, version-independent events and current state — this is where a
+v1 and a v2 referral schema become one meaning. Logical publishes four governed
+interfaces, each with one owner and one authoritative grain, enforced against the
+real dbt manifest by a standards checker. Existing analytics reach the interfaces
+through compatibility views — the Welch/CUPED/SRM estimators behind the
+experiments view run unchanged on governed data — so validated work was
+preserved, not rewritten, and nothing was deleted.
 
-## 6. Incremental correctness and reward reconciliation
+## Incremental correctness and reward reconciliation
 
 Incremental selection keys on `ingested_at`; business-state ordering keys on
-`occurred_at` — never conflated. A three-day ingestion lookback repairs
-ordinary late arrivals; anything older needs an explicit, logged bounded
-backfill. A blue/green harness builds the same final event set two ways —
-full refresh vs chronological incremental — and compares row counts, content
-fingerprints and integer financial totals at every governed interface, with
-zero tolerance for keys and money. The referral-reward subledger books
-double-entry journals over three fictional accounts (an illustrative treatment,
-not any real bank's policy) and reconciles daily: debits equal credits, opening
-plus movements equals closing, and every injected exception surfaces with its
-reason code.
+`occurred_at`. The two are never conflated. A three-day ingestion lookback
+repairs ordinary late arrivals; anything older needs an explicit, logged
+backfill. A blue/green harness builds the same final state both ways, full
+refresh and chronological incremental, and compares row counts, content
+fingerprints and integer money at every interface with zero tolerance. The
+referral-reward subledger books double-entry journals over three fictional
+accounts — an illustrative treatment, not any real bank's policy — and
+reconciles daily: debits equal credits, opening plus movements equals closing,
+and every injected exception shows up with its reason code.
 
-## 7. The BigQuery benchmark and its actual result
+## The BigQuery benchmark, and its actual result
 
-After Gate 0 and the local platform were accepted, the warehouse executed on
-BigQuery under a preflight-approved £10 ceiling with a 1 GiB per-query cap and an
-80%-of-ceiling stop. Base/Delta/Repair phases (90/9/1 by ingestion) were
-registered before any output was inspected. Full and incremental lineages
-reached **exact parity** at all six governed interfaces at every phase.
+Once Gate 0 and the local platform were accepted, the warehouse executed on
+BigQuery under a £10 cap with a 1 GiB per-query limit and an 80%-of-cap stop.
+The Base, Delta and Repair phases (90/9/1 by ingestion) were fixed before any
+output was seen. Full and incremental builds matched exactly at all six
+interfaces, every phase.
 
-The cost result is **mixed, and reported as measured**: across three
-repetitions, incremental processing billed 1.483 GB versus 1.454 GB for a full
-rebuild (**+1.95%**) while using **62.7% less compute** (median slot-ms 765,826
-vs 2,172,197) at comparable runtime. The byte parity is not a failure to explain
-away — the raw event store is unpartitioned, so every strategy scans the full
-landing view. The physical-design ablation isolates where byte savings actually
-come from: the identical seven-day reconciliation query processed **523.9× fewer
-bytes** on partitioned versus unpartitioned storage. Full refresh remains the
-simpler, justified choice at this scale for the parts that scan the raw store;
-incremental's win here is compute, and partitioning is what unlocks byte
-savings. Nothing is extrapolated to production or Monzo scale. The whole run
-was 844 attributed jobs billing 32.99 GB ≈ £0.21 (likely £0 under the monthly
-free tier).
+The cost result is mixed, and I report it as measured. Across three repetitions,
+incremental billed 1.483 GB against 1.454 GB for a full rebuild — 1.95% more —
+while using 62.7% less compute (median slot-ms 765,826 versus 2,172,197). The
+byte figure is not something to explain away: the raw event store is
+unpartitioned, so every strategy scans the whole landing view. The ablation
+isolates where byte savings live — the same seven-day reconciliation query
+scanned 523.9× fewer bytes on partitioned storage. Full refresh stays the
+simpler, justified choice for the raw-scan parts; incremental's win here is
+compute, and partitioning is what buys bytes. Nothing is extrapolated to
+production or Monzo scale. The whole run was 844 attributed jobs billing
+32.99 GB, about £0.21, likely £0 under the free tier.
 
-## 8. What the scale run caught that the small one did not
+## What the scale run caught that the small one didn't
 
 The repair phase held back a busy ingestion day, confirmed the ordinary lookback
-missed it, and recovered it with a bounded backfill. At 569k-delivery scale this
-also exposed two real staleness defects the tiny-scale proof could not: a
-settlement that arrived before its (late-redelivered) booking froze an
-unresolved reference, and its ledger lines stayed stale after the reference
-healed. Both were fixed with self-healing re-selection clauses and two new
-invariants, verified on DuckDB and BigQuery, after which parity was exact on the
-complete dataset. The failure-and-recovery evidence is retained.
+missed it, and recovered it with a bounded backfill. At 569k deliveries it also
+surfaced two staleness bugs the tiny-scale proof could not. A settlement that
+arrived before its late-redelivered booking left an unresolved reference, and
+its ledger lines stayed stale after the reference healed. I fixed both with
+self-healing re-selection clauses and two new invariants, checked on DuckDB and
+BigQuery, and parity came back exact on the full dataset. The failure and the
+recovery are both kept as evidence.
 
-## 9. Looker: what was built, and the honest gap
+## Looker: what I built, and the gap
 
-A complete LookML project — model, four Explores, three dashboards, Assert tests
-— is authored against the governed BigQuery interfaces. It was **not** validated
-in a Looker instance: the trial signup returned a sales-contact outcome with no
-instance provisioned. No Looker execution or experience is claimed; the LookML
-stands at "configured", and the record carries a dated upgrade path if a genuine
-no-cost trial is later provisioned.
+There is a full LookML project — model, four Explores, three dashboards, Assert
+tests — against the governed BigQuery interfaces. It never ran in a Looker
+instance: the trial signup returned a sales-contact page with no instance. I
+claim no Looker execution or experience; the LookML sits at "written", and the
+record carries a dated upgrade path if a real no-cost trial appears.
 
-## 10. Trade-offs and rejected routes
+## Trade-offs and the routes I turned down
 
-- **Route B (keep batch sources)** was kept as an explicit fallback and never
-  triggered — the event boundary reproduced the core inputs without an unbounded
-  bank system.
-- **Kafka/streaming** was excluded: the project proves warehouse-side
-  correctness, not transport.
-- **A dbt Semantic Layer** was not adopted; governed dbt marts/interfaces are
-  used and no Semantic Layer usage is claimed.
-- **One-commit model renames** were forbidden in favour of compatibility
-  relations.
+Route B — keeping batch sources — was the explicit fallback and never fired,
+because the event boundary reproduced the core inputs without an unbounded bank.
+Kafka and streaming were out: this proves warehouse-side correctness, not
+transport. I did not use a dbt Semantic Layer, and I do not claim one. And I
+forbade one-commit model renames in favour of compatibility views.
 
-## 11. Limitations and what would differ in a real organisation
+## Limitations, and what would change in a real organisation
 
-The data is synthetic and engineered for oracle coverage, not calibrated to any
-real population; the accounting treatment is illustrative; the benchmark is one
-dataset size in one region on one day. A real deployment would add production
-identity and access controls, data governance and retention, keyless CI/CD, a
-model/feature registry, and formal Consumer Duty and model-risk approval before
-any live customer decisioning — and would partition the raw event store, which
-this benchmark shows is where the byte savings live.
+The data is synthetic and built for coverage, not calibrated to any population;
+the accounting is illustrative; the benchmark is one dataset size, one region,
+one day. A real deployment would add production identity and access controls,
+data governance and retention, keyless CI/CD, a model and feature registry, and
+formal Consumer Duty and model-risk approval before any live customer
+decisioning. It would also partition the raw event store — which this benchmark
+shows is where the byte savings are.
