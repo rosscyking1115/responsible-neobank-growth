@@ -29,15 +29,19 @@ claims:
   - claim_id: local-suite-counts
     group: counts
     statement: >-
-      Full local suite: 441 pytest tests and 291 dbt results (including unit
-      tests) pass from one command on DuckDB.
+      Full local suite on DuckDB: 494 pytest tests pass, and the dbt build is
+      289 green results — 68 models, 217 data tests and 4 unit tests (4
+      exposures are no-op).
     level: executed-local
-    scope: tools/ci/verify_plan2.py end-to-end run
+    scope: >-
+      uv run pytest -q and uv run dbt build --target dev at the release commit
+      (the earlier Plan 2 snapshot recorded 441 pytest / 291 dbt before Plan 4
+      added its release-gate tests)
     evidence_paths:
       - artifacts/plan2/local-verification.json
       - artifacts/plan2/verification-summary.md
     measured_on: "2026-07-17"
-    commit: "51545ae"
+    commit: "3407b2f"
     limitations: Local DuckDB execution; BigQuery evidence recorded separately.
     surfaces: [README.md, docs/case-study]
 
@@ -236,15 +240,16 @@ claims:
     group: demo
     statement: >-
       A public Streamlit dashboard of the decision-support platform is
-      deployed at neobank-appuct-analytics.streamlit.app.
+      deployed at responsible-neobank-growth.streamlit.app.
     level: external
     scope: Streamlit Community Cloud deployment
     evidence_paths:
-      - "https://neobank-appuct-analytics.streamlit.app/"
-    commit: "9d680ab"
+      - "https://responsible-neobank-growth.streamlit.app/"
+    commit: "3407b2f"
     limitations: >-
-      Owner-confirmed deployment slug (the 'appuct' spelling is the real
-      subdomain); availability depends on the free hosting tier.
+      Renamed 2026-07-17 from the old 'appuct' slug (a workaround for
+      Streamlit's ban on 'prod' in subdomains) to match the repository;
+      availability depends on the free hosting tier and the app may sleep.
     surfaces: [README.md]
 
   # --- dataset ----------------------------------------------------------------

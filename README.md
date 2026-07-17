@@ -4,7 +4,7 @@
 [![Monitoring Snapshot](https://github.com/rosscyking1115/responsible-neobank-growth/actions/workflows/monitoring-snapshot.yml/badge.svg)](https://github.com/rosscyking1115/responsible-neobank-growth/actions/workflows/monitoring-snapshot.yml)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue.svg)](pyproject.toml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Live dashboard](https://img.shields.io/badge/demo-Streamlit-ff4b4b)](https://neobank-appuct-analytics.streamlit.app/)
+[![Live dashboard](https://img.shields.io/badge/demo-Streamlit-ff4b4b)](https://responsible-neobank-growth.streamlit.app/)
 [![Dataset on Hugging Face](https://img.shields.io/badge/dataset-Hugging%20Face-yellow)](https://huggingface.co/datasets/rosscyking/responsible-neobank-growth-events)
 
 I built a synthetic neobank whose backend events misbehave on purpose — late,
@@ -177,6 +177,12 @@ rather than rewritten:
 - **Real-data cross-checks** — the same estimators re-run on real public data,
   UCI Bank Marketing and Criteo Uplift, as method validation
   ([UCI](docs/REAL_DATA_ADAPTER.md) · [Criteo](docs/REAL_DATA_CRITEO.md)).
+- **Marketing measurement** — this project absorbed my separate
+  marketing-effectiveness lab: the MMM-versus-experiment reconciliation and its
+  parameter-recovery checks now live here
+  ([reconciliation](docs/case-studies/mmm-experiment-reconciliation.md) ·
+  [parameter recovery](docs/methodology/parameter-recovery-validation.md) ·
+  [benchmark note](docs/methodology/mmm-benchmark-note.md)).
 
 These surface in the Streamlit decision app.
 
