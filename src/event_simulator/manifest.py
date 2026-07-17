@@ -42,9 +42,13 @@ def _classify(deliveries: list[dict], registry: EventRegistry) -> tuple[list[dic
     quarantined: list[dict] = []
     for event in deliveries:
         try:
-            jsonschema.validate(instance=event, schema=registry.envelope)
-            schema = registry.payload_schema(event["event_name"], event["schema_version"])
-            jsonschema.validate(instance=event["payload"], schema=schema)
+            if not registry.envelope_validator.is_valid(event):
+                raise jsonschema.ValidationError("invalid envelope")
+            validator = registry.payload_validator(
+                event["event_name"], event["schema_version"]
+            )
+            if not validator.is_valid(event["payload"]):
+                raise jsonschema.ValidationError("invalid payload")
         except (jsonschema.ValidationError, UnknownEventError):
             quarantined.append(event)
         else:

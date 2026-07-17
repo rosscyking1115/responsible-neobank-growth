@@ -36,9 +36,13 @@ def classify(event: dict, registry: EventRegistry, keymap: dict[str, str]) -> Cl
     deliveries; the caller updates it after accepting a valid delivery.
     """
     try:
-        jsonschema.validate(instance=event, schema=registry.envelope)
-        schema = registry.payload_schema(event["event_name"], event["schema_version"])
-        jsonschema.validate(instance=event["payload"], schema=schema)
+        envelope_error = next(registry.envelope_validator.iter_errors(event), None)
+        if envelope_error is not None:
+            raise envelope_error
+        validator = registry.payload_validator(event["event_name"], event["schema_version"])
+        payload_error = next(validator.iter_errors(event["payload"]), None)
+        if payload_error is not None:
+            raise payload_error
     except UnknownEventError as unknown:
         return Classification(
             status="quarantined",

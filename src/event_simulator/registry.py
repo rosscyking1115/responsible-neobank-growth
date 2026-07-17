@@ -6,9 +6,10 @@ may only emit what the registry admits.
 """
 
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
+import jsonschema
 import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -24,6 +25,11 @@ class EventRegistry:
     events: dict
     services: dict
     envelope: dict
+    # Precompiled validators: compiling a Draft 2020-12 validator per event is
+    # ~10x cheaper than jsonschema.validate() per delivery, which matters at
+    # the standard profile's volume.
+    envelope_validator: jsonschema.Draft202012Validator = field(repr=False, default=None)
+    payload_validators: dict = field(repr=False, default_factory=dict)
 
     @classmethod
     def load(cls, events_dir: Path = EVENTS_DIR) -> "EventRegistry":
@@ -32,18 +38,35 @@ class EventRegistry:
         with open(events_dir / "event-envelope.schema.json", encoding="utf-8") as f:
             envelope = json.load(f)
         events = {}
+        payload_validators = {}
         for event in registry["events"]:
             schemas = {}
             for version, relative in event["schemas"].items():
                 with open(events_dir / relative, encoding="utf-8") as f:
-                    schemas[int(version)] = json.load(f)
+                    schema = json.load(f)
+                schemas[int(version)] = schema
+                payload_validators[(event["name"], int(version))] = (
+                    jsonschema.Draft202012Validator(schema)
+                )
             events[event["name"]] = {
                 "family": event["family"],
                 "source_service": event["source_service"],
                 "schemas": schemas,
             }
         services = {s["name"]: s for s in registry["services"]}
-        return cls(events=events, services=services, envelope=envelope)
+        return cls(
+            events=events,
+            services=services,
+            envelope=envelope,
+            envelope_validator=jsonschema.Draft202012Validator(envelope),
+            payload_validators=payload_validators,
+        )
+
+    def payload_validator(self, event_name: str, version: int) -> jsonschema.Draft202012Validator:
+        key = (event_name, version)
+        if key not in self.payload_validators:
+            raise UnknownEventError(f"unknown event/version: {key}")
+        return self.payload_validators[key]
 
     def payload_schema(self, event_name: str, version: int) -> dict:
         if event_name not in self.events:
