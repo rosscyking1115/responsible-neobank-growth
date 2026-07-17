@@ -15,9 +15,10 @@ artifacts/*
 !artifacts/plan3/
 !artifacts/plan4/
 
-# Data generated locally
-raw/
-data/
+# Data generated locally (anchored to repo root so it does not also ignore
+# dataset/data/, which carries the committed tiny release tree)
+/raw/
+/data/
 *.duckdb
 *.duckdb.wal
 *.parquet
