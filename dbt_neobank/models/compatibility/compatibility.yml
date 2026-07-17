@@ -1,0 +1,99 @@
+version: 2
+
+# Compatibility contract (Plan 2 section 7.5): each model declares its source
+# governed interface, consumers, differences from the former source,
+# deprecation status and removal gate. The legacy relations keep building from
+# the preserved batch models until each consumer verifies against these
+# compatibility relations (deprecation gate below); nothing is deleted in
+# Plan 2.
+
+models:
+  - name: cmp_fct_activation
+    description: >-
+      fct_activation core contract from the governed growth_acquisition
+      interface (grain preserved: one row per customer).
+    config:
+      meta: &compatibility_meta
+        layer: compatibility
+        owner: growth
+        classification: synthetic_restricted
+        deprecation_status: parallel-run
+        removal_gate: >-
+          Legacy relation is swapped only after every consumer in the Task 5
+          consumer map verifies against the compatibility relation.
+        source_interface: growth_acquisition
+        consumers: [streamlit_product_health_tab, activation_model]
+        differences_from_former_source: >-
+          Event-boundary universe (activation = first funding of an approved
+          application); batch-universe attribute columns (region, device_os,
+          age, income_segment, push_opt_in, vulnerable/business flags) and
+          lifetime monetary aggregates are not served here and remain on the
+          preserved batch models.
+    columns:
+      - name: user_id
+        tests: [not_null, unique]
+      - name: activated_d7
+        tests: [not_null]
+      - name: activated_ever
+        tests: [not_null]
+
+  - name: cmp_fct_experiment_user_metrics
+    description: >-
+      Anchor consumer (Gate G0.4): the experiment metric grain served entirely
+      from governed interfaces.
+    config:
+      meta:
+        <<: *compatibility_meta
+        source_interface: growth_acquisition + customer outcome events
+        consumers: [streamlit_experiments_tab, release_gate_engine]
+        differences_from_former_source: >-
+          Covariate columns (income segment, device, propensity scores,
+          feature adoption, app crashes) are batch-universe context and are
+          not served by the event boundary.
+    columns:
+      - name: user_id
+        tests: [not_null, unique]
+      - name: variant
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [control, treatment]
+      - name: support_contacts
+        tests: [not_null]
+
+  - name: cmp_stg_referrals
+    description: stg_referrals core contract from the referral_economics interface.
+    config:
+      meta:
+        <<: *compatibility_meta
+        source_interface: referral_economics
+        consumers: [geo_referral_analysis]
+        differences_from_former_source: >-
+          Reward amounts convert from integer minor units at this boundary;
+          geo columns and ground-truth flags are not served by the event
+          boundary.
+    columns:
+      - name: referral_id
+        tests: [not_null, unique]
+      - name: referrer_reward_gbp
+        tests: [not_null]
+
+  - name: cmp_fct_customer_outcomes
+    description: >-
+      Customer-outcome guardrail counts per customer from the governed
+      interface.
+    config:
+      meta:
+        <<: *compatibility_meta
+        owner: governance
+        source_interface: customer outcome events
+        consumers: [streamlit_customer_outcomes_tab, release_gate_engine]
+        differences_from_former_source: >-
+          Wellbeing proxy attributes and their RBAC boundaries remain on the
+          preserved batch models (stg_wellbeing_proxies).
+    columns:
+      - name: user_id
+        tests: [not_null, unique]
+      - name: outcome_events
+        tests: [not_null]

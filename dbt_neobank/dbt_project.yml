@@ -36,6 +36,9 @@ models:
     presentation:
       +schema: presentation
       +materialized: table
+    compatibility:
+      +schema: compatibility
+      +materialized: view
 
 vars:
   # Incremental ingestion lookback (docs/contracts/incremental-correctness.md).

@@ -49,6 +49,14 @@
     {%- endif %}
 {% endmacro %}
 
+{% macro ts_add_days(expression, days) -%}
+    {%- if target.type == 'bigquery' -%}
+        timestamp_add({{ expression }}, interval {{ days }} day)
+    {%- else -%}
+        ({{ expression }} + interval {{ days }} day)
+    {%- endif -%}
+{%- endmacro %}
+
 {% macro date_diff_days(later, earlier) -%}
     {%- if target.type == 'bigquery' -%}
         date_diff({{ later }}, {{ earlier }}, day)
