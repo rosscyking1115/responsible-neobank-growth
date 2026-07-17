@@ -5,6 +5,7 @@
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue.svg)](pyproject.toml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Live dashboard](https://img.shields.io/badge/demo-Streamlit-ff4b4b)](https://neobank-appuct-analytics.streamlit.app/)
+[![Dataset on Hugging Face](https://img.shields.io/badge/dataset-Hugging%20Face-yellow)](https://huggingface.co/datasets/rosscyking/responsible-neobank-growth-events)
 
 I built a synthetic neobank whose backend events misbehave on purpose — late,
 duplicated, reversed, schema-evolving — and a governed dbt warehouse that turns
@@ -86,6 +87,7 @@ Each row traces to a record in [`evidence/registry.yml`](evidence/registry.yml).
 | Late-event recovery: a held-back day missed by the lookback, recovered by a bounded backfill; two staleness bugs found and fixed at scale | [run record](artifacts/plan3/run-record.md) |
 | Reward reconciliation: debits equal credits, opening plus movements equals closing, every injected exception caught | [execution oracle](tests/oracles/test_reward_reconciliation_execution.py) |
 | Reproducible from a clean clone with no cloud account | [reproducibility](artifacts/plan4/reproducibility.md) |
+| Dataset published on Hugging Face (CC-BY-4.0), verified from a clean download | [release record](artifacts/plan4/dataset-release.md) |
 | Spend: 844 jobs, 32.99 GB billed, about £0.21 (likely £0 under the free tier) against a £10 cap | [run record](artifacts/plan3/run-record.md) |
 
 ## Quick start (local, no cloud account)

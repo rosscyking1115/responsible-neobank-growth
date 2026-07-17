@@ -251,15 +251,17 @@ claims:
   - claim_id: dataset-release
     group: dataset
     statement: >-
-      A versioned synthetic event benchmark (deliveries, quarantine fixtures,
-      truth manifests, checksums) is planned for release on Hugging Face after
-      the licence, privacy and packaging gates pass.
-    level: planned
-    scope: Plan 4 Tasks 5-7; requires explicit user publication approval
+      The versioned synthetic event benchmark (568,789 + 1,833 deliveries,
+      quarantine fixtures, truth manifests, checksums) is published on Hugging
+      Face under CC-BY-4.0 and verified from a clean download.
+    level: external
+    scope: Hugging Face dataset rosscyking/responsible-neobank-growth-events, revision 0111c26e
     evidence_paths:
-      - docs/adr/ADR-route-c-release-branch.md
-    commit: "9716d35"
+      - artifacts/plan4/dataset-release.md
+      - "https://huggingface.co/datasets/rosscyking/responsible-neobank-growth-events"
+    measured_on: "2026-07-17"
+    commit: "cdd6bfe"
     limitations: >-
-      Not released; no dataset URL, size or licence is claimable until the
-      gates pass and the user approves publication.
-    surfaces: [docs/release]
+      Synthetic benchmark data, not calibrated to any real population; once on
+      the Hub it may be cached or indexed and should be treated as permanent.
+    surfaces: [README.md, docs/release, dataset-card]
