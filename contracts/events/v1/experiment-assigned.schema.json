@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "experiment-assigned v1 payload",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["experiment_id", "customer_id", "variant", "assignment_unit"],
+  "properties": {
+    "experiment_id": { "type": "string", "pattern": "^exp_[a-z0-9_]{4,}$" },
+    "customer_id": { "type": "string", "pattern": "^cus_[a-z0-9]{6,}$" },
+    "variant": { "type": "string", "enum": ["control", "treatment"] },
+    "assignment_unit": { "type": "string", "enum": ["customer"] }
+  },
+  "examples": [
+    {
+      "experiment_id": "exp_onboarding_v2",
+      "customer_id": "cus_a00001",
+      "variant": "treatment",
+      "assignment_unit": "customer"
+    }
+  ]
+}

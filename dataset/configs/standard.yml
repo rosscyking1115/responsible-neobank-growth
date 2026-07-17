@@ -1,0 +1,31 @@
+# standard profile — later public benchmark and BigQuery proof (Plan 2 §5.1).
+# Generated locally on demand; configuration and manifest committed, data
+# ignored. No claim that the volume resembles Monzo.
+profile: standard
+seed: 42
+generator_version: 0.1.0
+clock:
+  start: "2025-07-01T00:00:00Z"
+  end: "2026-06-30T23:59:59Z"
+volumes:
+  customers: 120000
+  max_deliveries: 1000000
+event_families:
+  - campaign_spend
+  - application_kyc_account
+  - activation_funding
+  - referral_reward
+  - experiment
+  - customer_outcome
+reward_amount_minor: 5000
+late_threshold_hours: 24
+lookback_days: 3
+scenario_mix:
+  duplicate_delivery_rate: 0.01
+  late_arrival_rate: 0.02
+  beyond_lookback_count: 10
+  reversal_rate: 0.02
+  malformed_rate: 0.005
+  v2_share: 0.2
+  freshness_outage: true
+  reconciliation_break_count: 25

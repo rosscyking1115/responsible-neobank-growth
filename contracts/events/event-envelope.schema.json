@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/rosscyking1115/responsible-neobank-growth/contracts/events/event-envelope.schema.json",
+  "title": "Neobank synthetic event envelope",
+  "description": "Shared envelope for every synthetic backend event (ADR-route-c-event-boundary). Timestamps are UTC ('Z' or '+00:00' only); a naive or non-UTC timestamp is invalid. Payloads are validated separately against the registered event/version schema.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "event_id",
+    "idempotency_key",
+    "event_name",
+    "source_service",
+    "occurred_at",
+    "emitted_at",
+    "ingested_at",
+    "schema_version",
+    "producer_id",
+    "trace_id",
+    "payload",
+    "generator_version",
+    "scenario_id"
+  ],
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "description": "Globally unique immutable identifier per emitted delivery.",
+      "pattern": "^evt_[a-z0-9][a-z0-9-]{7,}$"
+    },
+    "idempotency_key": {
+      "type": "string",
+      "description": "Stable across delivery duplicates of one business event.",
+      "pattern": "^idk_[a-z0-9_][a-z0-9_-]{5,}$"
+    },
+    "event_name": {
+      "type": "string",
+      "description": "Version-independent business event name.",
+      "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$"
+    },
+    "source_service": {
+      "type": "string",
+      "description": "Fictional producer service; membership is validated against the registry.",
+      "pattern": "^[a-z][a-z0-9-]*-service$"
+    },
+    "occurred_at": {
+      "$ref": "#/$defs/utc_timestamp",
+      "description": "Business occurrence time (UTC)."
+    },
+    "emitted_at": {
+      "$ref": "#/$defs/utc_timestamp",
+      "description": "Producer emission time (UTC); not before occurrence unless a clock-skew scenario is injected."
+    },
+    "ingested_at": {
+      "$ref": "#/$defs/utc_timestamp",
+      "description": "Warehouse arrival time (UTC); may be deliberately late."
+    },
+    "schema_version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Payload schema version, validated against the event registry."
+    },
+    "producer_id": {
+      "type": "string",
+      "description": "Fictional producer instance identifier.",
+      "minLength": 4
+    },
+    "trace_id": {
+      "type": "string",
+      "description": "Groups a bounded business workflow.",
+      "pattern": "^trc_[a-z0-9_][a-z0-9_-]{5,}$"
+    },
+    "payload": {
+      "type": "object",
+      "description": "Validated against the named event/version payload schema."
+    },
+    "generator_version": {
+      "type": "string",
+      "description": "Exact generator release that produced the event.",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "scenario_id": {
+      "type": "string",
+      "description": "Links the event to its scenario/truth manifest.",
+      "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$"
+    }
+  },
+  "$defs": {
+    "utc_timestamp": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|\\+00:00)$"
+    }
+  }
+}

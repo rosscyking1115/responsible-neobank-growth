@@ -1,0 +1,21 @@
+{
+  "duplicates": 1,
+  "event_count": 5,
+  "generator_version": "0.1.0",
+  "late_arrivals": 0,
+  "lifecycle_end_states": {
+    "ref_000010": "settled"
+  },
+  "quarantined": 0,
+  "reconciliation": {
+    "booked_minor": 5000,
+    "entitled_minor": 5000,
+    "exceptions": [],
+    "outstanding_payable_minor": 0,
+    "reversed_minor": 0,
+    "settled_minor": 5000
+  },
+  "scenario_id": "duplicate-delivery",
+  "seed": 42,
+  "unique_business_events": 4
+}

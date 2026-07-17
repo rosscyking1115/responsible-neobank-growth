@@ -14,6 +14,12 @@ clean-targets:
   - target
   - dbt_packages
 
+# Job attribution (Plan 3 section 7.1): every BigQuery job carries the dbt
+# invocation and node ids as job labels plus a query comment.
+query-comment:
+  comment: "route_c_plan3 {{ invocation_id }}"
+  job-label: true
+
 models:
   neobank:
     +materialized: table
@@ -24,3 +30,30 @@ models:
       +schema: intermediate
     marts:
       +schema: marts
+    landing:
+      +schema: landing
+      +materialized: view
+    normalised:
+      +schema: normalised
+      +materialized: table
+    logical:
+      +schema: logical
+      +materialized: table
+    presentation:
+      +schema: presentation
+      +materialized: table
+    compatibility:
+      +schema: compatibility
+      +materialized: view
+
+vars:
+  # Incremental ingestion lookback (docs/contracts/incremental-correctness.md).
+  lookback_days: 3
+  # Bounded backfill window (exclusive end); set only via tools/reconcile/backfill.py.
+  backfill_start: ""
+  backfill_end: ""
+  # Expected referral reward entitlement in integer minor units; must match the
+  # simulator profile (config/simulator/*.yml reward_amount_minor).
+  reward_amount_minor: 5000
+  # Synthetic settlement SLA for pending_beyond_synthetic_sla exceptions (days).
+  reward_settlement_sla_days: 14

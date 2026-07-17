@@ -113,8 +113,20 @@ The demo raw landing path was exercised on 2026-05-30 against project
 
 This proves the raw GCS-to-BigQuery warehouse path and dbt mart build are
 working for a small synthetic demo export. Batch scoring has also been exercised
-through Cloud Storage and BigQuery. Scheduled scoring jobs, monitoring jobs, and
-production security controls have not yet been deployed on GCP.
+through Cloud Storage and BigQuery.
+
+> **Scheduled-jobs status (dated history, corrected 2026-07-17).** An earlier
+> version of this document stated that scheduled scoring/monitoring jobs "have
+> not yet been deployed on GCP". That understated what
+> [CLOUD_RUN_DEPLOYMENT.md](CLOUD_RUN_DEPLOYMENT.md) records with execution IDs:
+> on **2026-05-31**, Cloud Scheduler triggered both
+> `neobank-activation-score-load` and `neobank-score-monitoring` successfully as
+> a **one-off smoke test**. What was *not* done is leaving a standing daily
+> schedule running, and production security controls remain undeployed. Both
+> dated records stand; this note reconciles them rather than rewriting either.
+> The current Route C cloud evidence is the dated 2026-07-17 BigQuery benchmark
+> run ([artifacts/plan3/run-record.md](../artifacts/plan3/run-record.md)); the
+> 2026-05-30/31 figures above are historical.
 
 ## BigQuery Dataset Layout
 

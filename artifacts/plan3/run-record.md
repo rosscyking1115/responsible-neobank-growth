@@ -1,0 +1,124 @@
+# Plan 3 Run Record — route-c-p3-20260717
+
+> Started 2026-07-17 after Ross's spend-preflight approval (recorded in
+> `cloud/gcp/plan3/run-config.yml`). Every entry is dated; nothing here is
+> restated later — corrections append.
+
+## 2026-07-17 — preflight and provisioning
+
+- **Approval:** spend preflight approved by Ross in chat (£10 ceiling, 80%
+  stop); recorded with approver/date; mechanical guard open.
+- **Auth:** authenticated as the project owner (`gcloud auth list`); the
+  gcloud default project (unrelated) was left untouched — every command uses
+  explicit `--project_id=neobank-growth-platform-ross`.
+- **Identity decision:** the bounded run uses the authenticated owner identity
+  with no service-account keys minted (fewer credentials at rest than the
+  planned deployment SA; deviation from "separate identities where possible"
+  recorded here). The read-only Looker service account is created only at the
+  Looker stage, where its connection requires one.
+- **Live inventory:** recorded in `cloud/gcp/plan3/resource-inventory.md`.
+  Key finding: **billing disabled** (sandbox mode) — MERGE probe failed with
+  "DML queries are not allowed in the free tier" (probe table deleted).
+  Incremental benchmark blocked until billing is enabled; Ross opted to enable
+  billing (console action, his own).
+- **Datasets provisioned** (free; within approved scope): the five
+  `neobank_p3_*_route_c_p3_20260717` datasets in `europe-west2`, labels
+  `route_c: plan3` + `run: route-c-p3-20260717`, default table expiry 30 days.
+  Verified via `bq ls --filter="labels.route_c:plan3"`.
+- **Job attribution verified:** the labelled probe query ran under
+  `--label=route_c:plan3` before the benchmark, satisfying Plan 3 §7.1's
+  attribution test.
+- **Standard profile:** generated and determinism-verified locally
+  (568,789 deliveries / 356 batches / 312.6 MB; identical logical checksum
+  `7fb8b85813d7d182…` across two runs). Local loader run into
+  `data/warehouse-standard/` for Parquet upload (loads are free).
+
+## 2026-07-17 — standard profile loaded and reconciled (Task 3)
+
+- Local loader over the standard profile: 356 batches, 565,960 valid,
+  2,829 quarantined (matches the 0.5% malformed rate).
+- Consolidated Parquet (88.9 MB deliveries + 0.4 MB quarantine) batch-loaded
+  into `neobank_p3_raw_route_c_p3_20260717.raw_event_deliveries` /
+  `.raw_event_quarantine` — loads are free.
+- **Source reconciliation exact on all checks**
+  (`artifacts/plan3/source-load-manifest.json`): total 568,789; unique
+  idempotency keys 560,360; duplicates 5,600; quarantined 2,829; event_ids
+  unique. Cloud source state equals the local run manifest.
+- Remaining stages (dbt builds, F-vs-I benchmark) blocked on billing
+  enablement (sandbox blocks DML); watch armed.
+
+## 2026-07-17 — billing enabled; benchmark phases armed (Tasks 4–5 start)
+
+- Ross linked billing account `01C196-FFCF87-70548B`; `billingEnabled: True`
+  verified; a labelled MERGE probe now **succeeds** (DML unblocked); probe
+  table deleted.
+- 16 legacy raw tables batch-loaded (free) into the Plan 3 raw dataset for the
+  current-graph rerun, alongside the two event tables.
+- dbt now stamps every BigQuery job with the invocation/node ids
+  (`query-comment: job-label: true`) — attribution verified earlier with the
+  labelled probe.
+- **Phases pre-registered before any output** (`artifacts/plan3/phase-manifest.json`):
+  90/9/1 by delivery count over `ingested_at`; Base cutoff
+  `2026-05-07T04:39:31Z` (509,364 deliveries = 90.0%), Delta cutoff
+  `2026-06-07T00:26:47Z`. Raw tables renamed `*_all`; the dbt sources read
+  phase views so phase advances are pure view DDL.
+- **Contractual dry runs recorded:** full delivery-view scan 274.4 MB;
+  largest legacy source (transactions) 5.9 MB — every stage far under the
+  1 GiB per-query cap; whole-build totals in single-digit GB (free tier).
+- Baseline (`neobank_p3b_20260717_*`) full build launched on the Base phase.
+
+## 2026-07-17 — benchmark complete (Tasks 4–8)
+
+- **Task 4:** full current graph + Route C (68 models, 215 tests) green on
+  BigQuery after one cross-dialect fix (`varchar` → `string_type()` macro);
+  artifacts in `current-graph/`. Supersedes the 13-table/107-check historical
+  record as current cloud evidence.
+- **Task 5:** base parity exact across all 6 governed interfaces
+  (`base-parity.json`).
+- **Task 6 (Delta, 3 repetitions each):** byte-identical scans per strategy
+  across reps. **Result (honest, mixed):** incremental billed **+1.95% MORE
+  bytes** than full rebuild (unpartitioned raw source — every strategy scans
+  the full landing view) while using **62.7% less compute** (median slot-ms
+  765,826 vs 2,172,197) at comparable runtime. `benchmark/` + `benchmark-summary.json`
+  + `warehouse-cost-results.csv`.
+- **Task 7 (Repair):** held-back day (2026-01-03, 7,492 deliveries) missed by
+  the ordinary lookback (recorded pre-backfill: financial interfaces diverged),
+  bounded backfill recovered it — and the at-scale run exposed **two real
+  staleness defects** the tiny-scale blue/green could not: (1) settlements
+  arriving before their booking froze `referral_id NULL`; (2) their ledger
+  lines stayed stale after healing. Fixed with self-healing re-selection
+  clauses + two new invariants (`assert_reward_references_resolved`,
+  `assert_ledger_is_complete`), green on DuckDB and BigQuery.
+  **Final parity: exact** (`repair-parity.json`).
+- **Task 8 (ablation):** identical 7-day reconciliation query, identical 52-row
+  result: **2,449 bytes (partitioned) vs 1,282,960 bytes (unpartitioned) —
+  523.9× fewer bytes processed**; both billed at the 10 MB per-query minimum at
+  this absolute scale. This locates where incremental byte savings actually
+  come from. Evidence mart `warehouse_job_evidence` built in the evidence
+  dataset (job metadata only, no query text).
+- No result is extrapolated to production or Monzo scale.
+
+## 2026-07-17 — Looker access outcome (Tasks 9–11)
+
+- LookML authored locally and committed (model, 4 views, 3 dashboards, Assert
+  tests) against the parity-proven optimised lineage; readiness tests pass.
+  Claim level: **configured**.
+- Trial signup submitted by Ross (business email `rosscykinglabs@gmail.com`,
+  company RossCyKing Labs, UK) → outcome: **"Our team will reach out to you
+  shortly"** — sales-mediated contact, **no instance provisioned**. Screenshot
+  retained by Ross; no payment was requested or offered.
+- Per Plan 3 §14.4: prepared LookML retained; **no BI substitute used; no
+  Looker execution claimed**. Outcome recorded as
+  **`partial go — BigQuery only`**, with a documented upgrade path: if a
+  genuine no-cost trial is provisioned before the cleanup deadline
+  (2026-08-16), the validation stage runs and the record is upgraded by dated
+  addendum.
+
+## Spend log
+
+| Date | Action | Bytes billed | Est. cost | Cumulative |
+|---|---|---|---|---|
+| 2026-07-17 | Dataset creation ×5, probe CTAS (sandbox, no billing possible) | 0 | £0.00 | £0.00 |
+| 2026-07-17 | Parquet batch loads ×2 (loads are free) | 0 | £0.00 | £0.00 |
+| 2026-07-17 | Source reconciliation count queries ×3 (~90 MB scans, sandbox free tier) | 0 | £0.00 | £0.00 |
+| 2026-07-17 | Full benchmark run: 844 query jobs (builds, parity, repair, ablation, evidence mart) | 32,994,492,416 | £0.21 (0 if free tier applies) | ≤£0.21 |

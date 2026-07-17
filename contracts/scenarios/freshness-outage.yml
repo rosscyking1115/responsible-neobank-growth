@@ -1,0 +1,18 @@
+scenario_id: freshness-outage
+description: >-
+  A 96-hour gap in event arrivals (05 Jan to 09 Jan) breaches the 72-hour
+  freshness threshold; the warehouse-health interface must surface a source
+  freshness/SLO failure rather than silently reporting stale data as current.
+seed: 42
+generator_version: 0.1.0
+events_fixture: fixtures/events/tiny/freshness-outage.jsonl
+truth_fixture: fixtures/truth/tiny/freshness-outage.json
+reward_amount_minor: 5000
+late_threshold_hours: 24
+freshness_gap_hours: 72
+prohibited_interpretation: >-
+  Synthetic engineering fixture only; the outage window is injected, not an
+  availability measurement of any real system.
+limitations: >-
+  Replaces the previous fixed-date freshness proxy with testable arrival-gap
+  semantics; SLO wiring into dbt source freshness is Plan 2 work.

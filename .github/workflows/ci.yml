@@ -61,8 +61,37 @@ jobs:
       - name: Generate synthetic data for dbt
         run: uv run python -m data_generator.generate --users 5000 --months 6 --seed 42 --output-dir raw/ci
 
+      - name: Generate deterministic events twice and compare checksums
+        run: |
+          uv run python -m src.event_simulator.cli generate --profile tiny --output data/generated/tiny-a
+          uv run python -m src.event_simulator.cli generate --profile tiny --output data/generated/tiny-b
+          uv run python -m src.event_simulator.cli compare --left data/generated/tiny-a --right data/generated/tiny-b
+
+      - name: Load events with quarantine
+        run: uv run python -m src.ingestion.event_loader --source data/generated/tiny-a --warehouse data/warehouse
+
       - name: dbt build
         run: uv run dbt build --project-dir dbt_neobank --profiles-dir dbt_neobank
+
+      - name: Standards-as-code against the real manifest
+        run: uv run python -m tools.standards.check_dbt_interfaces --manifest dbt_neobank/target/manifest.json --json-output artifacts/plan2/standards-report.json
+
+      - name: Blue/green interface reconciliation
+        run: uv run python -m tools.reconcile.compare_interfaces --scenario all
+
+      - name: Pipeline-gated tests (oracles, consumer contracts, standards)
+        run: uv run pytest tests/oracles tests/migration tests/standards -q
+
+      - name: Upload Route C evidence artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: route-c-plan2-evidence
+          path: |
+            artifacts/plan2/blue-green-report.json
+            artifacts/plan2/standards-report.json
+            artifacts/plan2/backfill-log.jsonl
+            dbt_neobank/target/run_results.json
 
       - name: Build API container
         run: docker build -f Dockerfile.api -t neobank-api:ci .

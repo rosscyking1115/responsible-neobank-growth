@@ -1,0 +1,151 @@
+# Route C metric ownership (Plan 1 section 7.2 — ADR-route-c-dbt-looker-boundary).
+#
+# Every headline metric has exactly ONE authoritative persisted grain and ONE
+# semantic owner. LookML may define consumer-facing measures over the
+# authoritative grain but may not reimplement eligibility, state reconstruction,
+# causal adjustment or reconciliation logic. Duplicate metric names fail
+# tests/contracts/test_interface_contracts.py.
+
+metrics:
+  # --- growth_acquisition (owner: growth) -----------------------------------
+  - name: applications
+    owner: growth
+    authoritative_interface: growth_acquisition
+    authoritative_grain: one row per customer application journey
+    definition: Count of submitted applications (canonical application-submitted events).
+    lookml_may: aggregate and slice by campaign, channel, cohort and date.
+
+  - name: approved_accounts
+    owner: growth
+    authoritative_interface: growth_acquisition
+    authoritative_grain: one row per customer application journey
+    definition: Applications whose canonical KYC decision is approved.
+    lookml_may: aggregate; must label the denominator when used in rates.
+
+  - name: activated_accounts
+    owner: growth
+    authoritative_interface: growth_acquisition
+    authoritative_grain: one row per customer application journey
+    definition: Approved applications with a canonical account-activated event.
+    lookml_may: aggregate; must not re-derive activation from raw events.
+
+  - name: funded_activations
+    owner: growth
+    authoritative_interface: growth_acquisition
+    authoritative_grain: one row per customer application journey
+    definition: Activated accounts with a canonical first account-funded event.
+    lookml_may: aggregate; funding recency windows stay in dbt.
+
+  - name: customer_outcome_flag_rate
+    owner: growth
+    authoritative_interface: growth_acquisition
+    authoritative_grain: one row per customer application journey
+    definition: >-
+      Share of journeys with a synthetic customer-outcome guardrail signal;
+      illustrative only, prominently labelled synthetic.
+    lookml_may: display with mandatory limitation description.
+
+  # --- referral_economics (growth meaning; finance owns booked cost) --------
+  - name: referral_invitations
+    owner: growth
+    authoritative_interface: referral_economics
+    authoritative_grain: one row per referral
+    definition: Count of canonical referral-invited events.
+    lookml_may: aggregate and slice by cohort and date.
+
+  - name: referral_qualifications
+    owner: growth
+    authoritative_interface: referral_economics
+    authoritative_grain: one row per referral
+    definition: Canonical referral-qualified events (v1/v2 normalised); qualification rules live in dbt.
+    lookml_may: aggregate; must not reimplement qualification eligibility.
+
+  - name: incremental_activated_customers
+    owner: growth
+    authoritative_interface: referral_economics
+    authoritative_grain: one row per referral
+    definition: >-
+      Experiment-based incremental activation estimate from governed dbt outputs
+      (CUPED/DiD adjustments stay in dbt); carries uncertainty fields.
+    lookml_may: display estimate and uncertainty; must not re-estimate.
+
+  - name: reward_booked_cost
+    owner: finance
+    authoritative_interface: referral_economics
+    authoritative_grain: one row per referral
+    definition: Booked referral reward cost in integer minor units (finance-owned meaning).
+    lookml_may: aggregate and convert to display currency without changing minor-unit truth.
+
+  - name: cost_per_incremental_activation
+    owner: growth
+    authoritative_interface: referral_economics
+    authoritative_grain: one row per referral
+    definition: Booked reward cost divided by incremental activated customers; ratio persisted in dbt.
+    lookml_may: display; must not recompute from other Looker measures (average-of-averages risk).
+
+  # --- reward_reconciliation (owner: finance) --------------------------------
+  - name: reward_entitlement_amount
+    owner: finance
+    authoritative_interface: reward_reconciliation
+    authoritative_grain: one row per reward per reconciliation day
+    definition: Expected reward amount per qualified referral per day, integer minor units.
+    lookml_may: aggregate by day, cohort and status.
+
+  - name: reward_settled_amount
+    owner: finance
+    authoritative_interface: reward_reconciliation
+    authoritative_grain: one row per reward per reconciliation day
+    definition: Settled reward amount, integer minor units.
+    lookml_may: aggregate.
+
+  - name: reward_reversed_amount
+    owner: finance
+    authoritative_interface: reward_reconciliation
+    authoritative_grain: one row per reward per reconciliation day
+    definition: Reversed reward amount, integer minor units.
+    lookml_may: aggregate.
+
+  - name: outstanding_reward_payable
+    owner: finance
+    authoritative_interface: reward_reconciliation
+    authoritative_grain: one row per reward per reconciliation day
+    definition: Booked minus settled minus reversed, integer minor units; balance rules live in dbt.
+    lookml_may: aggregate; must not derive balances from other measures.
+
+  - name: reconciliation_exception_count
+    owner: finance
+    authoritative_interface: reward_reconciliation
+    authoritative_grain: one row per reward per reconciliation day
+    definition: Count of reconciliation exceptions by reason code and age; reason logic lives in dbt.
+    lookml_may: aggregate and drill by reason; must not reclassify exceptions.
+
+  # --- warehouse_health (owner: platform) ------------------------------------
+  - name: model_freshness_status
+    owner: platform
+    authoritative_interface: warehouse_health
+    authoritative_grain: one row per model per run day
+    definition: Freshness state against the declared interface SLOs.
+    lookml_may: display and filter.
+
+  - name: test_pass_rate
+    owner: platform
+    authoritative_interface: warehouse_health
+    authoritative_grain: one row per model per run day
+    definition: Share of dbt tests passing per model per run, from run artifacts.
+    lookml_may: aggregate over time.
+
+  - name: bytes_processed
+    owner: platform
+    authoritative_interface: warehouse_health
+    authoritative_grain: one row per model per run day
+    definition: BigQuery bytes processed per model run; null until Plan 3 measures it.
+    lookml_may: aggregate; must not display nulls as zero cost.
+
+  - name: estimated_query_cost
+    owner: platform
+    authoritative_interface: warehouse_health
+    authoritative_grain: one row per model per run day
+    definition: >-
+      Estimated on-demand cost from measured bytes with pricing date recorded;
+      null until Plan 3 measures it; never presented as billed cost.
+    lookml_may: display with pricing-date caveat.

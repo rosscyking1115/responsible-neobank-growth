@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "referral-qualified v2 payload",
+  "description": "v2 adds the required qualification_rule and optional qualifying_account_id. The required addition is a change-managed break, hence the new schema_version; the normalised layer must adapt v1 and v2 to one canonical meaning (v1 rows expose a null qualification_rule).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["referral_id", "referrer_customer_id", "referred_customer_id", "qualified_reason", "qualification_rule"],
+  "properties": {
+    "referral_id": { "type": "string", "pattern": "^ref_[a-z0-9]{6,}$" },
+    "referrer_customer_id": { "type": "string", "pattern": "^cus_[a-z0-9]{6,}$" },
+    "referred_customer_id": { "type": "string", "pattern": "^cus_[a-z0-9]{6,}$" },
+    "qualified_reason": { "type": "string", "enum": ["first_funding_completed", "activation_completed"] },
+    "qualification_rule": { "type": "string", "pattern": "^rule_[a-z0-9_]{4,}$" },
+    "qualifying_account_id": { "type": ["string", "null"], "pattern": "^acc_[a-z0-9]{6,}$" }
+  },
+  "examples": [
+    {
+      "referral_id": "ref_000002",
+      "referrer_customer_id": "cus_a00002",
+      "referred_customer_id": "cus_b00002",
+      "qualified_reason": "first_funding_completed",
+      "qualification_rule": "rule_v2_first_funding_within_30d",
+      "qualifying_account_id": "acc_000002"
+    }
+  ]
+}

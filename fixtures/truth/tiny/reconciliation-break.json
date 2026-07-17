@@ -1,0 +1,26 @@
+{
+  "duplicates": 0,
+  "event_count": 2,
+  "generator_version": "0.1.0",
+  "late_arrivals": 0,
+  "lifecycle_end_states": {
+    "ref_000060": "qualified"
+  },
+  "quarantined": 0,
+  "reconciliation": {
+    "booked_minor": 0,
+    "entitled_minor": 5000,
+    "exceptions": [
+      {
+        "count": 1,
+        "reason": "missing_posting"
+      }
+    ],
+    "outstanding_payable_minor": 0,
+    "reversed_minor": 0,
+    "settled_minor": 0
+  },
+  "scenario_id": "reconciliation-break",
+  "seed": 42,
+  "unique_business_events": 2
+}

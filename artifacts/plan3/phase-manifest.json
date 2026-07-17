@@ -1,0 +1,8 @@
+{
+  "rule": "90/9/1 by delivery count ordered by ingested_at (Plan 3 section 6.2), registered before any benchmark output was inspected",
+  "base_cutoff_ingested_at": "2026-05-07T04:39:31Z",
+  "delta_cutoff_ingested_at": "2026-06-07T00:26:47Z",
+  "min_ingested_at": "2025-06-30T04:14:44Z",
+  "max_ingested_at": "2026-06-23T09:00:03Z",
+  "valid_deliveries": 565960
+}

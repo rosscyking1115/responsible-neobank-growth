@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Route C governed interface manifest",
+  "description": "Contract every governed normalised/logical interface must satisfy (Plan 1 section 7). Field names may improve later, but every concept here must remain enforced.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "name",
+    "version",
+    "status",
+    "owner",
+    "purpose",
+    "audiences",
+    "grain",
+    "unique_key",
+    "source_domain",
+    "allowed_consumers",
+    "freshness_slo",
+    "classification",
+    "partition_policy",
+    "compatibility",
+    "tests",
+    "exposures",
+    "deprecation_policy"
+  ],
+  "properties": {
+    "name": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+    "version": { "type": "integer", "minimum": 1 },
+    "status": { "type": "string", "enum": ["proposed", "active", "deprecated"] },
+    "owner": { "type": "string", "enum": ["growth", "finance", "platform", "responsible_growth"] },
+    "purpose": { "type": "string", "minLength": 20 },
+    "audiences": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "enum": ["growth", "product", "finance", "platform", "governance"] }
+    },
+    "grain": { "type": "string", "pattern": "^one row per .+" },
+    "unique_key": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "source_domain": { "type": "string", "minLength": 3 },
+    "allowed_consumers": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "enum": ["looker", "reporting", "ml", "streamlit", "api", "finance"] }
+    },
+    "freshness_slo": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["warn_after", "error_after"],
+      "properties": {
+        "warn_after": { "type": "string", "pattern": "^\\d+ (hours|days)$" },
+        "error_after": { "type": "string", "pattern": "^\\d+ (hours|days)$" }
+      }
+    },
+    "classification": { "type": "string", "enum": ["synthetic_restricted", "synthetic_public"] },
+    "partition_policy": { "type": "string", "minLength": 10 },
+    "compatibility": { "type": "string", "enum": ["backward_compatible", "breaking_with_migration"] },
+    "tests": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 3 }
+    },
+    "exposures": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 3 }
+    },
+    "deprecation_policy": { "type": "string", "minLength": 10 }
+  }
+}

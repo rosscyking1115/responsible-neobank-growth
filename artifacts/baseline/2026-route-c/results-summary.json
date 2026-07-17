@@ -1,0 +1,42 @@
+{
+  "captured_at_utc": "2026-07-17T01:06:54.484016+00:00",
+  "git_commit": "9d680abba3d9cee79c9e3e97931654f93d7528c2",
+  "git_branch": "feat/route-c-plan1-gate0",
+  "dbt_result_statuses": {
+    "success": 34,
+    "pass": 99
+  },
+  "dbt_total_results": 133,
+  "dbt_model_count": 34,
+  "raw_bigquery_manifest_table_count": 16,
+  "raw_bigquery_manifest_tables": [
+    "users",
+    "experiment_assignments",
+    "activation_ground_truth",
+    "transactions",
+    "sessions",
+    "feature_events",
+    "support_contacts",
+    "referrals",
+    "region_daily_signups",
+    "pricing_offer_catalog",
+    "pricing_exposures",
+    "pricing_outcomes",
+    "experiment_ground_truth",
+    "wellbeing_proxies",
+    "onboarding_events",
+    "protection_events"
+  ],
+  "pytest_result": "217 passed",
+  "ruff_result": "All checks passed",
+  "marimo_check_result": "exit 0",
+  "commands": [
+    "uv run ruff check .",
+    "uv run marimo check notebooks --ignore-scripts",
+    "uv run pytest",
+    "uv run python -m data_generator.generate --users 5000 --months 6 --seed 42 --output-dir raw/ci",
+    "uv run dbt deps --project-dir dbt_neobank --profiles-dir dbt_neobank",
+    "uv run dbt parse --project-dir dbt_neobank --profiles-dir dbt_neobank --target dev",
+    "uv run dbt build --project-dir dbt_neobank --profiles-dir dbt_neobank --target dev"
+  ]
+}

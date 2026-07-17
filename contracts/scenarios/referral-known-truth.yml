@@ -1,0 +1,19 @@
+scenario_id: referral-known-truth
+description: >-
+  The mandatory hand-built combined referral case (Plan 1 section 8.3): one
+  normally settled qualification, one duplicated delivery, one late-arriving
+  qualification, one reversed reward, one malformed v2 payload quarantined and
+  one intentionally missing posting — with exact daily entitlement, ledger and
+  exception totals declared.
+seed: 42
+generator_version: 0.1.0
+events_fixture: fixtures/events/tiny/referral-known-truth.jsonl
+truth_fixture: fixtures/truth/tiny/referral-known-truth.json
+reward_amount_minor: 5000
+late_threshold_hours: 24
+prohibited_interpretation: >-
+  Synthetic engineering fixture only; defect mix and amounts are designed for
+  oracle coverage, not representative of any real reward programme.
+limitations: >-
+  Six referrals across two business days; proves the contracts express the
+  difficult cases before any generated volume exists (tiny profile, Gate 0).

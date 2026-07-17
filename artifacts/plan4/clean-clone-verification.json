@@ -1,0 +1,18 @@
+{
+  "stages": {
+    "lint": "pass",
+    "unit-tests": "pass",
+    "generate-a": "pass",
+    "generate-b": "pass",
+    "determinism": "pass",
+    "load": "pass",
+    "generate-batch-raw": "pass",
+    "dbt-build": "pass",
+    "standards": "pass",
+    "blue-green": "pass",
+    "pipeline-tests": "pass"
+  },
+  "missing_artifacts": [],
+  "blue_green_parity": true,
+  "ok": true
+}

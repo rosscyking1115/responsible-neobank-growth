@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "account-funded v1 payload",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["account_id", "customer_id", "amount_minor", "currency", "funding_method", "is_first_funding"],
+  "properties": {
+    "account_id": { "type": "string", "pattern": "^acc_[a-z0-9]{6,}$" },
+    "customer_id": { "type": "string", "pattern": "^cus_[a-z0-9]{6,}$" },
+    "amount_minor": { "type": "integer", "minimum": 1, "description": "Integer minor units (pence)." },
+    "currency": { "type": "string", "enum": ["GBP"] },
+    "funding_method": { "type": "string", "enum": ["bank_transfer", "debit_card", "salary"] },
+    "is_first_funding": { "type": "boolean" }
+  },
+  "examples": [
+    {
+      "account_id": "acc_000001",
+      "customer_id": "cus_a00001",
+      "amount_minor": 10000,
+      "currency": "GBP",
+      "funding_method": "bank_transfer",
+      "is_first_funding": true
+    }
+  ]
+}

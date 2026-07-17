@@ -1,0 +1,17 @@
+scenario_id: referral-v1-to-v2
+description: >-
+  Two referrals qualify in the same window, one emitting a v1 payload and one a
+  valid v2 payload (with qualification_rule); both versions must coexist and
+  normalise to one canonical qualified meaning downstream.
+seed: 42
+generator_version: 0.1.0
+events_fixture: fixtures/events/tiny/referral-v1-to-v2.jsonl
+truth_fixture: fixtures/truth/tiny/referral-v1-to-v2.json
+reward_amount_minor: 5000
+late_threshold_hours: 24
+prohibited_interpretation: >-
+  Synthetic engineering fixture only; the version migration timing is invented,
+  not a record of any real schema rollout.
+limitations: >-
+  Canonical equivalence at the normalised layer (v1 rows exposing a null
+  qualification_rule) is asserted structurally here and executed in Plan 2.

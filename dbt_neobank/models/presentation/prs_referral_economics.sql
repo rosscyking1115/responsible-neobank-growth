@@ -1,0 +1,25 @@
+-- Consumer-shaped referral economics (Looker/Streamlit/Finance reporting).
+select
+    referral_id,
+    referrer_customer_id,
+    referred_customer_id,
+    invite_channel,
+    invited_at,
+    invite_cohort_month,
+    qualified_at,
+    is_qualified,
+    qualification_rule,
+    referred_customer_funded,
+    reward_id,
+    entitled_minor,
+    booked_minor,
+    settled_minor,
+    reversed_minor,
+    outstanding_payable_minor,
+    lifecycle_status,
+    exception_reason,
+    incremental_activated_estimate,
+    incremental_activated_ci_low,
+    incremental_activated_ci_high,
+    estimate_method
+from {{ ref('lgl_referral_economics') }}

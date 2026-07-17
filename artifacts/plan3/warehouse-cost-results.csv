@@ -1,0 +1,11 @@
+run_id,strategy,phase,rep,model_or_query,input_deliveries,lookback_days,bytes_processed,bytes_billed,total_slot_ms,runtime_seconds,estimated_cost_gbp,currency,pricing_date,correctness_status,notes
+route-c-p3-20260717,full,delta,1,route_c_graph_30_models,560301,3,1312773072,1454374912,2172197,36.7,0.0091,GBP,2026-07-17,parity_exact,dbt log (runner timer lost to the extraction hang; see run-record)
+route-c-p3-20260717,full,delta,2,route_c_graph_30_models,560301,3,1312773072,1454374912,2522925,41.7,0.0091,GBP,2026-07-17,parity_exact,
+route-c-p3-20260717,full,delta,3,route_c_graph_30_models,560301,3,1312773072,1454374912,1855128,38.4,0.0091,GBP,2026-07-17,parity_exact,
+route-c-p3-20260717,incremental,delta,1,route_c_graph_30_models,560301,3,1328332079,1482686464,904037,31.3,0.0093,GBP,2026-07-17,parity_exact,dbt log
+route-c-p3-20260717,incremental,delta,2,route_c_graph_30_models,560301,3,1329478381,1482686464,765826,38.4,0.0093,GBP,2026-07-17,parity_exact,
+route-c-p3-20260717,incremental,delta,3,route_c_graph_30_models,560301,3,1329478381,1482686464,744942,30.5,0.0093,GBP,2026-07-17,parity_exact,
+route-c-p3-20260717,full,repair,1,route_c_graph_30_models,565960,3,,,,40.5,,GBP,2026-07-17,parity_exact,
+route-c-p3-20260717,incremental,repair,1,route_c_graph_30_models,565960,3,,,,33.6,,GBP,2026-07-17,parity_exact,
+route-c-p3-20260717,physical_ablation,delta,1,reward_events_7day_reconciliation_partitioned,27004,3,2449,10485760,80,0.159,0.0001,GBP,2026-07-17,identical_52_rows,billed at the 10MB per-query minimum
+route-c-p3-20260717,physical_ablation,delta,1,reward_events_7day_reconciliation_unpartitioned,27004,3,1282960,10485760,43,0.159,0.0001,GBP,2026-07-17,identical_52_rows,billed at the 10MB per-query minimum; 523.9x more bytes processed than partitioned

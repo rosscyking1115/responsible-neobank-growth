@@ -1,0 +1,17 @@
+scenario_id: late-arrival
+description: >-
+  A referral qualification arrives 48 hours after it occurred — beyond the
+  24-hour late threshold but inside the 3-day incremental lookback — so an
+  ordinary incremental run must repair the affected state without backfill.
+seed: 42
+generator_version: 0.1.0
+events_fixture: fixtures/events/tiny/late-arrival.jsonl
+truth_fixture: fixtures/truth/tiny/late-arrival.json
+reward_amount_minor: 5000
+late_threshold_hours: 24
+prohibited_interpretation: >-
+  Synthetic engineering fixture only; the delay is injected, not a measurement
+  of real pipeline latency.
+limitations: >-
+  The beyond-lookback variant (requiring explicit bounded backfill) is specified
+  in docs/contracts/incremental-correctness.md and exercised in Plan 2.

@@ -6,14 +6,27 @@ __pycache__/
 .mypy_cache/
 .coverage
 htmlcov/
-artifacts/
+artifacts/*
+# Route C evidence baselines and gate decisions are committed deliberately
+# (immutable dated evidence)
+!artifacts/baseline/
+!artifacts/gate0/
+!artifacts/plan2/
+!artifacts/plan3/
+!artifacts/plan4/
 
-# Data generated locally
-raw/
-data/
+# Data generated locally (anchored to repo root so it does not also ignore
+# dataset/data/, which carries the committed tiny release tree)
+/raw/
+/data/
 *.duckdb
 *.duckdb.wal
 *.parquet
+
+# Dataset release candidate: the tiny tree is committed; the standard profile's
+# large data is built on demand and uploaded, never committed.
+dataset/data/standard/
+dataset/truth/standard-manifest.json
 
 # dbt build artifacts
 dbt_neobank/target/

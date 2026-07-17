@@ -1,0 +1,51 @@
+{
+  "nodes": {
+    "model.neobank.lgl_growth_acquisition": {
+      "name": "lgl_growth_acquisition",
+      "resource_type": "model",
+      "path": "models/logical/lgl_growth_acquisition.sql",
+      "config": {
+        "materialized": "incremental",
+        "meta": {
+          "owner": "growth",
+          "purpose": "Application-to-funded-activation journeys with experiment and guardrail context",
+          "grain": "one row per customer application journey",
+          "unique_key": ["application_id"],
+          "freshness_slo": {"warn_after": "24 hours", "error_after": "72 hours"},
+          "classification": "synthetic_restricted",
+          "interface_version": 1,
+          "compatibility": "backward_compatible",
+          "exposures": ["streamlit_product_health_tab", "future_looker_growth_acquisition_explore"],
+          "partition_policy": "partition by application submission date (daily)"
+        }
+      }
+    },
+    "model.neobank.nrm_referral_event": {
+      "name": "nrm_referral_event",
+      "resource_type": "model",
+      "path": "models/normalised/nrm_referral_event.sql",
+      "config": {
+        "materialized": "table",
+        "meta": {
+          "owner": "growth",
+          "purpose": "Canonical version-independent referral lifecycle events",
+          "grain": "one row per canonical referral event",
+          "unique_key": ["idempotency_key"],
+          "freshness_slo": {"warn_after": "24 hours", "error_after": "72 hours"},
+          "classification": "synthetic_restricted",
+          "interface_version": 1,
+          "compatibility": "backward_compatible",
+          "exposures": ["referral_economics_interface"],
+          "partition_policy": "not applicable: tiny reference volume, documented",
+          "incremental_exemption": "tiny fixture volume in Plan 1; incremental materialisation deferred to Plan 2 with the real event volume"
+        }
+      }
+    },
+    "model.neobank.stg_users": {
+      "name": "stg_users",
+      "resource_type": "model",
+      "path": "models/staging/stg_users.sql",
+      "config": {"materialized": "view", "meta": {}}
+    }
+  }
+}

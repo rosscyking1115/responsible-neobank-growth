@@ -1,0 +1,21 @@
+{
+  "run_id": "route-c-p3-20260717",
+  "strategy": "full",
+  "phase": "delta",
+  "rep": 1,
+  "prefix": "neobank_p3b_20260717",
+  "window": [
+    "2026-07-17T16:41:36Z",
+    "2026-07-17T16:42:15Z"
+  ],
+  "runtime_seconds": 36.7,
+  "runtime_source": "dbt log (runner timer lost to the extraction hang; see run-record)",
+  "totals": {
+    "job_count": 30,
+    "bytes_processed": 1312773072,
+    "bytes_billed": 1454374912,
+    "total_slot_ms": 2172197,
+    "cache_hits": 0
+  },
+  "estimated_cost_gbp": 0.0091
+}

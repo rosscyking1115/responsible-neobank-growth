@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Route C scenario manifest",
+  "description": "Declares one deterministic tiny scenario: which event fixture it plays, which truth manifest states its exact expected outcomes, and the interpretation limits (ADR-route-c-synthetic-truth).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "scenario_id",
+    "description",
+    "seed",
+    "generator_version",
+    "events_fixture",
+    "truth_fixture",
+    "reward_amount_minor",
+    "late_threshold_hours",
+    "prohibited_interpretation",
+    "limitations"
+  ],
+  "properties": {
+    "scenario_id": { "type": "string", "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$" },
+    "description": { "type": "string", "minLength": 20 },
+    "seed": { "type": "integer", "minimum": 0 },
+    "generator_version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+    "events_fixture": { "type": "string", "pattern": "^fixtures/events/tiny/[a-z0-9-]+\\.jsonl$" },
+    "truth_fixture": { "type": "string", "pattern": "^fixtures/truth/tiny/[a-z0-9-]+\\.json$" },
+    "reward_amount_minor": { "type": "integer", "minimum": 1 },
+    "late_threshold_hours": { "type": "integer", "minimum": 1 },
+    "freshness_gap_hours": { "type": "integer", "minimum": 1 },
+    "prohibited_interpretation": { "type": "string", "minLength": 20 },
+    "limitations": { "type": "string", "minLength": 20 }
+  }
+}

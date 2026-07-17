@@ -1,0 +1,63 @@
+{
+  "tag": "repair-pre-backfill",
+  "left_prefix": "neobank_p3b_20260717",
+  "right_prefix": "neobank_p3o_20260717",
+  "interfaces": {
+    "lgl_growth_acquisition": {
+      "content_fingerprint": "6435823005306812646",
+      "row_count": "120000",
+      "sum_first_funding_amount_minor": "2337153877"
+    },
+    "lgl_referral_economics": {
+      "content_fingerprint": "-8943591903008208798",
+      "row_count": "17809",
+      "sum_booked_minor": "67510000",
+      "sum_reversed_minor": "1350000",
+      "sum_settled_minor": "66160000"
+    },
+    "lgl_reward_entitlement": {
+      "content_fingerprint": "-179106309910241641",
+      "row_count": "13527",
+      "sum_booked_minor": "67510000",
+      "sum_entitled_minor": "67635000",
+      "sum_settled_minor": "66160000"
+    },
+    "lgl_reward_ledger_reconciliation": {
+      "content_fingerprint": "2629318417706293601",
+      "row_count": "2473030",
+      "sum_outstanding_payable_minor": "465290000"
+    },
+    "lgl_warehouse_health": {
+      "content_fingerprint": "-1729704151154907010",
+      "row_count": "1068"
+    },
+    "prs_financial_reconciliation_daily": {
+      "content_fingerprint": "3499628400598560485",
+      "row_count": "355",
+      "sum_booked_minor": "12335600000",
+      "sum_entitled_minor": "12365150000"
+    }
+  },
+  "differences": [
+    "lgl_growth_acquisition.content_fingerprint: left=6435823005306812646 right=6818905348832810308",
+    "lgl_growth_acquisition.row_count: left=120000 right=118414",
+    "lgl_growth_acquisition.sum_first_funding_amount_minor: left=2337153877 right=2295483840",
+    "lgl_referral_economics.content_fingerprint: left=-8943591903008208798 right=3123657512246876024",
+    "lgl_referral_economics.row_count: left=17809 right=17573",
+    "lgl_referral_economics.sum_booked_minor: left=67510000 right=66060000",
+    "lgl_referral_economics.sum_reversed_minor: left=1350000 right=1320000",
+    "lgl_referral_economics.sum_settled_minor: left=66160000 right=63910000",
+    "lgl_reward_entitlement.content_fingerprint: left=-179106309910241641 right=1871278212790619542",
+    "lgl_reward_entitlement.row_count: left=13527 right=13344",
+    "lgl_reward_entitlement.sum_booked_minor: left=67510000 right=66565000",
+    "lgl_reward_entitlement.sum_entitled_minor: left=67635000 right=66720000",
+    "lgl_reward_entitlement.sum_settled_minor: left=66160000 right=64405000",
+    "lgl_reward_ledger_reconciliation.content_fingerprint: left=2629318417706293601 right=613544679599291830",
+    "lgl_reward_ledger_reconciliation.row_count: left=2473030 right=2441554",
+    "lgl_reward_ledger_reconciliation.sum_outstanding_payable_minor: left=465290000 right=603350000",
+    "prs_financial_reconciliation_daily.content_fingerprint: left=3499628400598560485 right=4772243237845859889",
+    "prs_financial_reconciliation_daily.sum_booked_minor: left=12335600000 right=12173075000",
+    "prs_financial_reconciliation_daily.sum_entitled_minor: left=12365150000 right=12207770000"
+  ],
+  "parity": false
+}

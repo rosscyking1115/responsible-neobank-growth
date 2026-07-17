@@ -1,0 +1,17 @@
+scenario_id: reconciliation-break
+description: >-
+  A referral qualifies but the expected reward posting never arrives; daily
+  reconciliation must emit exactly one missing_posting exception tracing back to
+  the qualified referral.
+seed: 42
+generator_version: 0.1.0
+events_fixture: fixtures/events/tiny/reconciliation-break.jsonl
+truth_fixture: fixtures/truth/tiny/reconciliation-break.json
+reward_amount_minor: 5000
+late_threshold_hours: 24
+prohibited_interpretation: >-
+  Synthetic engineering fixture only; the break is injected, not an estimate of
+  real reconciliation failure rates.
+limitations: >-
+  One exception type; duplicate posting, amount mismatch and invalid transitions
+  are specified in docs/contracts/reward-reconciliation.md for Plan 2 execution.

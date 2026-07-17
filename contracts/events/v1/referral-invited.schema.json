@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "referral-invited v1 payload",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["referral_id", "referrer_customer_id", "invite_channel"],
+  "properties": {
+    "referral_id": { "type": "string", "pattern": "^ref_[a-z0-9]{6,}$" },
+    "referrer_customer_id": { "type": "string", "pattern": "^cus_[a-z0-9]{6,}$" },
+    "invite_channel": { "type": "string", "enum": ["in_app_link", "share_code"] }
+  },
+  "examples": [
+    {
+      "referral_id": "ref_000001",
+      "referrer_customer_id": "cus_a00001",
+      "invite_channel": "in_app_link"
+    }
+  ]
+}

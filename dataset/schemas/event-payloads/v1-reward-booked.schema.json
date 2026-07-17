@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "reward-booked v1 payload",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["reward_id", "referral_id", "beneficiary_customer_id", "amount_minor", "currency"],
+  "properties": {
+    "reward_id": { "type": "string", "pattern": "^rwd_[a-z0-9]{6,}$" },
+    "referral_id": { "type": "string", "pattern": "^ref_[a-z0-9]{6,}$" },
+    "beneficiary_customer_id": { "type": "string", "pattern": "^cus_[a-z0-9]{6,}$" },
+    "amount_minor": { "type": "integer", "minimum": 1, "description": "Integer minor units (pence)." },
+    "currency": { "type": "string", "enum": ["GBP"] }
+  },
+  "examples": [
+    {
+      "reward_id": "rwd_000001",
+      "referral_id": "ref_000001",
+      "beneficiary_customer_id": "cus_a00001",
+      "amount_minor": 5000,
+      "currency": "GBP"
+    }
+  ]
+}

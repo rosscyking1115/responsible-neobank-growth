@@ -1,0 +1,21 @@
+{
+  "duplicates": 0,
+  "event_count": 4,
+  "generator_version": "0.1.0",
+  "late_arrivals": 1,
+  "lifecycle_end_states": {
+    "ref_000020": "settled"
+  },
+  "quarantined": 0,
+  "reconciliation": {
+    "booked_minor": 5000,
+    "entitled_minor": 5000,
+    "exceptions": [],
+    "outstanding_payable_minor": 0,
+    "reversed_minor": 0,
+    "settled_minor": 5000
+  },
+  "scenario_id": "late-arrival",
+  "seed": 42,
+  "unique_business_events": 4
+}

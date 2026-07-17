@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "campaign-spend-recorded v1 payload",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["campaign_id", "spend_date", "amount_minor", "currency", "channel"],
+  "properties": {
+    "campaign_id": { "type": "string", "pattern": "^cmp_[a-z0-9_]{4,}$" },
+    "spend_date": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+    "amount_minor": { "type": "integer", "minimum": 0, "description": "Integer minor units (pence)." },
+    "currency": { "type": "string", "enum": ["GBP"] },
+    "channel": { "type": "string", "enum": ["paid_social", "paid_search", "referral", "partnership", "brand"] }
+  },
+  "examples": [
+    {
+      "campaign_id": "cmp_spring_boost",
+      "spend_date": "2026-01-05",
+      "amount_minor": 250000,
+      "currency": "GBP",
+      "channel": "paid_social"
+    }
+  ]
+}

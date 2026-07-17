@@ -1,4 +1,4 @@
-# Responsible Neobank Growth Platform
+# Responsible Neobank Growth — Analytics Engineering Platform
 
 [![CI](https://github.com/rosscyking1115/responsible-neobank-growth/actions/workflows/ci.yml/badge.svg)](https://github.com/rosscyking1115/responsible-neobank-growth/actions/workflows/ci.yml)
 [![Monitoring Snapshot](https://github.com/rosscyking1115/responsible-neobank-growth/actions/workflows/monitoring-snapshot.yml/badge.svg)](https://github.com/rosscyking1115/responsible-neobank-growth/actions/workflows/monitoring-snapshot.yml)
@@ -6,324 +6,244 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Live dashboard](https://img.shields.io/badge/demo-Streamlit-ff4b4b)](https://neobank-appuct-analytics.streamlit.app/)
 
-![Responsible Neobank Growth Platform dashboard](docs/assets/streamlit-product-health.png)
+I built a synthetic neobank whose backend events misbehave on purpose — late,
+duplicated, reversed, schema-evolving — and a governed dbt warehouse that turns
+them into trusted Growth and referral-reward interfaces. The events are
+generated against a known-truth manifest, so the warehouse's correctness can be
+checked rather than asserted. On top of that, I ran an honest cost benchmark:
+does an incremental warehouse produce the same answer as a full rebuild, and
+what does each actually cost?
 
-**A fintech data-science project** applying responsible-growth analytics
-under **UK Consumer Duty**. On synthetic neobank data it shows the methodology a product
-data scientist would apply to a growth decision — experimentation rigour, activation and
-geo-lift modelling, fairness metrics, and a foreseeable-harm gate that decides whether a
-change should **ship, iterate, or hold**.
+> Everything here is synthetic. No affiliation with Monzo or any bank; no real
+> customer, internal, or proprietary data. Monzo's public engineering writing
+> shaped which problems I chose, not how any of it is built. See
+> [Safety & ethics](#safety--ethics).
 
-> A reference project, **not a product** and not for sale. All data is
-> synthetic — no real customer data, internal bank data, or proprietary business metrics
-> are used. See [Safety & ethics](#safety--ethics).
+**What ran, and what didn't** — every figure below traces to
+[`evidence/registry.yml`](evidence/registry.yml), and a claim audit fails CI on
+any number that doesn't:
 
-> **How to read the numbers in this repo.** Every figure is one of two kinds:
-> 🟢 *ground-truth-validated* (the method is judged against a known embedded answer — CUPED
-> variance reduction, SRM, synthetic-control recovering the true incrementality) or
-> 🟡 *synthetic — illustrative of method, not real-world performance* (activation rates,
-> £CLV, fairness-gap magnitudes). The same analysis code is also re-run on **real** public
-> data (UCI Bank Marketing, Criteo Uplift) as a cross-check. See
-> **[docs/CREDIBILITY.md](docs/CREDIBILITY.md)** for the split, the non-circularity
-> guarantee, and why the core stays synthetic.
+- the four-layer warehouse executed on BigQuery under a £10 approved cap — one
+  dated benchmark run, not a live service;
+- full-refresh and incremental builds matched exactly at every governed
+  interface, across all three phases;
+- the cost result is measured and mixed, and I report it that way (below);
+- the LookML is written and reviewed but never validated in a Looker instance —
+  the trial was access-limited, so I claim no Looker experience.
 
-> Part of my responsible-fintech cluster, alongside
-> [cashflow-risk](https://github.com/rosscyking1115/cashflow-risk) and
-> [cited-market-brief-agent](https://github.com/rosscyking1115/cited-market-brief-agent);
-> it also absorbed my marketing-measurement lab (see `docs/case-studies/`). Full project map →
-> [profile](https://github.com/rosscyking1115).
+## Why known truth
 
----
+Most analytics demos start from clean data and treat growth as the only goal.
+A real neobank has neither luxury: events arrive late, duplicated, corrected and
+reversed, schemas change under you, and a bad growth decision can leave a
+vulnerable customer worse off. So the source here is built with the answer known
+in advance. Every duplicate, late arrival, reversal, malformed payload and
+missing posting is injected against a manifest. That is what makes the
+incremental-versus-full comparison and the reward reconciliation mean anything —
+there is a fixed truth to check against, not a plausible-looking output to
+trust.
 
-## Why this project exists
-
-In most analytics demos, growth is the only goal. In financial services that framing
-is dangerous: a bad e-commerce discount wastes money, but a bad fintech growth
-decision can push a vulnerable customer toward a worse financial outcome. This
-platform asks a sharper question than "does this action move a metric?":
-
-> Can we grow activation, retention, referrals, and pricing conversion **while still
-> delivering good customer outcomes** — and is the evidence strong enough to act?
-
-Every analysis therefore ends in a **decision with guardrails**, and one principle is
-enforced throughout: **customer-outcome concerns dominate commercial appeal.** A strong
-uplift never overrides a block-level harm signal.
-
-## What it covers (data-science focus)
-
-The centrepiece is the **responsible-growth methodology**, not the plumbing:
-
-- **Experimentation rigour** — CUPED variance reduction, sample-ratio-mismatch checks,
-  confidence-interval guardrails, heterogeneous treatment effects, and a two-proportion
-  evidence-strength signal that feeds the decision gate.
-- **Activation & geo-lift modelling** — a calibrated (isotonic) D7-activation model with
-  threshold economics and a model card; referral incrementality via difference-in-
-  differences with clustered standard errors, parallel-trends, placebo-in-space, and
-  synthetic control.
-- **Fairness metrics** — segment outcome gaps, and a **treatment-induced** fairness signal
-  (the change's *effect* on disparity, not pre-existing baseline inequality).
-- **Foreseeable-harm gate** — evidence and customer-outcome guardrails resolve to
-  `ship / limited_rollout / experiment_only / needs_human_review / block`, where a harm
-  signal always overrides commercial uplift.
-
-Engineering breadth — dbt marts, a FastAPI service, RBAC / data-minimisation over sensitive
-fields, CI, and an optional GCP path — is included to show the analysis is **reproducible
-and operable**, not as a product to sell.
-
-**See it end-to-end:** [a single worked decision](docs/WORKED_DECISION_ONBOARDING_AB.md) —
-the personalised-onboarding A/B walked from SRM check → activation uplift → guardrails →
-fairness (heterogeneous effects) → a `limited_rollout` verdict.
-
-## Key features
-
-**Core analytics, experimentation & decisioning**
-
-- **Synthetic data generation** — deterministic, seeded `polars` generators for users,
-  transactions, sessions, feature adoption, support, referrals, pricing, and
-  experiment assignments with embedded ground truth.
-- **dbt metrics layer** — staging plus product, pricing, experiment, geo, and finance
-  marts (DuckDB locally; BigQuery as an optional target).
-- **Activation decisioning model** — logistic pipeline with isotonic calibration on a
-  forward time window, threshold economics, a published
-  [model card](docs/model_cards/MODEL_ACTIVATION_DECISIONING.md), an artifact
-  registry, and batch scoring.
-- **Experimentation & causal inference** — Welch difference-in-means, CUPED, SRM,
-  heterogeneous effects, confidence-interval guardrails, difference-in-differences
-  with clustered standard errors, parallel trends, placebo-in-space, and synthetic
-  control.
-- **FastAPI service** — scoring, offer-recommendation, and pricing-scenario contracts,
-  each returning a decision, reason codes, and guardrail flags.
-
-**Responsible-growth modules**
-
-- **Financial wellbeing layer** — synthetic wellbeing/vulnerability proxies with
-  *executable* permitted/prohibited-use guardrails and fairness-gap metrics
-  ([docs](docs/FINANCIAL_WELLBEING_PROXIES.md)).
-- **Customer Outcomes & Fairness** — segment fairness gaps plus a live release-gate
-  verdict on the onboarding A/B (dashboard tab).
-- **Responsible release-gate engine** — maps evidence + guardrails to
-  `ship / limited_rollout / experiment_only / needs_human_review / block`
-  ([docs](docs/RELEASE_DECISION_FRAMEWORK.md)).
-- **Fair-value pricing governance** — scores each offer's fair value and downgrades
-  commercially attractive but unfair offers ([docs](docs/FAIR_VALUE_PRICING.md)).
-- **Digital inclusion & onboarding funnel** — who drops out, which segments are
-  underserved, who needs an assisted journey ([docs](docs/DIGITAL_INCLUSION.md)).
-- **Customer-protection / scam-intervention simulation** — risk-triggered *supportive*
-  responses that never block a payment ([docs](docs/CUSTOMER_PROTECTION_SIMULATION.md)).
-- **Responsible growth decision pack** — consolidates every engine's output into one
-  stakeholder report with a business-impact summary, exportable from the dashboard as
-  HTML or Excel ([docs](docs/RESPONSIBLE_GROWTH_REPORT.md)).
-- **Public-data calibration** — anchors the synthetic wellbeing/inclusion distributions
-  to verified UK public benchmarks (ONS, DWP, Lloyds) and reports the gaps
-  ([docs](docs/PUBLIC_DATA_CALIBRATION.md)).
-- **Real-data cross-checks** — the *same* analysis code re-run on real public data: the
-  fairness/outcome analysis on the UCI Bank Marketing dataset
-  ([docs](docs/REAL_DATA_ADAPTER.md)), and the A/B estimators (Welch, CUPED, SRM) on the
-  real randomised Criteo Uplift experiment ([docs](docs/REAL_DATA_CRITEO.md)) — so the
-  pipeline is shown working on inputs the author did not generate.
-- **Access control & data minimisation** — a lightweight RBAC layer that restricts
-  individual-level vulnerability data to governance roles, with a role selector in the
-  dashboard ([docs](docs/ACCESS_CONTROL.md)).
-
-## What decisions it supports
-
-| Question a growth / product / governance team asks | What the platform provides |
-| --- | --- |
-| Should we ship this onboarding treatment? | D7 activation A/B readout (CUPED, SRM) plus a release-gate verdict. |
-| Which users need onboarding **help** (not upsell)? | Calibrated activation model targeting *low-propensity* users, with a vulnerable-customer review path. |
-| Are referral incentives genuinely incremental? | Geo difference-in-differences with parallel-trends, placebo, and synthetic-control checks. |
-| Is this pricing offer attractive **and fair**? | Offer economics, scenario runs, and a fair-value governance verdict. |
-| Are vulnerable or digitally excluded customers worse off? | Segment fairness gaps and onboarding-abandonment analysis. |
-| Should this transfer trigger support? | Supportive scam-intervention simulation (education → soft friction → cooling-off → human review). |
-
-## Dashboard views
-
-The **Customer Outcomes** tab turns the analysis into a decision: a release-gate verdict
-with its reasons, role-based access to sensitive segments (data minimisation), and
-segment fairness gaps.
-
-![Customer Outcomes tab — release-gate verdict, role-based access, and fairness gaps](docs/assets/streamlit-customer-outcomes.png)
-
-The **Digital Inclusion** tab shows who drops out of onboarding and which segments are
-underserved — here, onboarding abandonment rises sharply for lower digital-confidence
-customers.
-
-![Digital Inclusion tab — onboarding funnel and abandonment by digital confidence](docs/assets/streamlit-digital-inclusion.png)
-
-## Technology stack
-
-| Layer | Tools |
-| --- | --- |
-| Language / runtime | Python 3.12+, managed with `uv` |
-| Data generation | `polars`, Faker-style synthetic events, Parquet |
-| Analytics engineering | dbt, DuckDB, BigQuery |
-| Experimentation | CUPED, SRM, CI-based guardrails, DiD, synthetic control (`scipy`, `statsmodels`, `linearmodels`) |
-| Modelling | `scikit-learn`, isotonic calibration, model card, batch scoring |
-| Application | Streamlit dashboard, FastAPI prediction service |
-| Cloud | Cloud Storage, BigQuery, Cloud Run, Cloud Scheduler, Cloud Monitoring |
-| Quality | `pytest`, `ruff`, GitHub Actions, monitoring snapshot workflow |
-
-## Project architecture
+## Architecture
 
 ```text
-Synthetic event generator  (users, transactions, sessions, features, support,
-        |                    referrals, pricing, wellbeing, onboarding, protection)
+Synthetic service events        (campaign, application/KYC, activation/funding,
+  (versioned envelope)           referral/reward, experiment, customer-outcome)
+        |
         v
-DuckDB / Parquet  ──►  dbt metrics layer  ──►  Streamlit dashboard
-        |                                        (7 decision tabs)
-        ├──►  modelling + experiments  ──►  model card, memos, monitoring
-        ├──►  responsible-growth engines (release gates, fair value, inclusion,
-        |                                  protection) ──►  decisions with guardrails
-        └──►  FastAPI service  ──►  scoring, offer, and pricing contracts
-
-Optional GCP path:
-   Cloud Storage ─► BigQuery (raw + marts) ─► Cloud Run jobs + private API
-                                              ─► Cloud Scheduler + Monitoring
+Immutable delivery batches + quarantine     (append-only; bad payloads kept as evidence)
+        |
+        v
+Landing (lnd_*)  ->  Normalised (nrm_*)  ->  Logical / governed interfaces (lgl_*)
+        |                 |                          |
+        |            SCD2 / current state           v
+        |                                    Presentation (prs_*)
+        |                                          |
+        |                          +---------------+----------------+
+        |                          v               v                v
+        |                     Looker (LookML   Streamlit /      ML features /
+        |                     written)         decision app     scoring
+        v
+Truth manifest  ->  correctness + reward-reconciliation oracle
+BigQuery job metadata  ->  warehouse-health interface
 ```
 
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full local and cloud
-architecture.
+Only normalised and logical models are governed interfaces; presentation models
+are replaceable. The existing analytics reach the interfaces through
+compatibility views, so nothing that already worked was thrown away. Decisions
+are written up in [docs/adr/](docs/adr/README.md); the full local and cloud
+picture is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
-## Getting started
+## What holds up
 
-**Prerequisites:** Python 3.12+ and [`uv`](https://docs.astral.sh/uv/). No cloud
-account is required — the entire platform runs locally.
+Each row traces to a record in [`evidence/registry.yml`](evidence/registry.yml).
+
+| Result | Evidence |
+|---|---|
+| Standard profile: 568,789 deliveries in 356 batches, identical checksum across two runs | [phase manifest](artifacts/plan3/phase-manifest.json) |
+| BigQuery run: 68 dbt models and 215 tests green (this is the current cloud evidence; the older 13-table/107-check run is historical) | [current-graph summary](artifacts/plan3/current-graph/summary.json) |
+| Full versus incremental: exact match at all six governed interfaces, base/delta/repair | [base](artifacts/plan3/base-parity.json) · [delta](artifacts/plan3/delta-parity.json) · [repair](artifacts/plan3/repair-parity.json) |
+| Cost, measured and mixed: incremental billed +1.95% bytes but used −62.7% compute; partitioning cut one query's scan 523.9× | [benchmark summary](artifacts/plan3/benchmark-summary.json) · [results CSV](artifacts/plan3/warehouse-cost-results.csv) |
+| Late-event recovery: a held-back day missed by the lookback, recovered by a bounded backfill; two staleness bugs found and fixed at scale | [run record](artifacts/plan3/run-record.md) |
+| Reward reconciliation: debits equal credits, opening plus movements equals closing, every injected exception caught | [execution oracle](tests/oracles/test_reward_reconciliation_execution.py) |
+| Reproducible from a clean clone with no cloud account | [reproducibility](artifacts/plan4/reproducibility.md) |
+| Spend: 844 jobs, 32.99 GB billed, about £0.21 (likely £0 under the free tier) against a £10 cap | [run record](artifacts/plan3/run-record.md) |
+
+## Quick start (local, no cloud account)
+
+Python 3.12+ and [`uv`](https://docs.astral.sh/uv/). The whole local platform
+runs on DuckDB.
+
+Generate the tiny profile twice and check it reproduces:
 
 ```powershell
 uv sync --group dev
-uv run python -m data_generator.generate --users 5000 --months 6 --output-dir raw/ci
-uv run dbt build --project-dir dbt_neobank --profiles-dir dbt_neobank
-uv run pytest
-uv run streamlit run app/streamlit_app.py
+uv run python -m src.event_simulator.cli generate --profile tiny --output data/generated/tiny-a
+uv run python -m src.event_simulator.cli generate --profile tiny --output data/generated/tiny-b
+uv run python -m src.event_simulator.cli compare --left data/generated/tiny-a --right data/generated/tiny-b
 ```
 
-Run the API locally:
+Run the whole local proof — generation, ingestion, dbt build, standards,
+full-versus-incremental parity, tests:
 
 ```powershell
-uv run uvicorn api.main:app --reload   # then open http://127.0.0.1:8000/docs
+uv run python -m tools.ci.verify_plan2
 ```
 
-For a full-size dataset, generate with `--users 50000 --months 12` and pass
-`--vars "{raw_path: raw/portfolio_full}"` to `dbt build`.
+## Governed interfaces
 
-## Project structure
+Each interface answers one question and has one owner and one authoritative
+grain ([`docs/metrics/metric-ownership.yml`](docs/metrics/metric-ownership.yml)).
+
+| Interface | Question | Owner |
+|---|---|---|
+| `growth_acquisition` | Where do applicants move or drop between application, approval and funded activation? | Growth |
+| `referral_economics` | Do referrals bring in incremental activated customers at a reward cost worth paying? | Growth / Finance |
+| `reward_reconciliation` | Which expected rewards are missing, duplicated, mismatched, stale or wrongly reversed? | Finance |
+| `warehouse_health` | Which interfaces are stale, failing, expensive or slower than their baseline? | Platform |
+
+Contracts live in [`contracts/interfaces/`](contracts/interfaces/); a standards
+checker enforces them against the real dbt manifest.
+
+## The BigQuery benchmark
+
+The comparison is set up to be hard to game. On an identical final event state,
+it pits rebuilding all history after a new-event batch against processing that
+batch plus the frozen lookback. The Base, Delta and Repair phases (90/9/1 by
+ingestion) were fixed before any output was looked at.
+
+The result is mixed, and I report it as measured. On 569k deliveries,
+incremental billed 1.95% more bytes than a full rebuild while using 62.7% less
+compute. The byte figure is not a surprise once you see why: the raw event store
+is unpartitioned, so every strategy scans the whole landing view. The ablation
+shows where byte savings actually come from — the same seven-day reconciliation
+query scanned 523.9× fewer bytes on partitioned storage. Full refresh stays the
+simpler choice for the raw-scan parts; incremental's win here is compute, and
+partitioning is what buys bytes. None of it is extrapolated to production or
+Monzo scale. Method and absolute numbers:
+[the case study](docs/case-study/analytics-engineering-case-study.md).
+
+## Looker — written, not validated
+
+There is a full LookML project in [`looker/`](looker/README.md): a model, four
+Explores, three dashboards, Assert tests, all against the governed BigQuery
+interfaces. It has not run in a Looker instance. The trial signup returned a
+sales-contact page with no instance, so I claim no Looker experience and no
+validated LookML. If a genuine no-cost trial turns up before the cleanup
+deadline, the validators run and the record gets a dated addendum
+([Plan 3 decision](docs/adr/ADR-route-c-plan3-decision.md)).
+
+## Downstream consumers (the responsible-growth work)
+
+The data-science methodology from earlier in the project's life is kept as a set
+of consumers of the governed interfaces, reached through compatibility views
+rather than rewritten:
+
+- **Experimentation** — CUPED, SRM, heterogeneous effects, difference-in-
+  differences with clustered standard errors, parallel-trends, placebo-in-space
+  and synthetic control; the Welch/CUPED/SRM estimators run unchanged on the
+  governed `growth_acquisition` data
+  ([a worked decision](docs/WORKED_DECISION_ONBOARDING_AB.md)).
+- **Responsible release-gate engine** — evidence and customer-outcome guardrails
+  resolve to `ship / limited_rollout / experiment_only / needs_human_review /
+  block`, and a harm signal beats commercial uplift
+  ([framework](docs/RELEASE_DECISION_FRAMEWORK.md)).
+- **Fairness, wellbeing, inclusion, protection** modules and a fair-value pricing
+  check, over synthetic proxies with executable use boundaries and RBAC
+  ([access control](docs/ACCESS_CONTROL.md)).
+- **Activation model + FastAPI service** — calibrated scoring from the governed
+  feature interface.
+- **Real-data cross-checks** — the same estimators re-run on real public data,
+  UCI Bank Marketing and Criteo Uplift, as method validation
+  ([UCI](docs/REAL_DATA_ADAPTER.md) · [Criteo](docs/REAL_DATA_CRITEO.md)).
+
+These surface in the Streamlit decision app.
+
+![Responsible Neobank Growth Platform dashboard](docs/assets/streamlit-product-health.png)
+
+## Synthetic data — what the numbers are, and aren't
+
+Results split three ways, kept apart in
+[docs/CREDIBILITY.md](docs/CREDIBILITY.md):
+
+- **engineering truth** — exact outcomes from the generator's manifest (event,
+  duplicate, quarantine, ledger and exception counts);
+- **method validation** — causal and statistical recovery against seeded truth
+  and the two real-data adapters;
+- **illustrative magnitude** — activation rates, £CLV and fairness-gap sizes are
+  not evidence about real customers.
+
+The data is engineered for coverage, not calibrated to any bank, and generation
+and analysis are kept separate so the recovery is not circular (tested in
+`tests/test_no_circularity.py`).
+
+## Technology
+
+| Layer | Tools |
+|---|---|
+| Language / runtime | Python 3.12+, `uv` |
+| Event simulator | seeded generators, virtual clock, JSON Schema contracts |
+| Ingestion | append-only Parquet, checksum-gated batch registry, quarantine |
+| Analytics engineering | dbt (four layers, incremental, contracts, unit tests), DuckDB local / BigQuery |
+| Semantic / BI | LookML (written), Streamlit decision app |
+| Experimentation | CUPED, SRM, DiD, synthetic control (`scipy`, `statsmodels`, `linearmodels`) |
+| Modelling | `scikit-learn`, isotonic calibration, model card, batch scoring |
+| Quality | `pytest`, `ruff`, GitHub Actions, standards-as-code |
+
+## Repository map
 
 ```text
-api/                    FastAPI prediction & pricing service
-app/                    Streamlit dashboard (7 decision tabs)
-data_generator/         Seeded synthetic event & proxy generators
-dbt_neobank/            dbt metrics layer (staging + marts)
+contracts/        event/interface/scenario JSON-Schema + YAML contracts
 src/
-  experiments/          CUPED, SRM, DiD, synthetic control, guardrails
-  modelling/            Activation model: train, calibrate, score, explain
-  monitoring/           Monitoring snapshot, model & calibration reports
-  pricing/              Pricing scenario runs
-  pricing_governance/   Fair-value scoring & governance
-  wellbeing/            Wellbeing proxy guardrails & fairness metrics
-  inclusion/            Onboarding funnel & digital-exclusion analysis
-  release_decisions/    Responsible release-gate engine
-  protection/           Scam-intervention simulation
-  cloud/                GCP load / verify / deploy plan generators + jobs
-docs/                   Architecture, case study, module docs, model card
-tests/                  pytest suite
+  event_simulator/  deterministic generator (domains, scenarios, writers)
+  ingestion/        append-only loader + quarantine
+  experiments/ modelling/ wellbeing/ inclusion/ release_decisions/ protection/  downstream consumers
+  adapters/         real-data method-validation adapters
+dbt_neobank/      four-layer warehouse (landing/normalised/logical/presentation/compatibility)
+looker/           LookML project (written)
+tools/            standards, reconciliation harness, cloud runner, release audit
+docs/             architecture, ADRs, contracts, case study, module docs
+evidence/         claim registry (source of every public number)
+artifacts/        dated baseline / gate0 / plan2 / plan3 / plan4 evidence
+tests/            pytest suite
 ```
 
-## Development workflow
-
-- Work happens on feature branches (`feat/...`, `chore/...`) and merges to `main` via
-  pull request; the responsible-growth modules were delivered as a stacked PR chain.
-- Every PR runs the CI pipeline below; `main` is the protected default branch.
-- Synthetic data, DuckDB files, dbt `target/`, and `artifacts/` are git-ignored — only
-  source is tracked, so the repo stays reproducible from the generators.
-
-## Coding standards
-
-- `ruff` (line length 100; `E`, `F`, `I`, `UP`, `B`, `SIM` rule sets) — `uv run ruff check .`
-- Type hints throughout; typed Pydantic contracts at the API boundary and frozen
-  dataclasses for engine inputs/outputs.
-- Guardrail boundaries are executable, not doc-only: prohibited uses of wellbeing
-  proxies and non-supportive protection actions raise/are rejected in code.
-
-## Testing
-
-```powershell
-uv run pytest            # full suite
-uv run ruff check .      # lint
-uv run dbt build --project-dir dbt_neobank --profiles-dir dbt_neobank   # marts + dbt tests
-```
-
-The suite covers the data generators, statistical methods, the decision engines, the
-dbt-backed dashboard helpers, and the cloud plan generators. The GitHub Actions CI
-pipeline runs lint → notebook check → tests → synthetic data → `dbt build` → API
-container build → authenticated `/health` smoke test.
-
-## Documentation
-
-| Document | Purpose |
-| --- | --- |
-| [docs/CREDIBILITY.md](docs/CREDIBILITY.md) | **How to read the numbers** — method-validation vs illustrative-magnitude, and the non-circularity guarantee. |
-| **Marketing measurement** (absorbed from [marketing-effectiveness-lab](https://github.com/rosscyking1115/marketing-effectiveness-lab)) | [Reconciliation case study](docs/case-studies/mmm-experiment-reconciliation.md) · [Parameter recovery & calibration](docs/methodology/parameter-recovery-validation.md) · [MMM benchmark note](docs/methodology/mmm-benchmark-note.md) |
-| [docs/WORKED_DECISION_ONBOARDING_AB.md](docs/WORKED_DECISION_ONBOARDING_AB.md) | **One decision end-to-end** — the onboarding A/B walked to a verdict (DS-focused). |
-| [docs/CASE_STUDY.md](docs/CASE_STUDY.md) | Business-facing case study, decisions, evidence, limitations. |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Local and cloud architecture. |
-| [docs/API.md](docs/API.md) | Prediction and pricing-scenario API contract. |
-| [docs/RELEASE_DECISION_FRAMEWORK.md](docs/RELEASE_DECISION_FRAMEWORK.md) | Release-gate decisions and resolution order. |
-| [docs/FINANCIAL_WELLBEING_PROXIES.md](docs/FINANCIAL_WELLBEING_PROXIES.md) | Wellbeing data dictionary and use boundaries. |
-| [docs/FAIR_VALUE_PRICING.md](docs/FAIR_VALUE_PRICING.md) | Fair-value scoring and pricing governance. |
-| [docs/DIGITAL_INCLUSION.md](docs/DIGITAL_INCLUSION.md) | Onboarding funnel and digital-exclusion analysis. |
-| [docs/CUSTOMER_PROTECTION_SIMULATION.md](docs/CUSTOMER_PROTECTION_SIMULATION.md) | Scam-intervention simulation. |
-| [docs/RESPONSIBLE_GROWTH_REPORT.md](docs/RESPONSIBLE_GROWTH_REPORT.md) | Consolidated stakeholder decision pack (HTML / Excel). |
-| [docs/PUBLIC_DATA_CALIBRATION.md](docs/PUBLIC_DATA_CALIBRATION.md) | Calibrating synthetic distributions to public benchmarks. |
-| [docs/REAL_DATA_PROVENANCE.md](docs/REAL_DATA_PROVENANCE.md) | Verified public sources behind the calibration anchors + real-dataset options. |
-| [docs/REAL_DATA_ADAPTER.md](docs/REAL_DATA_ADAPTER.md) | Running the fairness analysis on the real UCI Bank Marketing dataset. |
-| [docs/REAL_DATA_CRITEO.md](docs/REAL_DATA_CRITEO.md) | Running the A/B estimators on the real randomised Criteo Uplift experiment. |
-| [docs/ACCESS_CONTROL.md](docs/ACCESS_CONTROL.md) | RBAC / data-minimisation over sensitive wellbeing fields. |
-| [docs/MONITORING.md](docs/MONITORING.md) | Data, model, score, and GCP monitoring checks. |
-| [docs/OPERATIONS_RUNBOOK.md](docs/OPERATIONS_RUNBOOK.md) | Rollback triggers, triage, and GCP operations. |
-
-## Cloud path
-
-The GCP path has been exercised beyond local development: a Cloud Storage landing
-zone loaded into BigQuery, a dbt graph run against BigQuery, an activation score
-extract and monitoring result written to BigQuery, a private Cloud Run API and Cloud
-Run scoring/monitoring jobs, Cloud Scheduler runs, and Cloud Monitoring alert policies
-plus a budget and storage-lifecycle policy for cost control. See
-[docs/CLOUD_RUN_DEPLOYMENT.md](docs/CLOUD_RUN_DEPLOYMENT.md) and
-[docs/GCP_WAREHOUSE.md](docs/GCP_WAREHOUSE.md).
-
-> The recorded BigQuery figures (13 raw tables, 107 dbt checks) reflect the cloud run
-> *before* the responsible-growth pivot. The load manifest now covers all 16 raw
-> tables; the new wellbeing, inclusion, and protection tables and marts are exercised
-> locally and would be reloaded on the next GCP run.
+More: [docs/adr/](docs/adr/README.md) ·
+[docs/CREDIBILITY.md](docs/CREDIBILITY.md) ·
+[the case study](docs/case-study/analytics-engineering-case-study.md) ·
+[docs/GCP_WAREHOUSE.md](docs/GCP_WAREHOUSE.md) ·
+[docs/CLOUD_RUN_DEPLOYMENT.md](docs/CLOUD_RUN_DEPLOYMENT.md).
 
 ## Safety & ethics
 
-This project uses **synthetic data** and is **not** a production banking, fraud,
-credit, eligibility, or financial-advice system. Vulnerability, wellbeing, and
-inclusion fields are synthetic proxies for evaluating product decisions and must not
-be used to deny services, set prices unfairly, determine creditworthiness, or make
-punitive decisions. The customer-protection module is a supportive-intervention
-simulation, not a fraud engine. It does not represent any real financial institution.
+Synthetic data, and not a production banking, fraud, credit, eligibility or
+financial-advice system — and not affiliated with Monzo or any bank. The
+vulnerability, wellbeing and inclusion fields are synthetic proxies for testing
+product decisions; they must not be used to deny services, set prices unfairly,
+judge creditworthiness, or make punitive decisions. The customer-protection
+module is a supportive-intervention simulation, not a fraud engine.
 
-## What would be hardened for production
+## Licence and citation
 
-This stays a reference project — the list below maps the gap between a demonstration and a
-regulated deployment, not a plan to ship one. A regulated
-deployment would add stronger API protection (API Gateway / IAP / JWT,
-rate limits, structured logging); formal data governance (row/column controls,
-retention, lineage, cost controls); keyless OIDC CI/CD with image scanning, SBOMs, and
-IaC; a model registry / feature store with shadow deployments and online/offline
-parity; and formal privacy, Consumer Duty, model-risk, and approval controls before any
-live customer decisioning. (A lightweight access-control / data-minimisation layer over
-sensitive wellbeing data is already demonstrated — see
-[docs/ACCESS_CONTROL.md](docs/ACCESS_CONTROL.md); production would enforce it with real
-identity, row/column-level security, and audit logging.)
-
-## Contributing
-
-This is a synthetic reference project. Issues and suggestions are welcome — please run
-`uv run ruff check .` and `uv run pytest` before opening a pull request.
-
-## License
-
-Released under the [MIT License](LICENSE).
+[MIT](LICENSE) © 2026 Cheng-Yuan King. Independent synthetic reference project;
+if you cite it, cite the repository and commit. No affiliation with Monzo Bank
+Ltd is claimed or implied.
