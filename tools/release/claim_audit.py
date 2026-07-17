@@ -54,7 +54,9 @@ NEGATION_TOKENS = [
 
 
 def _negated(window: str) -> bool:
-    return any(token in window for token in NEGATION_TOKENS)
+    # Strip markdown emphasis so "**not**" reads as "not".
+    plain = window.replace("*", "").replace("_", "")
+    return any(token in plain for token in NEGATION_TOKENS)
 
 
 def audit_text(surface: str, text: str, registry_text: str) -> list[str]:
