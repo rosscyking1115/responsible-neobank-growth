@@ -4,6 +4,8 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   NEOBANK_DUCKDB_PATH: neobank.duckdb
   RAW_PATH: raw/monitoring
+  EVENT_SOURCE_PATH: data/generated/monitoring
+  EVENTS_WAREHOUSE: data/warehouse
   SNAPSHOT_DATE: "2025-06-30"
 
 on:
@@ -40,12 +42,24 @@ jobs:
           --seed 42
           --output-dir "$RAW_PATH"
 
+      - name: Generate event deliveries for the landing models
+        run: >
+          uv run python -m src.event_simulator.cli generate
+          --profile tiny
+          --output "$EVENT_SOURCE_PATH"
+
+      - name: Load event deliveries with quarantine
+        run: >
+          uv run python -m src.ingestion.event_loader
+          --source "$EVENT_SOURCE_PATH"
+          --warehouse "$EVENTS_WAREHOUSE"
+
       - name: Build dbt marts
         run: >
           uv run dbt build
           --project-dir dbt_neobank
           --profiles-dir dbt_neobank
-          --vars "{raw_path: $RAW_PATH}"
+          --vars "{raw_path: $RAW_PATH, events_warehouse: $EVENTS_WAREHOUSE}"
 
       - name: Train activation model artifact
         run: >
