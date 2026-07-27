@@ -37,12 +37,15 @@ Pricing Intelligence Platform"; that name is retired. Do not reuse it.
 
 ## GitHub summary
 
-Repository description — this is the first line a recruiter reads, so it leads
-with the detection property, same as everything else here (336 chars, under
-GitHub's 350 limit):
+Repository description — the GitHub **About** blurb. This is the first line a
+recruiter reads, and its job is to say *what the project is*, then land the idea
+it is built on. It is not the place to recite a fact about the test suite: a
+reader who does not yet know what the repository contains cannot do anything
+with "invalid fixtures prove each rule fires". Describe, then characterise
+(301 chars, under GitHub's 350 limit):
 
 ```text
-Every check here is tested for detection: invalid fixtures prove each governance rule fires for exactly one reason, and a poisoned-input test proves the causal estimators ignore the generator's own answer key. On that base, a synthetic neobank event stream and a governed four-layer dbt warehouse checked against a known-truth manifest.
+A synthetic neobank whose backend events misbehave on purpose — late, duplicated, reversed, schema-evolving — and a governed four-layer dbt warehouse that turns them into trusted interfaces, checked against a known-truth manifest. Built on one idea: a check is only real if something fails without it.
 ```
 
 Suggested topics:
