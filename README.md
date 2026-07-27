@@ -78,12 +78,12 @@ end.
 | Result | How it's checked |
 |---|---|
 | Standard profile: 568,789 deliveries in 356 batches, identical logical checksum across two runs | `cli generate` ×2 + `cli compare` (`tests/event_simulator/test_reproducibility.py`) |
-| dbt build: 68 models, 217 data tests, 4 unit tests green | `uv run dbt build` (`PASS=289`); also executed on BigQuery |
+| dbt build: 68 models, 217 data tests, 4 unit tests green | `uv run dbt build --project-dir dbt_neobank --profiles-dir dbt_neobank --target dev` (`PASS=289`, plus 4 exposures as NO-OP); also executed on BigQuery |
 | Full versus incremental: exact match at all six governed interfaces (base/delta/repair) | blue/green harness `tools/reconcile/compare_interfaces.py` (`tests/oracles/test_incremental_execution.py`) |
 | Cost, measured and mixed: incremental billed +1.95% bytes but used −62.7% compute; partitioning cut one query's scan 523.9× | BigQuery benchmark (below) |
 | Late-event recovery: a held-back day missed by the 3-day lookback, recovered by a bounded backfill | `tools/reconcile/backfill.py` (`tests/oracles/test_incremental_execution.py`) |
 | Reward reconciliation: debits equal credits, opening plus movements equals closing, every injected exception caught | `tests/oracles/test_reward_reconciliation_execution.py` + `dbt_neobank/tests/logical/` |
-| Full local suite: 494 pytest tests and 289 dbt-build results pass with no cloud account | `uv run pytest` · `uv run dbt build` |
+| Full local suite: 400 pytest tests and 289 dbt-build results pass with no cloud account | `uv run pytest` · `uv run dbt build --project-dir dbt_neobank --profiles-dir dbt_neobank --target dev` |
 
 ## Quick start (local, no cloud account)
 
@@ -106,6 +106,19 @@ full-versus-incremental parity, tests:
 uv run python -m tools.ci.verify_pipeline
 ```
 
+### What CI runs on every push
+
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) does the same proof, plus
+two things worth calling out:
+
+- **Determinism is proven, not asserted** — CI generates the tiny profile twice
+  into separate directories and fails unless `cli compare` finds the checksums
+  identical. A generator that quietly drifted would break the build.
+- **Both containers are built** — the FastAPI image (`Dockerfile.api`) and the
+  Cloud Run jobs image (`Dockerfile.jobs`). The API image is additionally started
+  and polled on `/health` until it answers, so the build proves the service comes
+  up, not just that it compiles. The jobs image is build-only.
+
 ## Governed interfaces
 
 Each interface answers one question and has one owner and one authoritative
@@ -118,8 +131,40 @@ grain ([`docs/metrics/metric-ownership.yml`](docs/metrics/metric-ownership.yml))
 | `reward_reconciliation` | Which expected rewards are missing, duplicated, mismatched, stale or wrongly reversed? | Finance |
 | `warehouse_health` | Which interfaces are stale, failing, expensive or slower than their baseline? | Platform |
 
-Contracts live in [`contracts/interfaces/`](contracts/interfaces/); a standards
-checker enforces them against the real dbt manifest.
+Contracts live in [`contracts/interfaces/`](contracts/interfaces/). To be exact
+about what "contract" means here, because dbt uses the word for something
+narrower: **no model sets dbt's own `contract: enforced: true`.** The contracts
+in this project are YAML interface contracts and JSON-Schema event contracts,
+and they are enforced by a checker rather than by dbt.
+
+### How the interfaces are actually governed
+
+- **Standards-as-code.** [`tools/standards/check_dbt_interfaces.py`](tools/standards/check_dbt_interfaces.py)
+  reads [`rules.yml`](tools/standards/rules.yml) and fails CI when a governed
+  `nrm_`/`lgl_` model omits an owner, purpose, grain, unique key, freshness SLO,
+  classification, version, compatibility policy or declared exposures. It runs
+  against the **real** `dbt_neobank/target/manifest.json`, not a copy
+  (`tests/standards/test_real_manifest.py`). Five deliberately-invalid fixture
+  manifests in [`tests/standards/fixtures/`](tests/standards/fixtures/) prove
+  each rule actually fails when violated, alongside a valid one that must pass —
+  so the checker is tested for detection, not just for running clean.
+- **Blue/green reconciliation.** [`tools/reconcile/compare_interfaces.py`](tools/reconcile/compare_interfaces.py)
+  asserts full-refresh and incremental builds produce identical output at all six
+  governed interfaces, across every scenario, with no tolerance on keys or
+  integer financial values.
+- **History from occurrence time, never ingestion time.** The SCD2-style models
+  [`nrm_account_history.sql`](dbt_neobank/models/normalised/nrm_account_history.sql)
+  and [`nrm_referral_history.sql`](dbt_neobank/models/normalised/nrm_referral_history.sql)
+  rebuild state intervals from the event log ordered by business occurrence time
+  with deterministic tie-breakers, so a late or replayed delivery cannot rewrite
+  when something happened.
+- **Declared consumers.** Four dbt exposures (one typed `ml`) tie the presentation
+  layer to the things that read it, so breaking a consumer is visible in lineage.
+- **Bounded BI re-derivation.** [`docs/metrics/metric-ownership.yml`](docs/metrics/metric-ownership.yml)
+  gives every metric one authoritative owner and a `bi_may` clause saying what BI
+  is permitted to re-derive (for example: aggregate, but do not reimplement
+  qualification eligibility). Two metrics claiming the same name fail a test
+  (`tests/contracts/test_interface_contracts.py`).
 
 ## The BigQuery benchmark
 
@@ -174,8 +219,13 @@ These surface in the Streamlit decision app.
 
 ## Synthetic data — what the numbers are, and aren't
 
-Results split three ways, kept apart in
-[docs/CREDIBILITY.md](docs/CREDIBILITY.md):
+**If you read one supporting document, read
+[docs/CREDIBILITY.md](docs/CREDIBILITY.md).** It is where the project states
+which of its numbers can be trusted and on what grounds, and it is the honest
+answer to the fair question a reviewer should ask of any synthetic project:
+*is this real signal, or a generator the author tuned?*
+
+Results split three ways, kept apart there:
 
 - **engineering truth** — exact outcomes from the generator's manifest (event,
   duplicate, quarantine, ledger and exception counts);
@@ -195,7 +245,7 @@ and analysis are kept separate so the recovery is not circular (tested in
 | Language / runtime | Python 3.12+, `uv` |
 | Event simulator | seeded generators, virtual clock, JSON Schema contracts |
 | Ingestion | append-only Parquet, checksum-gated batch registry, quarantine |
-| Analytics engineering | dbt (four layers, incremental, contracts, unit tests), DuckDB local / BigQuery |
+| Analytics engineering | dbt (four layers, incremental, unit tests) with YAML interface contracts checked against the built manifest, DuckDB local / BigQuery |
 | Application | Streamlit decision app, FastAPI service |
 | Experimentation | CUPED, SRM, DiD, synthetic control (`scipy`, `statsmodels`, `linearmodels`) |
 | Modelling | `scikit-learn`, isotonic calibration, model card, batch scoring |
@@ -216,6 +266,11 @@ tools/            standards checker, reconciliation harness, dataset builder, lo
 docs/             architecture, contracts, metrics, module docs
 tests/            pytest suite
 ```
+
+> **A note on the name.** The published repository, the live dashboard and every
+> link above use **`responsible-neobank-growth`**. Some local checkouts and older
+> internal references use the earlier directory name `neobank-product-analytics`.
+> Same project; the published name is the current one.
 
 More: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) ·
 [docs/CREDIBILITY.md](docs/CREDIBILITY.md) ·
