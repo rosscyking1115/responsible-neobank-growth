@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 
 import pandas as pd
 import plotly.express as px
 import streamlit as st
+
+logger = logging.getLogger(__name__)
 
 try:
     from src.access import ROLES, accessible_segments, can_view_sensitive
@@ -118,6 +121,14 @@ PROTECTION_LABELS = {
 
 
 def _apply_app_style() -> None:
+    """Layout-only CSS: widths, spacing, and the section-caption class.
+
+    The literal colours below (#111827, #202436, #5f6b85) assume a light
+    background. They are only safe because `.streamlit/config.toml` pins
+    `base = "light"` and defines no `[theme.dark]`, which locks the app to one
+    mode. The two are coupled: adding a dark theme without replacing these
+    literals gives dark-on-dark text. Colours belong in config.toml, not here.
+    """
     st.markdown(
         """
         <style>
@@ -125,9 +136,6 @@ def _apply_app_style() -> None:
             max-width: 1180px;
             padding-top: 3rem;
             padding-bottom: 3rem;
-        }
-        a[href^="#"] {
-            display: none;
         }
         div[data-testid="stMetric"] label {
             color: #111827;
@@ -242,7 +250,7 @@ def _render_product_health(data: DashboardData) -> None:
     )
     left, right = st.columns([1.2, 1])
     with left:
-        st.subheader("Weekly Engagement")
+        st.subheader("Weekly Engagement", anchor=False)
         fig = px.line(
             data.weekly_engagement,
             x="activity_week",
@@ -254,7 +262,7 @@ def _render_product_health(data: DashboardData) -> None:
         _apply_chart_layout(fig, height=330)
         st.plotly_chart(fig, width="stretch")
     with right:
-        st.subheader("D7 Activation By Region")
+        st.subheader("D7 Activation By Region", anchor=False)
         region_frame = data.activation_by_region.sort_values("d7_activation_rate")
         fig = px.bar(
             region_frame,
@@ -271,7 +279,7 @@ def _render_product_health(data: DashboardData) -> None:
 
     left, right = st.columns(2)
     with left:
-        st.subheader("Post-Activation Retention")
+        st.subheader("Post-Activation Retention", anchor=False)
         fig = px.line(
             data.retention_curve,
             x="weeks_since_signup",
@@ -284,7 +292,7 @@ def _render_product_health(data: DashboardData) -> None:
         fig.update_yaxes(tickformat=".0%")
         st.plotly_chart(fig, width="stretch")
     with right:
-        st.subheader("Feature Adoption")
+        st.subheader("Feature Adoption", anchor=False)
         fig = px.bar(
             data.feature_adoption,
             x="adoption_month",
@@ -300,7 +308,7 @@ def _render_product_health(data: DashboardData) -> None:
         _apply_chart_layout(fig, height=320)
         st.plotly_chart(fig, width="stretch")
 
-    st.subheader("Value By Income Segment")
+    st.subheader("Value By Income Segment", anchor=False)
     fig = px.bar(
         data.clv_by_segment,
         x="income_segment",
@@ -331,7 +339,7 @@ def _render_experiments(data: DashboardData) -> None:
     )
     onboarding, referral = st.columns(2)
     with onboarding:
-        st.subheader("Onboarding A/B")
+        st.subheader("Onboarding A/B", anchor=False)
         lift = onboarding_lift_pp(data.experiment_variants)
         st.metric("Treatment lift", f"{lift:.2f} pp" if lift is not None else "n/a")
         fig = px.bar(
@@ -349,7 +357,7 @@ def _render_experiments(data: DashboardData) -> None:
         st.plotly_chart(fig, width="stretch")
 
     with referral:
-        st.subheader("Referral Geo Incrementality")
+        st.subheader("Referral Geo Incrementality", anchor=False)
         economics = referral_economics(data.referral_daily)
         st.metric("Observed reward cost", _gbp(economics["reward_cost_gbp"]))
         st.metric(
@@ -388,7 +396,7 @@ def _render_pricing_scenarios(run: PricingScenarioRun) -> None:
 
     left, right = st.columns([1.1, 1])
     with left:
-        st.subheader("Scenario Portfolio")
+        st.subheader("Scenario Portfolio", anchor=False)
         top_scenarios = scenario_frame.sort_values(
             ["expected_monthly_margin_gbp", "incremental_activated_customers"],
             ascending=False,
@@ -408,7 +416,7 @@ def _render_pricing_scenarios(run: PricingScenarioRun) -> None:
             hide_index=True,
         )
     with right:
-        st.subheader("Sensitivity Check")
+        st.subheader("Sensitivity Check", anchor=False)
         best_scenario_id = str(summary["best_scenario_id"])
         best_sensitivity = sensitivity_frame[
             sensitivity_frame["scenario_id"] == best_scenario_id
@@ -453,7 +461,7 @@ def _render_pricing(data: DashboardData, scenario_run: PricingScenarioRun) -> No
 
     left, right = st.columns([1.1, 1])
     with left:
-        st.subheader("Recommendation Actions")
+        st.subheader("Recommendation Actions", anchor=False)
         action_frame = (
             data.pricing_recommendations.groupby(
                 ["recommended_action", "recommendation_reason_code"],
@@ -480,7 +488,7 @@ def _render_pricing(data: DashboardData, scenario_run: PricingScenarioRun) -> No
         st.plotly_chart(fig, width="stretch")
 
     with right:
-        st.subheader("Margin By Offer")
+        st.subheader("Margin By Offer", anchor=False)
         margin_frame = pricing_margin_by_offer(data.pricing_recommendations)
         fig = px.bar(
             margin_frame,
@@ -499,10 +507,10 @@ def _render_pricing(data: DashboardData, scenario_run: PricingScenarioRun) -> No
         _apply_chart_layout(fig, height=320)
         st.plotly_chart(fig, width="stretch")
 
-    st.subheader("Scenario Runs")
+    st.subheader("Scenario Runs", anchor=False)
     _render_pricing_scenarios(scenario_run)
 
-    st.subheader("Pricing Guardrails By Variant")
+    st.subheader("Pricing Guardrails By Variant", anchor=False)
     variant_frame = (
         data.pricing_recommendations.groupby(["price_variant"], as_index=False)
         .agg(
@@ -534,7 +542,7 @@ def _render_pricing(data: DashboardData, scenario_run: PricingScenarioRun) -> No
     fig.update_xaxes(tickformat=".0%")
     st.plotly_chart(fig, width="stretch")
 
-    st.subheader("Fair-Value Governance")
+    st.subheader("Fair-Value Governance", anchor=False)
     _section_caption(
         "Fairness lens on the commercial recommendation: an attractive offer is "
         "downgraded when its complaint, support, or human-review load points to poor "
@@ -608,8 +616,15 @@ def _render_release_verdict(data: DashboardData) -> None:
 
 def _render_decision_pack() -> None:
     """Offer the consolidated responsible-growth decision pack as HTML / Excel."""
+    # Dynamic expander (on_change="rerun"): pack.open is True only while the expander
+    # is open, so the pack -- whose Excel serialisation is the most expensive
+    # per-render work on this tab -- is never built for a visitor who leaves it shut.
+    # Same pattern as the tabs in main().
+    pack = st.expander("Responsible growth decision pack (download)", on_change="rerun")
+    if not pack.open:
+        return
     impact_statements, html_report, excel_bytes = cached_decision_pack(str(DEFAULT_DB_PATH))
-    with st.expander("Responsible growth decision pack (download)"):
+    with pack:
         for line in impact_statements:
             st.markdown(f"- {line}")
         left, right = st.columns(2)
@@ -663,7 +678,7 @@ def _render_customer_outcomes(data: DashboardData) -> None:
     )
     left, right = st.columns([1.1, 1])
     with left:
-        st.subheader("Outcome Gaps By Segment")
+        st.subheader("Outcome Gaps By Segment", anchor=False)
         if gaps.empty:
             st.info("No segment had enough customers to estimate a stable gap.")
         else:
@@ -691,7 +706,7 @@ def _render_customer_outcomes(data: DashboardData) -> None:
             st.plotly_chart(fig, width="stretch")
 
     with right:
-        st.subheader("D7 Activation By Digital Confidence")
+        st.subheader("D7 Activation By Digital Confidence", anchor=False)
         from src.wellbeing.metrics import segment_outcome_rates
 
         rates = segment_outcome_rates(
@@ -749,7 +764,7 @@ def _render_digital_inclusion(data: DashboardData) -> None:
 
     left, right = st.columns([1, 1.1])
     with left:
-        st.subheader("Onboarding Funnel")
+        st.subheader("Onboarding Funnel", anchor=False)
         fig = px.funnel(
             funnel,
             x="reached",
@@ -761,7 +776,7 @@ def _render_digital_inclusion(data: DashboardData) -> None:
         st.plotly_chart(fig, width="stretch")
 
     with right:
-        st.subheader("Abandonment By Digital Confidence")
+        st.subheader("Abandonment By Digital Confidence", anchor=False)
         abandonment = onboarding_abandonment_by_segment(
             data.onboarding_funnel, "digital_confidence_band", min_segment_size=30
         )
@@ -887,7 +902,7 @@ def _render_monitoring(snapshot: MonitoringSnapshot) -> None:
 
     left, right = st.columns([0.8, 1.2])
     with left:
-        st.subheader("Check Status")
+        st.subheader("Check Status", anchor=False)
         fig = px.bar(
             status_counts,
             x="status",
@@ -901,7 +916,7 @@ def _render_monitoring(snapshot: MonitoringSnapshot) -> None:
         st.plotly_chart(fig, width="stretch")
 
     with right:
-        st.subheader("Attention Required")
+        st.subheader("Attention Required", anchor=False)
         attention = checks[checks["status"].isin(["fail", "warn"])].copy()
         if attention.empty:
             st.dataframe(
@@ -916,7 +931,7 @@ def _render_monitoring(snapshot: MonitoringSnapshot) -> None:
                 hide_index=True,
             )
 
-    st.subheader("All Checks")
+    st.subheader("All Checks", anchor=False)
     status_order = {"fail": 0, "warn": 1, "pass": 2}
     ordered = checks.assign(status_order=checks["status"].map(status_order)).sort_values(
         ["status_order", "check"]
@@ -930,7 +945,7 @@ def _render_monitoring(snapshot: MonitoringSnapshot) -> None:
 
 def main() -> None:
     _apply_app_style()
-    st.title("Responsible Neobank Growth Platform")
+    st.title("Responsible Neobank Growth Platform", anchor=False)
     st.caption(
         "All data is synthetic. Read each figure as either **ground-truth-validated** "
         "(method recovers a known embedded answer) or **synthetic — illustrative of "
@@ -945,8 +960,16 @@ def main() -> None:
         data = cached_dashboard_data(db_path)
         monitoring_snapshot = cached_monitoring_snapshot(db_path)
         pricing_scenario_run = cached_pricing_scenario_run(db_path)
-    except Exception as exc:  # pragma: no cover - Streamlit-only failure path.
-        st.error(str(exc))
+    except Exception:  # pragma: no cover - Streamlit-only failure path.
+        # This dashboard is public. Exception text can carry filesystem paths, SQL
+        # fragments and connection details, so it goes to the server log only; the
+        # visitor gets a message that tells them what happened and nothing more.
+        logger.exception("Dashboard data load failed for db_path=%s", db_path)
+        st.error(
+            "The dashboard could not load its data. This is a problem with the "
+            "demo deployment, not with anything you did. Details have been "
+            "recorded in the server log."
+        )
         st.stop()
 
     _metric_grid(data)
