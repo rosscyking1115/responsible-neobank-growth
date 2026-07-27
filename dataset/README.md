@@ -7,6 +7,101 @@ tags:
   - incremental-processing
   - reconciliation
 pretty_name: Responsible Neobank Growth — Synthetic Event Benchmark
+configs:
+  - config_name: tiny
+    default: true
+    data_files:
+      - split: train
+        path: data/tiny/*.jsonl
+dataset_info:
+  - config_name: tiny
+    features:
+      - name: event_id
+        dtype: string
+      - name: idempotency_key
+        dtype: string
+      - name: event_name
+        dtype: string
+      - name: schema_version
+        dtype: int64
+      - name: occurred_at
+        dtype: string
+      - name: emitted_at
+        dtype: string
+      - name: ingested_at
+        dtype: string
+      - name: producer_id
+        dtype: string
+      - name: source_service
+        dtype: string
+      - name: trace_id
+        dtype: string
+      - name: scenario_id
+        dtype: string
+      - name: generator_version
+        dtype: string
+      - name: payload
+        struct:
+          - name: account_id
+            dtype: string
+          - name: amount_minor
+            dtype: int64
+          - name: application_id
+            dtype: string
+          - name: assignment_unit
+            dtype: string
+          - name: beneficiary_customer_id
+            dtype: string
+          - name: campaign_id
+            dtype: string
+          - name: channel
+            dtype: string
+          - name: currency
+            dtype: string
+          - name: customer_id
+            dtype: string
+          - name: decision
+            dtype: string
+          - name: decision_source
+            dtype: string
+          - name: experiment_id
+            dtype: string
+          - name: funding_method
+            dtype: string
+          - name: invite_channel
+            dtype: string
+          - name: is_first_funding
+            dtype: bool
+          - name: outcome_type
+            dtype: string
+          - name: qualification_rule
+            dtype: string
+          - name: qualified_reason
+            dtype: string
+          - name: qualifying_account_id
+            dtype: string
+          - name: referral_id
+            dtype: string
+          - name: referred_customer_id
+            dtype: string
+          - name: referrer_customer_id
+            dtype: string
+          - name: requested_product
+            dtype: string
+          - name: reversal_id
+            dtype: string
+          - name: reversal_reason
+            dtype: string
+          - name: reward_id
+            dtype: string
+          - name: settlement_id
+            dtype: string
+          - name: severity
+            dtype: string
+          - name: spend_date
+            dtype: string
+          - name: variant
+            dtype: string
 ---
 
 # Responsible Neobank Growth — Synthetic Event Benchmark
@@ -43,6 +138,25 @@ build-manifest.json        generator version, profiles, logical checksums, licen
 Every event shares one envelope — `event_id`, `idempotency_key`, `event_name`,
 `occurred_at`/`emitted_at`/`ingested_at` in UTC, `schema_version`, `payload` —
 with money in integer minor units.
+
+### Why the schema is pinned in this card
+
+`payload` is a union: its fields depend on `event_name`, and `referral-qualified`
+appears under both `schema_version` 1 and 2 with different fields. That is the
+dataset's subject matter, not an accident.
+
+It does mean the shape cannot be inferred per file. Each day's file contains a
+different mix of event types, so inferring separately gives a different `payload`
+struct per file — and a field that happens to be absent from one day infers as
+null, which will not merge with a string. Reading the files together then fails
+with an Arrow schema-mismatch error, which is what breaks a preview.
+
+So this card declares the full union explicitly in `dataset_info.features`: the
+30 payload fields across all event types, each with one consistent type. Every
+file is cast to that one schema, and a field an event does not carry reads as
+null. **Do not remove this block.** Without it the dataset still downloads, but
+the viewer and a plain `load_dataset` over multiple files will fail to unify the
+schema. If a new event type or payload field is ever added, add it here too.
 
 ## Profiles
 
