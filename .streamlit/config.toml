@@ -4,9 +4,20 @@ toolbarMode = "viewer"
 [browser]
 gatherUsageStats = false
 
+# Theme. `base = "light"` with no [theme.dark] section locks the app to light mode.
+#
+# COUPLING -- read before adding a dark theme. app/streamlit_app.py::_apply_app_style
+# injects CSS with literal light-mode colours (#111827, #202436, #5f6b85). Those are
+# only safe while this pin holds. Defining [theme.dark] here would let visitors switch
+# to dark mode and leave that text dark-on-dark. Replace the literals in that function
+# at the same time, or move them into this file where they belong.
 [theme]
 base = "light"
-primaryColor = "#FF4B4B"
+# Matches PRIMARY_BLUE in app/streamlit_app.py, so widget accents sit in the same
+# palette as the charts. Streamlit renders primary-button text in white; this blue is
+# 5.67:1 against white, which clears WCAG AA. The previous value (#FF4B4B, Streamlit's
+# stock red) clashed with the app's blue/teal charts and read as an error colour.
+primaryColor = "#0B66C3"
 backgroundColor = "#FFFFFF"
 secondaryBackgroundColor = "#F6F8FB"
 textColor = "#202436"
