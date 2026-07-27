@@ -7,15 +7,42 @@ reviewer:
 
 > *Is a result here real signal, or just a generator the author tuned?*
 
-This page answers it directly. The short version: **every number falls into one of two
+This page answers it directly. The short version: **every number falls into one of three
 piles, and they earn trust in different ways.** Read a figure's pile before you read its
 value.
 
 ---
 
-## The two piles
+## The three piles
 
-### Pile A — method-validation (ground-truth-backed)
+The first two piles are both trustworthy; they are kept apart because they are trustworthy
+*for different reasons*, and they fail differently. **Engineering truth is deterministic** —
+a checksum matches or it does not, a full-refresh and an incremental build agree exactly or
+they produce a diff. There is no confidence interval and no way to pass by luck.
+**Method validation is statistical** — an estimator has to land on a seeded parameter
+*within an interval*, which depends on sample size and can fail by chance. Collapsing the
+two would put the most mechanically checkable claims in this project into the same bucket
+as probabilistic ones.
+
+### Pile 1 — engineering truth (deterministic, exactly checkable)
+
+Exact outcomes from the generator's known-truth manifest and the warehouse built on it.
+These are binary: the pipeline either reproduces the manifest or it does not, and CI fails
+when it does not.
+
+| Claim | Why it holds |
+| --- | --- |
+| Event, duplicate, quarantine, ledger and exception counts | Injected against the manifest, so the expected value is fixed before the pipeline runs. |
+| Generation is reproducible | The tiny profile is generated twice in CI and the run fails unless the logical checksums are identical. |
+| Full-refresh and incremental agree at every governed interface | Blue/green harness, no tolerance on keys or integer financial values. |
+| Reward reconciliation balances | Debits equal credits, opening plus movements equals closing, and every injected exception is caught. |
+| Release-gate resolution logic | Deterministic mapping from signals to `ship / limited_rollout / … / block`; unit-tested. |
+| RBAC redaction | Verified against the access rules, not authored. |
+
+The current counts for the local suite and the dbt build are in the
+[README](../README.md#what-holds-up), with the commands to reproduce them.
+
+### Pile 2 — method validation (statistical recovery against known truth)
 
 These are **trustworthy on their own terms**, because the synthetic generator embeds a
 *known* answer and the method is judged on whether it recovers it. Synthetic data makes
@@ -27,10 +54,12 @@ on real data, because the true counterfactual is never observed.
 | CUPED variance-reduction %, delta-method SEs | Mechanical properties of the estimator on the data; reproducible. |
 | SRM chi-square (assignment validity) | A statistical check on the realised split, not a tuned output. |
 | Synthetic-control / DiD **recovers the embedded incrementality within CI** | The generator sets `referral_incrementality`; the method must land on it. That *is* the test. |
-| Release-gate resolution logic | Deterministic mapping from signals to `ship / limited_rollout / … / block`; unit-tested. |
-| Calibration reliability, RBAC redaction | Verified against held-out data / access rules, not authored. |
+| Calibration reliability | Verified against held-out data, not authored. |
 
-### Pile B — illustrative-magnitude (synthetic, not real-world performance)
+The same estimators are additionally re-run on two real public datasets — see
+[Real-data cross-checks](#real-data-cross-checks).
+
+### Pile 3 — illustrative-magnitude (synthetic, not real-world performance)
 
 These show the **method working end to end**, but their *magnitudes are illustrative* — they
 reflect the generator's assumptions, not a real neobank. Never quote them as real-world
@@ -39,15 +68,21 @@ performance.
 - D7 activation base rate, retention-curve shape, £CLV proxy, referral rates.
 - **All wellbeing / fairness disparities** (segment outcome gaps, digital-inclusion
   abandonment, vulnerable-customer shares).
-- The specific `limited_rollout` verdict in the worked decision (the *reasoning* is Pile A;
-  the +4.5pp / +1.2pp *magnitudes* are Pile B).
+- The specific `limited_rollout` verdict in the worked decision (the *reasoning* is Pile 1,
+  the estimated effect is Pile 2, and the +4.5pp / +1.2pp *magnitudes* are Pile 3).
 
-**Labelling convention** used across the docs and dashboard:
+**Labelling convention** used across the docs and dashboard — deliberately **two** symbols,
+not three:
 
-> 🟢 *ground-truth-validated* (Pile A) &nbsp;·&nbsp; 🟡 *synthetic — illustrative of method,
-> not real-world performance* (Pile B)
+> 🟢 *ground-truth-validated* &nbsp;·&nbsp; 🟡 *synthetic — illustrative of method,
+> not real-world performance*
 
-Two independent guards keep Pile B honest: magnitudes are **calibrated to real UK public
+The piles and the labels answer different questions, which is why the counts differ. The
+piles say **where a number comes from**; the labels say **whether you may trust its
+magnitude**. Piles 1 and 2 are both trustworthy, so both carry 🟢; only Pile 3 carries 🟡.
+A third symbol would imply a third trust level that does not exist.
+
+Two independent guards keep Pile 3 honest: magnitudes are **calibrated to real UK public
 benchmarks** where one exists ([PUBLIC_DATA_CALIBRATION.md](PUBLIC_DATA_CALIBRATION.md),
 [REAL_DATA_PROVENANCE.md](REAL_DATA_PROVENANCE.md)), and the **same code is re-run on real
 public data** as a cross-check (see [Real-data cross-checks](#real-data-cross-checks)).

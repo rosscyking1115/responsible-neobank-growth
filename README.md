@@ -40,6 +40,52 @@ incremental-versus-full comparison and the reward reconciliation mean anything �
 there is a fixed truth to check against, not a plausible-looking output to
 trust.
 
+## Every check here is tested for detection
+
+The property this project is actually built around, stated plainly:
+
+> **Attestation is not enforcement.** A log, an assertion or a green test is not
+> a guarantee. A check is only real if something fails when you take it away.
+
+So every detector in this repository is itself tested against deliberate negative
+controls — inputs constructed to be wrong, which the detector must catch. Three
+worked examples, each reproducible:
+
+**The standards checker is tested for precision, not just detection.**
+[`tests/standards/`](tests/standards/) holds five deliberately-invalid manifest
+fixtures, one per rule — missing owner, missing unique key, missing freshness
+SLO, missing partition policy, and non-incremental materialisation without a
+documented exemption. Each must produce **exactly one** violation, and it must be
+the *expected* one, so a rule that fired on everything would fail the suite just
+as surely as one that fired on nothing. A sixth, valid fixture must produce none,
+which pins the false-positive side. The CLI's exit codes are checked in both
+directions. Separately,
+[`tests/standards/test_real_manifest.py`](tests/standards/test_real_manifest.py)
+runs the same rules against the real `dbt_neobank/target/manifest.json`, so the
+rules are proven to fire on fixtures *and* proven to hold on the actual build.
+
+**The causal estimators are tested for immunity to their own answer key.**
+The generator embeds the truth it is asking the analysis to recover, which is
+exactly the setup where a project can fool itself.
+[`tests/test_no_circularity.py`](tests/test_no_circularity.py) poisons the input:
+it injects `true_d7_lift_pp = 99.0` into frames whose observed gap is about
++6pp, and asserts the estimate is **byte-identical** to the unpoisoned run — not
+merely close. It repeats this for CUPED and for the fairness `outcome_gap`, and
+adds a structural check that the release engine's input dataclass cannot carry a
+generator-only field at all. An estimator that peeked would move; these cannot.
+
+**Corruption is applied after valid generation, so truth stays separable.**
+The pipeline is `apply_faults(generate_valid_events(config), config)` — faults
+are a transformation over already-valid output, not something woven through
+generation. The ordering is guaranteed by composition rather than by convention,
+and the clean layer is exercised on its own in
+[`tests/event_simulator/test_lifecycles.py`](tests/event_simulator/test_lifecycles.py).
+That is what makes "the correct answer is known in advance" survive contact with
+duplicates, late arrivals, reversals and schema drift.
+
+None of this is specific to fintech. It is a way of building checks that holds
+wherever a check is supposed to mean something.
+
 ## Architecture
 
 ```text
@@ -276,6 +322,11 @@ More: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) ·
 [docs/CREDIBILITY.md](docs/CREDIBILITY.md) ·
 [docs/GCP_WAREHOUSE.md](docs/GCP_WAREHOUSE.md) ·
 [docs/CLOUD_RUN_DEPLOYMENT.md](docs/CLOUD_RUN_DEPLOYMENT.md).
+
+This project is **complete and frozen** as of 2026-07-27. Four candidate next
+directions were assessed and declined on evidence; the reasoning is recorded in
+[docs/FUTURES_DECLINED.md](docs/FUTURES_DECLINED.md) so it does not get
+re-litigated.
 
 ## Safety & ethics
 

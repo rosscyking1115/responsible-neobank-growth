@@ -57,6 +57,8 @@ I built a synthetic neobank whose backend events misbehave on purpose — late, 
 
 The point is that the events are generated against a known-truth manifest. Every duplicate, late arrival, reversal, malformed payload and missing posting is injected deliberately, so the warehouse's correctness can be checked rather than asserted.
 
+The part I'd actually defend, though, is smaller and more general: attestation is not enforcement. A log or a green test is not a guarantee — a check is only real if something fails when you take it away. So every detector in the repo is tested against deliberate negative controls. Five invalid fixture manifests prove each governance rule fires for exactly one reason (a rule that over-fires fails the suite too). A poisoned-input test injects a false answer key into the causal estimators and asserts the estimates do not move at all. Faults are applied to already-valid output, so known truth stays separable from the corruption. None of that is fintech-specific.
+
 What's actually in it:
 - A four-layer dbt warehouse (landing → normalised → logical → presentation), 68 models, running locally on DuckDB.
 - Governance that runs: a standards checker fails CI when a governed model omits an owner, grain, unique key, freshness SLO or declared consumers — checked against the real dbt manifest, with deliberately-invalid fixtures proving each rule catches its violation.
@@ -75,9 +77,9 @@ Dashboard: https://responsible-neobank-growth.streamlit.app/
 Shorter version:
 
 ```text
-I built a synthetic neobank whose events misbehave on purpose — late, duplicated, reversed, schema-evolving — and a governed four-layer dbt warehouse that turns them into trusted Growth and referral interfaces.
+Attestation is not enforcement. A log or a green test is not a guarantee — a check is only real if something fails when you take it away. So I built a synthetic neobank platform where every detector is itself tested against deliberate negative controls: five invalid fixture manifests prove each governance rule fires for exactly one reason, and a poisoned-input test injects a false answer key into the causal estimators and asserts the estimates do not move at all.
 
-Because the events are generated against a known-truth manifest, correctness is checked rather than asserted: a standards checker enforces interface rules against the real dbt manifest in CI, and a blue/green harness proves full-refresh and incremental builds agree exactly at all six governed interfaces.
+The rest follows from that. Events misbehave on purpose — late, duplicated, reversed, schema-evolving — and a governed four-layer dbt warehouse turns them into trusted Growth and referral interfaces. Because the events are generated against a known-truth manifest, correctness is checked rather than asserted: a blue/green harness proves full-refresh and incremental builds agree exactly at all six governed interfaces.
 
 The cost benchmark came out mixed and I report it that way — incremental billed +1.95% bytes but used −62.7% compute, because the raw store is unpartitioned.
 
@@ -90,13 +92,13 @@ Dashboard: https://responsible-neobank-growth.streamlit.app/
 ## CV bullet
 
 ```text
-Built a synthetic neobank analytics-engineering platform (Python, SQL, dbt, DuckDB, BigQuery, Streamlit, FastAPI): generated deliberately-malformed event streams against a known-truth manifest, modelled them in a governed four-layer dbt warehouse, and enforced interface standards as code against the real dbt manifest in CI; proved full-refresh and incremental builds agree exactly at all six governed interfaces, and benchmarked their cost on BigQuery.
+Built a synthetic neobank analytics-engineering platform (Python, SQL, dbt, DuckDB, BigQuery, Streamlit, FastAPI) in which every quality check is itself tested for detection against deliberate negative controls: invalid fixture manifests prove each governance rule fires for exactly one reason, and a poisoned-input test proves the causal estimators are numerically unmoved by the generator's own answer key. On that base, modelled deliberately-malformed event streams into a governed four-layer dbt warehouse, proved full-refresh and incremental builds agree exactly at all six governed interfaces, and benchmarked their cost on BigQuery.
 ```
 
 Shorter CV version:
 
 ```text
-Built a governed four-layer dbt/DuckDB warehouse over deliberately-malformed synthetic neobank events generated against a known-truth manifest, with standards-as-code enforced in CI, blue/green full-vs-incremental reconciliation, and a measured BigQuery cost benchmark.
+Built a synthetic neobank data platform in which every quality check is itself tested for detection: invalid fixture manifests prove each governance rule fires for exactly one reason, and a poisoned-input test proves the causal estimators are unmoved by the generator's own answer key. On that base, a governed four-layer dbt/DuckDB warehouse with standards-as-code in CI, blue/green full-vs-incremental reconciliation, and a measured BigQuery cost benchmark.
 ```
 
 ## Numbers you may quote
@@ -133,21 +135,43 @@ imply affiliation with Monzo or any bank.
 
 ## Demo script
 
-1. Open the README and say up front that the data is synthetic and the events
-   are broken on purpose against a known-truth manifest.
-2. Show why known truth matters — correctness can be checked, not asserted.
-3. Open `tools/standards/rules.yml` and the fixtures in
-   `tests/standards/fixtures/`: the rules run against the real manifest in CI,
-   and the invalid fixtures prove each rule fails when violated.
-4. Show the blue/green harness: full-refresh and incremental agree exactly at all
-   six governed interfaces.
-5. Show a history model (`nrm_account_history.sql`) and point out the ordering is
-   business occurrence time, never ingestion time.
-6. Open the dashboard and walk two or three of its seven tabs — Product health,
-   Customer outcomes, Monitoring.
-7. Close on the cost benchmark, including the byte result that went against the
-   thesis, and say plainly that the cloud side is deployment plans plus one dated
-   benchmark run.
+**Lead with the detection property. It is the most transferable thing here, and
+it is the thing a reviewer is least likely to have seen elsewhere.** Steps 1–5
+are the headline; everything from step 6 is supporting evidence. Do not open
+with dbt.
+
+1. State the principle first, before any code: *attestation is not enforcement —
+   a log or a green test is not a guarantee; a check is only real if something
+   fails when you take it away.* Then say that every detector in this repository
+   is tested against deliberate negative controls, and offer to show three.
+2. **The standards checker.** Open `tests/standards/fixtures/`: five manifests
+   built to be wrong, one per rule. Each must produce *exactly one* violation and
+   it must be the expected one — so a rule that over-fires fails the suite just
+   like a rule that never fires. The valid fixture must produce none. Then show
+   `tests/standards/test_real_manifest.py` running the same rules against the
+   real built manifest.
+3. **The non-circularity guard.** Open `tests/test_no_circularity.py`. The
+   generator embeds the answer the analysis is meant to recover, so the test
+   poisons the input with `true_d7_lift_pp = 99.0` against an observed gap of
+   about +6pp and asserts the estimate does not move *at all*. Note that it also
+   proves the release engine's inputs cannot structurally contain a generator-only
+   field.
+4. **Fault ordering.** `apply_faults(generate_valid_events(config), config)` —
+   corruption is applied to already-valid output, which is what keeps known truth
+   separable from the defects. Guaranteed by composition, not by convention.
+5. Say plainly that none of this is fintech-specific.
+
+Then, and only then, the supporting material:
+
+6. The synthetic-data framing and the known-truth manifest.
+7. The blue/green harness: full-refresh and incremental agree exactly at all six
+   governed interfaces.
+8. A history model (`nrm_account_history.sql`) — ordering is business occurrence
+   time, never ingestion time.
+9. The dashboard, two or three of its seven tabs.
+10. Close on the cost benchmark, including the byte result that went against the
+    thesis, and say that the cloud side is deployment plans plus one dated
+    benchmark run.
 
 ## Screenshot checklist
 
