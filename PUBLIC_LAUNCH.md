@@ -37,10 +37,12 @@ Pricing Intelligence Platform"; that name is retired. Do not reuse it.
 
 ## GitHub summary
 
-Repository description:
+Repository description — this is the first line a recruiter reads, so it leads
+with the detection property, same as everything else here (336 chars, under
+GitHub's 350 limit):
 
 ```text
-Synthetic neobank event platform whose backend events misbehave on purpose — late, duplicated, reversed, schema-evolving — and a governed four-layer dbt warehouse that turns them into trusted Growth and referral-reward interfaces, checked against a known-truth manifest.
+Every check here is tested for detection: invalid fixtures prove each governance rule fires for exactly one reason, and a poisoned-input test proves the causal estimators ignore the generator's own answer key. On that base, a synthetic neobank event stream and a governed four-layer dbt warehouse checked against a known-truth manifest.
 ```
 
 Suggested topics:
@@ -49,6 +51,13 @@ Suggested topics:
 analytics-engineering, data-engineering, dbt, duckdb, bigquery, data-quality,
 data-contracts, streamlit, fastapi, experimentation, causal-inference, python, sql
 ```
+
+**No `cloud-run` topic, and no topic asserting standing infrastructure.** Topics
+are indexed in GitHub search and render on the repo card, so a topic is a claim
+like any other. The repo holds a documented position that the cloud side is
+plan-renderer modules and one dated benchmark run; metadata that says otherwise
+contradicts it. Keep the topic list and the description consistent with the
+"one rule" section above.
 
 ## LinkedIn post
 
