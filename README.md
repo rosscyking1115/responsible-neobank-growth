@@ -15,6 +15,16 @@ checked rather than asserted. On top of that, I ran an honest cost benchmark:
 does an incremental warehouse produce the same answer as a full rebuild, and
 what does each actually cost?
 
+It is built on one idea: **a check is only real if something fails when you take
+it away.** Attestation is not enforcement — a log, an assertion or a green test
+is not a guarantee — so every detector here is tested against deliberate
+negative controls. Governance rules are proved against manifests built to be
+wrong. The causal estimators are proved immune to a poisoned answer key. Faults
+are applied only after valid generation, so known truth stays separable from the
+corruption. That is the part that transfers outside fintech, and it is worked
+through in [Every check here is tested for
+detection](#every-check-here-is-tested-for-detection).
+
 > Everything here is synthetic. No affiliation with Monzo or any bank; no real
 > customer, internal, or proprietary data. Monzo's public engineering writing
 > shaped which problems I chose, not how any of it is built. See
