@@ -83,7 +83,7 @@ The scan's conclusion was that the repository is complete, and that its most
 valuable property was under-sold rather than missing: **every detector in it is
 tested for detection, using deliberate negative controls.** That is now stated
 in the [README](../README.md#every-check-here-is-tested-for-detection) and leads
-the demo script in [PUBLIC_LAUNCH.md](../PUBLIC_LAUNCH.md).
+the demo script in [CLAIMS_AND_SCOPE.md](CLAIMS_AND_SCOPE.md).
 
 Promoting an existing, shipped, green property cost far less than any of the four
 options above and is the only one that improved how the work reads.

@@ -1,11 +1,11 @@
-# Public launch pack
+# Claims and scope
 
-How to post this project publicly, or point a CV or application at it, without
-overstating what it is.
+The boundary of what this project may claim, and the wording that stays inside
+it.
 
 The copy below is deliberately conservative. Everything in it is checkable from
 this repository, and the wording matches
-[the README](README.md) and [docs/CREDIBILITY.md](docs/CREDIBILITY.md). If you
+[the README](../README.md) and [CREDIBILITY.md](CREDIBILITY.md). If you
 edit one, edit the others.
 
 ## The one rule

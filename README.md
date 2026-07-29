@@ -330,8 +330,14 @@ tests/            pytest suite
 
 More: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) ·
 [docs/CREDIBILITY.md](docs/CREDIBILITY.md) ·
+[docs/CLAIMS_AND_SCOPE.md](docs/CLAIMS_AND_SCOPE.md) ·
 [docs/GCP_WAREHOUSE.md](docs/GCP_WAREHOUSE.md) ·
 [docs/CLOUD_RUN_DEPLOYMENT.md](docs/CLOUD_RUN_DEPLOYMENT.md).
+
+[docs/CLAIMS_AND_SCOPE.md](docs/CLAIMS_AND_SCOPE.md) is the boundary of what this
+project claims: what the cloud work is and is not, which wording is banned, and
+which numbers may be quoted. If a statement here and a statement there disagree,
+that document wins.
 
 This project is **complete and frozen** as of 2026-07-27. Four candidate next
 directions were assessed and declined on evidence; the reasoning is recorded in
